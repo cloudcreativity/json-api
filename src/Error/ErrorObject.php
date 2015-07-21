@@ -27,6 +27,14 @@ class ErrorObject implements ErrorInterface
     protected $_meta;
 
     /**
+     * @param array $input
+     */
+    public function __construct(array $input = [])
+    {
+      $this->exchangeArray($input);
+    }
+
+    /**
      * @return void
      */
     public function __clone()
