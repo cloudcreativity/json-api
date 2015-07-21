@@ -1,0 +1,19 @@
+{
+    "name": "cloudcreativity/appativity-json-api",
+    "description": "Framework agnostic JSON API serialization and deserialization.",
+    "license": "proprietary",
+    "require": {
+        "neomerx/json-api": "^0.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Appativity\\JsonApi\\": ["src/", "test/"]
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
