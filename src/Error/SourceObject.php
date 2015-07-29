@@ -1,60 +1,14 @@
 <?php
 
-namespace Appativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Error;
 
-class SourceObject implements \ArrayAccess, \JsonSerializable
+use CloudCreativity\JsonApi\Object\StandardObject;
+
+class SourceObject extends StandardObject implements \JsonSerializable
 {
 
     const POINTER = 'pointer';
     const PARAMETER = 'parameter';
-
-    /**
-     * @var array
-     */
-    protected $_data;
-
-    /**
-     * @param array $data
-     */
-    public function __construct(array $data = [])
-    {
-        $this->_data = $data;
-    }
-
-    /**
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->_data);
-    }
-
-    /**
-     * @param mixed $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->_data[$offset];
-    }
-
-    /**
-     * @param mixed $offset
-     * @param mixed $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->_data[$offset] = $value;
-    }
-
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->_data[$offset]);
-    }
 
     /**
      * @param $pointer
@@ -66,7 +20,7 @@ class SourceObject implements \ArrayAccess, \JsonSerializable
             $pointer = $pointer($this->getPointer());
         }
 
-        $this[static::POINTER] = $pointer;
+        $this->set(static::POINTER, $pointer);
 
         return $this;
     }
@@ -76,7 +30,7 @@ class SourceObject implements \ArrayAccess, \JsonSerializable
      */
     public function getPointer()
     {
-        return $this->offsetExists(static::POINTER) ? (string) $this[static::POINTER] : null;
+        return $this->get(static::POINTER, null);
     }
 
     /**
@@ -85,7 +39,7 @@ class SourceObject implements \ArrayAccess, \JsonSerializable
      */
     public function setParameter($parameter)
     {
-        $this[static::PARAMETER] = $parameter;
+        $this->set(static::PARAMETER, $parameter);
 
         return $this;
     }
@@ -95,26 +49,7 @@ class SourceObject implements \ArrayAccess, \JsonSerializable
      */
     public function getParameter()
     {
-        return $this->offsetExists(static::PARAMETER) ? (string) $this[static::PARAMETER] : null;
-    }
-
-    /**
-     * @param array $input
-     * @return $this
-     */
-    public function exchangeArray(array $input)
-    {
-        $this->_data = array_merge($this->_data, $input);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->_data;
+        return $this->get(static::PARAMETER, null);
     }
 
     /**
@@ -122,6 +57,6 @@ class SourceObject implements \ArrayAccess, \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return (object) $this->toArray();
+        return $this->getProxy();
     }
 }

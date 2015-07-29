@@ -1,8 +1,8 @@
 <?php
 
-namespace Appativity\JsonApi\Resource\Identifier;
+namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
-class IdentifierCollection implements \IteratorAggregate, \Countable
+class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
 {
 
     /**
@@ -19,10 +19,10 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param Identifier $identifier
+     * @param ResourceIdentifier $identifier
      * @return $this
      */
-    public function add(Identifier $identifier)
+    public function add(ResourceIdentifier $identifier)
     {
         if (!$this->has($identifier)) {
             $this->_stack[] = $identifier;
@@ -32,10 +32,10 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param Identifier $identifier
+     * @param ResourceIdentifier $identifier
      * @return bool
      */
-    public function has(Identifier $identifier)
+    public function has(ResourceIdentifier $identifier)
     {
         return in_array($identifier, $this->_stack);
     }
@@ -48,7 +48,7 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
     {
         foreach ($identifiers as $identifier) {
 
-            if (!$identifier instanceof Identifier) {
+            if (!$identifier instanceof ResourceIdentifier) {
                 throw new \InvalidArgumentException('Expecting only Identifier objects.');
             }
 
@@ -116,7 +116,7 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function isComplete()
     {
-        /** @var Identifier $identifier */
+        /** @var ResourceIdentifier $identifier */
         foreach ($this as $identifier) {
 
             if (!$identifier->isComplete()) {
@@ -133,7 +133,7 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function isOnly($typeOrTypes)
     {
-        /** @var Identifier $identifier */
+        /** @var ResourceIdentifier $identifier */
         foreach ($this as $identifier) {
 
             if (!$identifier->isType($typeOrTypes)) {
@@ -151,7 +151,7 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
     {
         $ret = [];
 
-        /** @var Identifier $identifier */
+        /** @var ResourceIdentifier $identifier */
         foreach ($this as $identifier) {
             $ret[] = $identifier->getId();
         }
@@ -167,7 +167,7 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
     {
         $ret = [];
 
-        /** @var Identifier $identifier */
+        /** @var ResourceIdentifier $identifier */
         foreach ($this as $identifier) {
 
             $key = is_array($typeMap) ? $identifier->mapType($typeMap) : $identifier->getType();
@@ -184,47 +184,16 @@ class IdentifierCollection implements \IteratorAggregate, \Countable
 
     /**
      * @param array $input
-     * @return $this
-     */
-    public function exchangeArray(array $input)
-    {
-        foreach ($input as $identifier) {
-
-            if (is_array($identifier)) {
-                $identifier = Identifier::create($identifier);
-            }
-
-            if ($identifier instanceof Identifier) {
-                $this->add($identifier);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        $ret = [];
-
-        /** @var Identifier $identifier */
-        foreach ($this as $identifier) {
-            $ret[] = $identifier->toArray();
-        }
-
-        return $ret;
-    }
-
-    /**
-     * @param array $input
-     * @return static
+     * @return ResourceIdentifierCollection
      */
     public static function create(array $input)
     {
         $collection = new static();
-        $collection->exchangeArray($input);
+
+        foreach ($input as $value) {
+            $collection->add(new ResourceIdentifier($value));
+        }
+
         return $collection;
     }
 }

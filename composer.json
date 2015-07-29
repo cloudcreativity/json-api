@@ -1,5 +1,5 @@
 {
-    "name": "cloudcreativity/appativity-json-api",
+    "name": "cloudcreativity/json-api",
     "description": "Framework agnostic JSON API serialization and deserialization.",
     "license": "proprietary",
     "require": {
@@ -10,7 +10,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Appativity\\JsonApi\\": ["src/", "test/"]
+            "CloudCreativity\\JsonApi\\": ["src/", "test/"]
         }
     },
     "config": {

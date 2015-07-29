@@ -1,28 +1,15 @@
 <?php
 
-namespace Appativity\JsonApi\Resource\Identifier;
+namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
-class Identifier
+use CloudCreativity\JsonApi\Object\StandardObject;
+
+class ResourceIdentifier extends StandardObject
 {
 
     const TYPE = 'type';
     const ID = 'id';
-
-    /**
-     * @var mixed
-     */
-    protected $_type;
-
-    /**
-     * @var mixed
-     */
-    protected $_id;
-
-    public function __construct($type = null, $id = null)
-    {
-        $this->setType($type)
-            ->setId($id);
-    }
+    const META = 'meta';
 
     /**
      * @param $type
@@ -30,7 +17,7 @@ class Identifier
      */
     public function setType($type)
     {
-        $this->_type = $type;
+        $this->set(static::TYPE, $type);
 
         return $this;
     }
@@ -44,7 +31,7 @@ class Identifier
             throw new \RuntimeException('No type set.');
         }
 
-        return $this->_type;
+        return $this->get(static::TYPE);
     }
 
     /**
@@ -52,7 +39,7 @@ class Identifier
      */
     public function hasType()
     {
-        return is_string($this->_type) && !empty($this->_type);
+        return $this->has(static::TYPE);
     }
 
     /**
@@ -62,10 +49,11 @@ class Identifier
     public function isType($typeOrTypes)
     {
         $types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
+        $type = $this->get(static::TYPE);
 
         foreach ($types as $check) {
 
-            if ($this->_type === $check) {
+            if ($type === $check) {
                 return true;
             }
         }
@@ -94,7 +82,7 @@ class Identifier
      */
     public function setId($id)
     {
-        $this->_id = $id;
+        $this->set(static::ID, $id);
 
         return $this;
     }
@@ -108,7 +96,7 @@ class Identifier
             throw new \RuntimeException('No id set.');
         }
 
-        return $this->_id;
+        return $this->get(static::ID);
     }
 
     /**
@@ -116,7 +104,7 @@ class Identifier
      */
     public function hasId()
     {
-        return (is_string($this->_id) || is_int($this->_id)) && !empty($this->_id);
+        return $this->has(static::ID);
     }
 
     /**
@@ -128,41 +116,11 @@ class Identifier
     }
 
     /**
-     * @param array $input
-     * @return $this
+     * @return StandardObject
      */
-    public function exchangeArray(array $input)
+    public function getMeta()
     {
-        if (array_key_exists(static::TYPE, $input)) {
-            $this->setType($input[static::TYPE]);
-        }
-
-        if (array_key_exists(static::ID, $input)) {
-            $this->setId($input[static::ID]);
-        }
-
-        return $this;
+        return new StandardObject($this->get(static::META));
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            static::TYPE => $this->hasType() ? $this->getType() : null,
-            static::ID => $this->hasId() ? $this->getId() : null,
-        ];
-    }
-
-    /**
-     * @param array $input
-     * @return Identifier
-     */
-    public static function create(array $input)
-    {
-        $identifier = new static();
-        $identifier->exchangeArray($input);
-        return $identifier;
-    }
 }

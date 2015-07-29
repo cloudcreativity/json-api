@@ -1,10 +1,10 @@
 <?php
 
-namespace Appativity\JsonApi\Resource;
+namespace CloudCreativity\JsonApi\Resource;
 
-use Appativity\JsonApi\Resource\Attributes\Attributes;
-use Appativity\JsonApi\Resource\Identifier\Identifier;
-use Appativity\JsonApi\Resource\Relationships\Relationships;
+use CloudCreativity\JsonApi\Resource\Attributes\Attributes;
+use CloudCreativity\JsonApi\Resource\Identifier\Identifier;
+use CloudCreativity\JsonApi\Resource\Relationships\Relationships;
 
 class ResourceObject implements \ArrayAccess
 {

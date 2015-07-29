@@ -1,6 +1,6 @@
 <?php
 
-namespace Appativity\JsonApi\Resource\Relationships;
+namespace CloudCreativity\JsonApi\Resource\Relationships;
 
 class Relationships implements \IteratorAggregate, \Countable, \ArrayAccess
 {

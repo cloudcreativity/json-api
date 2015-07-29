@@ -1,6 +1,6 @@
 <?php
 
-namespace Appativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Error;
 
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
@@ -95,7 +95,8 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
 
   public function testSetSourceArray()
   {
-    $expected = new SourceObject(['pointer' => '/foo/bar']);
+    $expected = new SourceObject();
+    $expected->setPointer('/foo/bar');
     $object = new ErrorObject();
 
     $object->setSource($expected->toArray());
@@ -120,7 +121,8 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
    */
   public function testArrayExchangeable(ErrorObject $object)
   {
-    $source = new SourceObject(['pointer' => '/foo/bar']);
+    $source = new SourceObject();
+    $source->setPointer('/foo/bar');
     $object->setSource($source);
 
     $arr = [

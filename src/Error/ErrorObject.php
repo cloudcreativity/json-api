@@ -1,6 +1,6 @@
 <?php
 
-namespace Appativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Error;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;

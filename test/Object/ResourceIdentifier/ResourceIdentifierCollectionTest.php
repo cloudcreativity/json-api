@@ -1,29 +1,32 @@
 <?php
 
-namespace Appativity\JsonApi\Resource\Identifier;
+namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
-class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
+class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @var ResourceIdentifier
+     */
     protected $a;
+
+    /**
+     * @var ResourceIdentifier
+     */
     protected $b;
 
     protected function setUp()
     {
-        $this->a = Identifier::create([
-            Identifier::TYPE => 'foo',
-            Identifier::ID => 123,
-        ]);
+        $this->a = new ResourceIdentifier();
+        $this->a->setType('foo')->setId(123);
 
-        $this->b = Identifier::create([
-            Identifier::TYPE => 'bar',
-            Identifier::ID => 456,
-        ]);
+        $this->b = new ResourceIdentifier();
+        $this->b->setType('bar')->setId(456);
     }
 
     public function testConstruct()
     {
-        $collection = new IdentifierCollection([$this->a, $this->b]);
+        $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
         $this->assertSame([$this->a, $this->b], $collection->getAll());
 
         return $collection;
@@ -32,7 +35,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testConstruct
      */
-    public function testIterator(IdentifierCollection $collection)
+    public function testIterator(ResourceIdentifierCollection $collection)
     {
         $expected = $collection->getAll();
         $this->assertEquals($expected, iterator_to_array($collection));
@@ -41,7 +44,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testConstruct
      */
-    public function testCountable(IdentifierCollection $collection)
+    public function testCountable(ResourceIdentifierCollection $collection)
     {
         $this->assertSame(2, count($collection));
     }
@@ -49,7 +52,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testConstruct
      */
-    public function testClear(IdentifierCollection $collection)
+    public function testClear(ResourceIdentifierCollection $collection)
     {
         $this->assertSame($collection, $collection->clear());
         $this->assertEmpty($collection->getAll());
@@ -57,7 +60,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testIsEmpty()
     {
-        $collection = new IdentifierCollection();
+        $collection = new ResourceIdentifierCollection();
         $this->assertTrue($collection->isEmpty());
         $collection->add($this->a);
         $this->assertFalse($collection->isEmpty());
@@ -65,7 +68,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testAdd()
     {
-        $collection = new IdentifierCollection();
+        $collection = new ResourceIdentifierCollection();
 
         $this->assertSame($collection, $collection->add($this->a));
         $collection->add($this->b);
@@ -77,7 +80,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testAdd
      */
-    public function testAddIgnoresDuplicates(IdentifierCollection $collection)
+    public function testAddIgnoresDuplicates(ResourceIdentifierCollection $collection)
     {
         $expected = $collection->getAll();
 
@@ -88,52 +91,26 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testHas()
     {
-        $collection = new IdentifierCollection([$this->a]);
+        $collection = new ResourceIdentifierCollection([$this->a]);
 
         $this->assertTrue($collection->has(clone $this->a));
         $this->assertFalse($collection->has($this->b));
     }
 
-    public function testArrayExchangeable()
-    {
-        $arr = [
-            $this->a->toArray(),
-            $this->b->toArray(),
-        ];
-
-        $expected = new IdentifierCollection([$this->a, $this->b]);
-        $actual = new IdentifierCollection();
-
-        $this->assertSame($actual, $actual->exchangeArray($arr));
-        $this->assertEquals($expected, $actual);
-        $this->assertEquals($arr, $expected->toArray());
-
-        return $expected;
-    }
-
-    /**
-     * @depends testArrayExchangeable
-     */
-    public function testCreate(IdentifierCollection $expected)
-    {
-        $actual = IdentifierCollection::create($expected->toArray());
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testIsComplete()
     {
-        $collection = new IdentifierCollection();
+        $collection = new ResourceIdentifierCollection();
 
         $this->assertTrue($collection->isComplete());
         $collection->add($this->a);
         $this->assertTrue($collection->isComplete());
-        $collection->add(new Identifier());
+        $collection->add(new ResourceIdentifier());
         $this->assertFalse($collection->isComplete());
     }
 
     public function testIsOnly()
     {
-        $collection = new IdentifierCollection();
+        $collection = new ResourceIdentifierCollection();
 
         $this->assertTrue($collection->isOnly($this->a->getType()));
         $collection->add($this->a);
@@ -151,7 +128,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIds()
     {
-        $collection = new IdentifierCollection([$this->a, $this->b]);
+        $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
         $expected = [$this->a->getId(), $this->b->getId()];
 
         $this->assertEquals($expected, $collection->getIds());
@@ -159,7 +136,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testMap()
     {
-        $collection = new IdentifierCollection([$this->a, $this->b]);
+        $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
 
         $expected = [
             $this->a->getType() => [
@@ -178,7 +155,7 @@ class IdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testMap
      */
-    public function testMapWithTypeConversion(IdentifierCollection $collection)
+    public function testMapWithTypeConversion(ResourceIdentifierCollection $collection)
     {
         $a = 'Alias-A';
         $b = 'Alias-B';

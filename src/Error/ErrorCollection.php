@@ -1,6 +1,6 @@
 <?php
 
-namespace Appativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Error;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
@@ -171,6 +171,14 @@ class ErrorCollection implements \IteratorAggregate, \Countable
     public function count()
     {
         return count($this->_stack);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return empty($this->_stack);
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Appativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Error;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
@@ -92,6 +92,15 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($collection, $collection->clear());
         $this->assertEmpty($collection->getAll());
+    }
+
+    public function testIsEmpty()
+    {
+        $collection = new ErrorCollection();
+
+        $this->assertTrue($collection->isEmpty());
+        $collection->add($this->a);
+        $this->assertFalse($collection->isEmpty());
     }
 
     public function testError()
