@@ -112,4 +112,39 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals(422, $error->getStatus());
     $this->assertEquals('/data', $error->source()->getPointer());
   }
+
+  public function testCallback()
+  {
+    $invoked = false;
+    $callback = function (ResourceIdentifier $identifier) use (&$invoked) {
+      $this->assertSame(static::TYPE, $identifier->getType());
+      $this->assertSame(static::ID, $identifier->getId());
+      $invoked = true;
+      return true;
+    };
+
+    $this->assertSame($this->validator, $this->validator->setCallback($callback));
+    $this->assertTrue($this->validator->isValid($this->valid));
+    $this->assertTrue($invoked, 'Expecting callback to have been invoked.');
+  }
+
+  /**
+   * @depends testCallback
+   */
+  public function testCallbackInvalid()
+  {
+    $this->validator->setCallback(function () {
+      return false;
+    });
+
+    $this->assertFalse($this->validator->isValid($this->valid));
+
+    /** @var ErrorObject $error */
+    $error = current($this->validator->getErrors()->getAll());
+
+    $this->assertInstanceOf(ErrorObject::class, $error);
+    $this->assertEquals(BelongsToValidator::ERROR_NOT_FOUND, $error->getCode());
+    $this->assertEquals(404, $error->getStatus());
+    $this->assertEquals('/data', $error->source()->getPointer());
+  }
 }

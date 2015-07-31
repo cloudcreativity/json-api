@@ -168,9 +168,9 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
    */
   public function testClone(ErrorObject $object)
   {
-    $expected = $object->getSource();
+    $expected = $object->source()->setPointer('/foo');
     $clone = clone $object;
-    $actual = $clone->getSource();
+    $actual = $clone->source();
 
     $this->assertEquals($expected, $actual);
     $this->assertNotSame($expected, $actual);

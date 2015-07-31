@@ -3,22 +3,20 @@
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
 use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
-use CloudCreativity\JsonApi\Validator\AbstractValidator;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 
-class BelongsToValidator extends AbstractValidator
+class HasManyValidator extends AbstractValidator
 {
 
-  const ERROR_INVALID_VALUE = 'invalid-value';
-  const ERROR_INVALID_TYPE = 'invalid-resource-type';
-  const ERROR_INVALID_ID = 'invalid-resouce-id';
-  const ERROR_NULL_DISALLOWED = 'relationship-required';
-  const ERROR_NOT_FOUND = 'not-found';
-
-  protected $_types = [];
-  protected $_allowEmpty = true;
-  protected $_callback;
+  const ERROR_INVALID_VALUE = BelongsToValidator::ERROR_INVALID_VALUE;
+  const ERROR_INVALID_TYPE = BelongsToValidator::ERROR_INVALID_TYPE;
+  const ERROR_INVALID_ID = BelongsToValidator::ERROR_INVALID_ID;
+  const ERROR_EMPTY_DISALLOWED = BelongsToValidator::ERROR_NULL_DISALLOWED;
+  const ERROR_INVALID_COLLECTION = 'invalid-resources';
+  const ERROR_NOT_FOUND = BelongsToValidator::ERROR_NOT_FOUND;
 
   protected $templates = [
     self::ERROR_INVALID_VALUE => [
@@ -31,19 +29,25 @@ class BelongsToValidator extends AbstractValidator
       ErrorObject::CODE => self::ERROR_INVALID_TYPE,
       ErrorObject::STATUS => 400,
       ErrorObject::TITLE => 'Invalid Relationship',
-      ErrorObject::DETAIL => 'This belongs-to relationship does not accept the specified resource object type.',
+      ErrorObject::DETAIL => 'This has-many relationship does not accept the specified resource object type.',
     ],
     self::ERROR_INVALID_ID => [
       ErrorObject::CODE => self::ERROR_INVALID_ID,
       ErrorObject::STATUS => 400,
       ErrorObject::TITLE => 'Invalid Relationship',
-      ErrorObject::DETAIL => 'The supplied belongs-to relationship id is missing or invalid.',
+      ErrorObject::DETAIL => 'The supplied relationship id is missing or invalid.',
     ],
-    self::ERROR_NULL_DISALLOWED => [
-      ErrorObject::CODE => self::ERROR_NULL_DISALLOWED,
+    self::ERROR_EMPTY_DISALLOWED => [
+      ErrorObject::CODE => self::ERROR_EMPTY_DISALLOWED,
       ErrorObject::STATUS => 422,
       ErrorObject::TITLE => 'Invalid Relationship',
       ErrorObject::DETAIL => 'This relationship cannot be set to an empty value.',
+    ],
+    self::ERROR_INVALID_COLLECTION => [
+      ErrorObject::CODE => self::ERROR_INVALID_COLLECTION,
+      ErrorObject::STATUS => 400,
+      ErrorObject::TITLE => 'Invalid Relationship',
+      ErrorObject::DETAIL => 'The has-many relationships provided is invalid.',
     ],
     self::ERROR_NOT_FOUND => [
       ErrorObject::CODE => self::ERROR_NOT_FOUND,
@@ -52,6 +56,10 @@ class BelongsToValidator extends AbstractValidator
       ErrorObject::DETAIL => 'The resource for this relationship cannot be found.',
     ],
   ];
+
+  protected $_types = [];
+  protected $_allowEmpty = true;
+  protected $_callback;
 
   public function setTypes($typeOrTypes)
   {
@@ -65,9 +73,9 @@ class BelongsToValidator extends AbstractValidator
     return in_array($type, $this->_types, true);
   }
 
-  public function setAllowEmpty($bool)
+  public function setAllowEmpty($allow)
   {
-    $this->_allowEmpty = (bool) $bool;
+    $this->_allowEmpty = (bool) $allow;
 
     return $this;
   }
@@ -104,7 +112,7 @@ class BelongsToValidator extends AbstractValidator
 
   protected function validate($value)
   {
-    // must be an object
+    // must be an object.
     if (!is_object($value)) {
       $this->error(static::ERROR_INVALID_VALUE);
       return;
@@ -112,49 +120,84 @@ class BelongsToValidator extends AbstractValidator
 
     $object = new Relationship($value);
 
-    // must be a belongs to relationship
-    if (!$object->isBelongsTo()) {
+    // must be a has many relationship
+    if (!$object->isHasMany()) {
       $this->error(static::ERROR_INVALID_VALUE)
         ->source()
         ->setPointer('/' . Relationship::DATA);
       return;
     }
 
+    /** @var ResourceIdentifierCollection $data */
     $data = $object->getData();
 
-    // must not be empty if empty is not allowed.
-    if (!$data && !$this->isEmptyAllowed()) {
-      $this->error(static::ERROR_NULL_DISALLOWED)
+    // if empty, empty relationship must be allowed.
+    if ($data->isEmpty() && !$this->isEmptyAllowed()) {
+      $this->error(static::ERROR_EMPTY_DISALLOWED)
         ->source()
         ->setPointer('/' . Relationship::DATA);
-    }
-
-    // if empty, is valid at this point so return.
-    if (!$data) {
+      return;
+    } elseif ($data->isEmpty()) {
       return;
     }
 
-    // type must be acceptable
-    if (!$data->hasType() || !$this->isType($data->getType())) {
-      $this->error(static::ERROR_INVALID_TYPE)
-        ->source()
-        ->setPointer('/' . Relationship::DATA . '/' . ResourceIdentifier::TYPE);
+    // check that each resource identifier is valid.
+    foreach ($data as $key => $identifier) {
+      $this->validateIdentifier($identifier, $key);
     }
 
-    $id = $data->hasId() ? $data->getId() : null;
+    if ($this->hasCallback()) {
+      $this->validateCallback($data);
+    }
+  }
+
+  protected function validateIdentifier(ResourceIdentifier $identifier, $index)
+  {
+    $pointer = sprintf('/%s/%s/', Relationship::DATA, $index);
+
+    // type must be acceptable
+    if (!$identifier->hasType() || !$this->isType($identifier->getType())) {
+      $this->error(static::ERROR_INVALID_TYPE)
+        ->source()
+        ->setPointer($pointer . ResourceIdentifier::TYPE);
+    }
+
+    $id = $identifier->hasId() ? $identifier->getId() : null;
 
     // id must be set an be either a non-empty string or an integer.
     if ((!is_string($id) && !is_int($id)) || (is_string($id) && empty($id))) {
       $this->error(static::ERROR_INVALID_ID)
         ->source()
-        ->setPointer('/' . Relationship::DATA . '/' . ResourceIdentifier::ID);
+        ->setPointer($pointer . ResourceIdentifier::ID);
+    }
+  }
+
+  protected function validateCallback(ResourceIdentifierCollection $collection)
+  {
+    $check = call_user_func($this->getCallback(), $collection);
+    $pointer = '/' . Relationship::DATA;
+
+    if (!is_array($check) && false == $check) {
+      $this->error(static::ERROR_INVALID_COLLECTION)
+        ->source()
+        ->setPointer($pointer);
     }
 
-    // check the callback, if one exists.
-    if ($this->hasCallback() && false == call_user_func($this->getCallback(), $data)) {
+    if (!is_array($check)) {
+      return;
+    }
+
+    $count = count($collection);
+
+    foreach ($check as $index) {
+
+      if (!is_numeric($index) || 0 > $index || $count <= $index) {
+        throw new \RuntimeException('Invalid error index.');
+      }
+
       $this->error(static::ERROR_NOT_FOUND)
         ->source()
-        ->setPointer('/' . Relationship::DATA);
+        ->setPointer($pointer . '/' . $index);
     }
   }
 }
