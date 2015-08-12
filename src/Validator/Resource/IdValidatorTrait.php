@@ -7,35 +7,35 @@ use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 trait IdValidatorTrait
 {
 
-  /**
-   * @var mixed
-   */
-  protected $_id;
+    /**
+     * @var mixed
+     */
+    protected $_id;
 
-  /**
-   * @param $id
-   * @return $this
-   */
-  protected function setId($id)
-  {
-    $this->_id = $id;
+    /**
+     * @param $id
+     * @return $this
+     */
+    protected function setId($id)
+    {
+        $this->_id = $id;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  /**
-   * @return mixed
-   */
-  public function getId()
-  {
-    return $this->_id;
-  }
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
 
-  /**
-   * @return ExpectedIdValidator
-   */
-  public function getIdValidator()
-  {
-    return new ExpectedIdValidator($this->getId());
-  }
+    /**
+     * @return ExpectedIdValidator
+     */
+    public function getIdValidator()
+    {
+        return new ExpectedIdValidator($this->getId());
+    }
 }

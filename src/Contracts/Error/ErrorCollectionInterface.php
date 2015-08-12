@@ -1,6 +1,7 @@
 <?php
 
 namespace CloudCreativity\JsonApi\Contracts\Error;
+
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 interface ErrorCollectionInterface extends \Traversable, \Countable

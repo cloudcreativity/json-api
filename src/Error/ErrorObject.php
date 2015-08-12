@@ -31,7 +31,7 @@ class ErrorObject implements ErrorInterface
      */
     public function __construct(array $input = [])
     {
-      $this->exchangeArray($input);
+        $this->exchangeArray($input);
     }
 
     /**
