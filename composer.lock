@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "89e126685b32c4646e0291d2c6ad50f1",
+    "hash": "5f05d4d00e03318b0ec479ced323545e",
     "packages": [
         {
             "name": "neomerx/json-api",
@@ -1016,6 +1016,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.5.0"
+    },
     "platform-dev": []
 }
