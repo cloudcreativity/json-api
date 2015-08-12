@@ -2,9 +2,9 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validator;
 
-use CloudCreativity\JsonApi\Error\ErrorCollection;
+use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;
 
-interface ValidatorInterface
+interface ValidatorInterface extends ErrorsAwareInterface
 {
 
     /**
@@ -12,9 +12,4 @@ interface ValidatorInterface
      * @return bool
      */
     public function isValid($value);
-
-    /**
-     * @return ErrorCollection
-     */
-    public function getErrors();
 }

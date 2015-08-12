@@ -3,16 +3,13 @@
 namespace CloudCreativity\JsonApi\Validator;
 
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
-use CloudCreativity\JsonApi\Error\ErrorCollection;
 use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Error\ErrorsAwareTrait;
 
 abstract class AbstractValidator implements ValidatorInterface
 {
 
-    /**
-     * @var ErrorCollection|null
-     */
-    protected $_errors;
+    use ErrorsAwareTrait;
 
     /**
      * @var array
@@ -41,18 +38,6 @@ abstract class AbstractValidator implements ValidatorInterface
         $this->setTemplate($key, array_merge_recursive($this->template($key), $template));
 
         return $this;
-    }
-
-    /**
-     * @return ErrorCollection
-     */
-    public function getErrors()
-    {
-        if (!$this->_errors instanceof ErrorCollection) {
-            $this->_errors = new ErrorCollection();
-        }
-
-        return $this->_errors;
     }
 
     /**

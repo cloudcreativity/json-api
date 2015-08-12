@@ -2,9 +2,10 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
+use CloudCreativity\JsonApi\Contracts\Error\ErrorCollectionInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
-class ErrorCollection implements \IteratorAggregate, \Countable
+class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
 {
 
     /**
@@ -84,14 +85,14 @@ class ErrorCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param ErrorCollection $errors
+     * @param ErrorCollectionInterface $errors
      * @return $this
      */
-    public function merge(ErrorCollection $errors)
+    public function merge(ErrorCollectionInterface $errors)
     {
-        $clone = clone $errors;
-
-        $this->_stack = array_merge($this->_stack, $clone->_stack);
+        foreach ($errors as $error) {
+            $this->add(clone $error);
+        }
 
         return $this;
     }
