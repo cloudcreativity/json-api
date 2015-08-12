@@ -2,14 +2,19 @@
 
 namespace CloudCreativity\JsonApi\Validator\Type;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 
-class TypeValidator extends AbstractValidator
+class TypeValidator extends AbstractValidator implements ConfigurableInterface
 {
 
     use NullableTrait;
 
+    // Config Constants
+    const ACCEPT_NULL = 'acceptNull';
+
+    // Error Constants
     const ERROR_INVALID_VALUE = 'invalid-value';
 
     /**
@@ -29,6 +34,19 @@ class TypeValidator extends AbstractValidator
     public function __construct($nullable = false)
     {
         $this->setAcceptNull($nullable);
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function configure(array $config)
+    {
+        if (array_key_exists(static::ACCEPT_NULL, $config)) {
+            $this->setAcceptNull($config[static::ACCEPT_NULL]);
+        }
+
+        return $this;
     }
 
     /**

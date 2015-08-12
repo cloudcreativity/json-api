@@ -18,11 +18,12 @@ class Relationships extends StandardObject
 
   /**
    * @param $key
+   * @param $default
    * @return Relationship
    */
-  public function get($key)
+  public function get($key, $default = null)
   {
-    return new Relationship(parent::get($key));
+    return new Relationship(parent::get($key, $default));
   }
 
   /**

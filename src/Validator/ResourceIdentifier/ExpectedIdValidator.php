@@ -35,6 +35,16 @@ class ExpectedIdValidator extends AbstractValidator
     protected $_expected;
 
     /**
+     * @param null $expected
+     */
+    public function __construct($expected = null)
+    {
+        if (!is_null($expected)) {
+            $this->setExpected($expected);
+        }
+    }
+
+    /**
      * @param int|string $id
      * @return $this
      */

@@ -2,15 +2,22 @@
 
 namespace CloudCreativity\JsonApi\Validator\Attributes;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
+use CloudCreativity\JsonApi\Validator\Type\StringValidator;
 use CloudCreativity\JsonApi\Validator\Type\TypeValidator;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 
-class AttributesValidator extends AbstractValidator
+class AttributesValidator extends AbstractValidator implements ConfigurableInterface
 {
 
+    // Config constants
+    const ALLOWED = 'allowed';
+    const REQUIRED = 'required';
+
+    // Error constants
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_UNRECOGNISED_ATTRIBUTE = 'not-recognised';
     const ERROR_REQUIRED_ATTRIBUTE = 'required';
@@ -118,6 +125,55 @@ class AttributesValidator extends AbstractValidator
         }
 
         return $this->_validators[$key];
+    }
+
+    /**
+     * Helper method to add a type validator for the specified key.
+     *
+     * @param $key
+     * @param null $type
+     * @param array $options
+     * @return $this
+     */
+    public function attr($key, $type = null, array $options = [])
+    {
+        if (is_null($type)) {
+            $type = 'type';
+        }
+
+        $class = sprintf('CloudCreativity\JsonApi\Validator\Type\%sValidator', ucfirst($type));
+
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('Unrecognised attribute type: %s.', $type));
+        }
+
+        /** @var ValidatorInterface $validator */
+        $validator = new $class();
+
+        if ($validator instanceof ConfigurableInterface) {
+            $validator->configure($options);
+        }
+
+        $this->setValidator($key, $validator);
+
+        return $this;
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function configure(array $config)
+    {
+        if (isset($config[static::ALLOWED]) && is_array($config[static::ALLOWED])) {
+            $this->setAllowed($config[static::ALLOWED]);
+        }
+
+        if (isset($config[static::REQUIRED]) && is_array($config[static::REQUIRED])) {
+            $this->setRequired($config[static::REQUIRED]);
+        }
+
+        return $this;
     }
 
     /**

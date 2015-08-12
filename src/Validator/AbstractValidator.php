@@ -78,12 +78,17 @@ abstract class AbstractValidator implements ValidatorInterface
 
     /**
      * @param $key
+     * @param $pointer
      * @return ErrorObject
      */
-    protected function error($key)
+    protected function error($key, $pointer = null)
     {
         $error = ErrorObject::create($this->template($key));
         $this->getErrors()->add($error);
+
+        if (!is_null($pointer)) {
+            $error->source()->setPointer($pointer);
+        }
 
         return $error;
     }

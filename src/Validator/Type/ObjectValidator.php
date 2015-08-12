@@ -4,7 +4,7 @@ namespace CloudCreativity\JsonApi\Validator\Type;
 
 use CloudCreativity\JsonApi\Error\ErrorObject;
 
-class ObjectValidator extends AbstractTypeValidator
+class ObjectValidator extends TypeValidator
 {
 
     use NullableTrait;

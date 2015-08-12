@@ -2,14 +2,22 @@
 
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 
-class BelongsToValidator extends AbstractValidator
+class BelongsToValidator extends AbstractValidator implements ConfigurableInterface
 {
 
+  // Config constants
+  const TYPES = 'types';
+  const TYPE = self::TYPES;
+  const ALLOW_EMPTY = 'allowEmpty';
+  const CALLBACK = 'callback';
+
+  // Error constants
   const ERROR_INVALID_VALUE = 'invalid-value';
   const ERROR_INVALID_TYPE = 'invalid-resource-type';
   const ERROR_INVALID_ID = 'invalid-resouce-id';
@@ -52,6 +60,16 @@ class BelongsToValidator extends AbstractValidator
       ErrorObject::DETAIL => 'The resource for this relationship cannot be found.',
     ],
   ];
+
+  /**
+   * @param $typeOrTypes
+   */
+  public function __construct($typeOrTypes = null)
+  {
+    if (!is_null($typeOrTypes)) {
+      $this->setTypes($typeOrTypes);
+    }
+  }
 
   public function setTypes($typeOrTypes)
   {
@@ -100,6 +118,23 @@ class BelongsToValidator extends AbstractValidator
   public function hasCallback()
   {
     return is_callable($this->_callback);
+  }
+
+  public function configure(array $config)
+  {
+    if (isset($config[static::TYPES])) {
+      $this->setTypes($config[static::TYPES]);
+    }
+
+    if (array_key_exists(static::ALLOW_EMPTY, $config)) {
+      $this->setAllowEmpty($config[static::ALLOW_EMPTY]);
+    }
+
+    if (isset($config[static::CALLBACK])) {
+      $this->setCallback($config[static::CALLBACK]);
+    }
+
+    return $this;
   }
 
   protected function validate($value)

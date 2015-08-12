@@ -2,15 +2,23 @@
 
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 
-class HasManyValidator extends AbstractValidator
+class HasManyValidator extends AbstractValidator implements ConfigurableInterface
 {
 
+  // Config constants
+  const TYPES = 'types';
+  const TYPE = self::TYPES;
+  const ALLOW_EMPTY = 'allowEmpty';
+  const CALLBACK = 'callback';
+
+  // Error constants
   const ERROR_INVALID_VALUE = BelongsToValidator::ERROR_INVALID_VALUE;
   const ERROR_INVALID_TYPE = BelongsToValidator::ERROR_INVALID_TYPE;
   const ERROR_INVALID_ID = BelongsToValidator::ERROR_INVALID_ID;
@@ -61,6 +69,16 @@ class HasManyValidator extends AbstractValidator
   protected $_allowEmpty = true;
   protected $_callback;
 
+  /**
+   * @param $typeOrTypes
+   */
+  public function __construct($typeOrTypes = null)
+  {
+    if (!is_null($typeOrTypes)) {
+      $this->setTypes($typeOrTypes);
+    }
+  }
+
   public function setTypes($typeOrTypes)
   {
     $this->_types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
@@ -108,6 +126,23 @@ class HasManyValidator extends AbstractValidator
   public function hasCallback()
   {
     return is_callable($this->_callback);
+  }
+
+  public function configure(array $config)
+  {
+    if (isset($config[static::TYPES])) {
+      $this->setTypes($config[static::TYPES]);
+    }
+
+    if (array_key_exists(static::ALLOW_EMPTY, $config)) {
+      $this->setAllowEmpty($config[static::ALLOW_EMPTY]);
+    }
+
+    if (isset($config[static::CALLBACK])) {
+      $this->setCallback($config[static::CALLBACK]);
+    }
+
+    return $this;
   }
 
   protected function validate($value)

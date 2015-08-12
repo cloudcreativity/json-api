@@ -12,6 +12,10 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
   const KEY_A = 'foo';
   const KEY_B = 'bars';
 
+  /**
+   * @var RelationshipsValidator
+   */
+  protected $validator;
   protected $input;
   protected $a;
   protected $b;
@@ -90,5 +94,50 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
 
     $this->assertInstanceOf(ErrorObject::class, $error);
     $this->assertEquals($expected, $error);
+  }
+
+  public function testUnrecognisedKey()
+  {
+    $this->validator->setValidator(static::KEY_A, $this->a);
+
+    $this->a->method('isValid')->willReturn(true);
+
+    $this->assertFalse($this->validator->isValid($this->input));
+
+    /** @var ErrorObject $error */
+    $error = current($this->validator->getErrors()->getAll());
+
+    $this->assertInstanceOf(ErrorObject::class, $error);
+    $this->assertEquals(RelationshipsValidator::ERROR_UNRECOGNISED_RELATIONSHIP, $error->getCode());
+    $this->assertEquals(400, $error->getStatus());
+  }
+
+  public function testRequired()
+  {
+    $this->assertSame($this->validator, $this->validator->setRequired([
+      static::KEY_A,
+      static::KEY_B,
+    ]));
+
+    $this->validator->setValidators([
+      static::KEY_A => $this->a,
+      static::KEY_B => $this->b,
+    ]);
+
+    $this->a->method('isValid')->willReturn(true);
+    $this->b->method('isValid')->willReturn(true);
+
+    $this->assertTrue($this->validator->isValid($this->input));
+
+    unset($this->input->{static::KEY_B});
+
+    $this->assertFalse($this->validator->isValid($this->input));
+
+    /** @var ErrorObject $error */
+    $error = current($this->validator->getErrors()->getAll());
+
+    $this->assertInstanceOf(ErrorObject::class, $error);
+    $this->assertEquals(RelationshipsValidator::ERROR_REQUIRED_RELATIONSHIP, $error->getCode());
+    $this->assertEquals(400, $error->getStatus());
   }
 }

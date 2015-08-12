@@ -30,6 +30,16 @@ class ExpectedTypeValidator extends AbstractValidator
     ];
 
     /**
+     * @param string|null $expected
+     */
+    public function __construct($expected = null)
+    {
+        if (!is_null($expected)) {
+            $this->setExpected($expected);
+        }
+    }
+
+    /**
      * @var string|null
      */
     protected $_expected;
