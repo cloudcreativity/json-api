@@ -39,7 +39,9 @@ class ErrorException extends \RuntimeException implements ErrorsAwareInterface
      */
     public function __construct(ErrorInterface $error, \Exception $previous = null)
     {
-        parent::__construct($error->getTitle(), $error->getCode(), $previous);
+        $code = is_numeric($error->getCode()) ? (int) $error->getCode() : null;
+
+        parent::__construct($error->getTitle(), $code, $previous);
 
         $this->_error = $error;
     }

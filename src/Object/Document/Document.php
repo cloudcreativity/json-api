@@ -36,18 +36,18 @@ class Document extends StandardObject
      *
      * @return ResourceObject
      */
-    public function getResource()
+    public function getResourceObject()
     {
         return new ResourceObject($this->get(static::DATA));
     }
 
     /**
-     * Get the primary data as a relationship object.
+     * Get the document as a relationship object.
      *
      * @return Relationship
      */
     public function getRelationship()
     {
-        return new Relationship($this->get(static::DATA));
+        return new Relationship($this->getProxy());
     }
 }

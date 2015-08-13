@@ -22,7 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
-use CloudCreativity\JsonApi\Validator\Type\StringValidator;
+use CloudCreativity\JsonApi\Validator\Helper\AllowedKeysTrait;
+use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 use CloudCreativity\JsonApi\Validator\Type\TypeValidator;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 
@@ -32,6 +33,9 @@ use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
  */
 class AttributesValidator extends AbstractValidator implements ConfigurableInterface
 {
+
+    use RequiredKeysTrait,
+        AllowedKeysTrait;
 
     // Config constants
     const ALLOWED = 'allowed';
@@ -67,60 +71,11 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     ];
 
     /**
-     * @var array|null
-     *      null means any allowed, array means only the supplied keys are allowed.
-     */
-    protected $_allowed;
-
-    /**
-     * @var array|null
-     */
-    protected $_required;
-
-    /**
      * Validators for use with keys within the attributes.
      *
      * @var array
      */
     protected $_validators = [];
-
-    /**
-     * @param array $keys
-     * @return $this
-     */
-    public function setAllowed(array $keys)
-    {
-        $this->_allowed = $keys;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAllowed($key)
-    {
-        return is_array($this->_allowed) ? in_array($key, $this->_allowed) : true;
-    }
-
-    /**
-     * @param array $keys
-     * @return $this
-     */
-    public function setRequired(array $keys)
-    {
-        $this->_required = $keys;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequired()
-    {
-        return (array) $this->_required;
-    }
 
     /**
      * @param $key
@@ -180,17 +135,29 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     }
 
     /**
+     * Only allow keys that have validators.
+     *
+     * @return $this
+     */
+    public function setRestricted()
+    {
+        $this->setAllowedKeys(array_keys($this->_validators));
+
+        return $this;
+    }
+
+    /**
      * @param array $config
      * @return $this
      */
     public function configure(array $config)
     {
         if (isset($config[static::ALLOWED]) && is_array($config[static::ALLOWED])) {
-            $this->setAllowed($config[static::ALLOWED]);
+            $this->setAllowedKeys($config[static::ALLOWED]);
         }
 
         if (isset($config[static::REQUIRED]) && is_array($config[static::REQUIRED])) {
-            $this->setRequired($config[static::REQUIRED]);
+            $this->setRequiredKeys($config[static::REQUIRED]);
         }
 
         return $this;
@@ -213,7 +180,7 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
         }
 
         // Check that required keys exist.
-        foreach ($this->getRequired() as $key) {
+        foreach ($this->getRequiredKeys() as $key) {
 
             if (!isset($value->{$key})) {
                 $err = $this->error(static::ERROR_REQUIRED_ATTRIBUTE);
@@ -230,7 +197,7 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     {
         $pointer = '/' . $key;
 
-        if (!$this->isAllowed($key)) {
+        if (!$this->isAllowedKey($key)) {
             $this->error(static::ERROR_UNRECOGNISED_ATTRIBUTE)
                 ->setSource([
                     SourceObject::POINTER => $pointer,

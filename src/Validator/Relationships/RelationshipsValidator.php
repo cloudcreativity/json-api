@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Validator\Relationships;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 
 /**
  * Class RelationshipsValidator
@@ -28,6 +29,8 @@ use CloudCreativity\JsonApi\Error\ErrorObject;
  */
 class RelationshipsValidator extends AbstractValidator
 {
+
+    use RequiredKeysTrait;
 
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_UNRECOGNISED_RELATIONSHIP = 'not-recognised';
@@ -61,30 +64,6 @@ class RelationshipsValidator extends AbstractValidator
      * @var array
      */
     protected $_validators = [];
-
-    /**
-     * @var array|null
-     */
-    protected $_required;
-
-    /**
-     * @param array $keys
-     * @return $this
-     */
-    public function setRequired(array $keys)
-    {
-        $this->_required = $keys;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequired()
-    {
-        return (array) $this->_required;
-    }
 
     /**
      * @param ValidatorInterface[] $validators
@@ -146,7 +125,7 @@ class RelationshipsValidator extends AbstractValidator
      * @param array $options
      * @return $this
      */
-    public function belongsTo($key, $typeOrTypes = null, array $options = [])
+    public function belongsTo($key, $typeOrTypes, array $options = [])
     {
         $validator = new BelongsToValidator($typeOrTypes);
         $validator->configure($options);
@@ -164,7 +143,7 @@ class RelationshipsValidator extends AbstractValidator
      * @param array $options
      * @return $this
      */
-    public function hasMany($key, $typeOrTypes = null, array $options = [])
+    public function hasMany($key, $typeOrTypes, array $options = [])
     {
         $validator = new HasManyValidator($typeOrTypes);
         $validator->configure($options);
@@ -191,7 +170,7 @@ class RelationshipsValidator extends AbstractValidator
         }
 
         // Check required relationships
-        foreach ($this->getRequired() as $key) {
+        foreach ($this->getRequiredKeys() as $key) {
 
             if (!isset($value->{$key})) {
                 $error = $this->error(static::ERROR_REQUIRED_RELATIONSHIP);

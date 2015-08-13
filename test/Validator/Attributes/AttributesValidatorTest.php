@@ -54,7 +54,7 @@ class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $validator = new AttributesValidator();
 
-        $this->assertSame($validator, $validator->setAllowed([static::KEY_A]));
+        $this->assertSame($validator, $validator->setAllowedKeys([static::KEY_A]));
         $this->assertFalse($validator->isValid($this->data));
 
         /** @var ErrorInterface $error */
@@ -69,14 +69,14 @@ class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
     public function testRequiredKeys()
     {
         $validator = new AttributesValidator();
-        $this->assertSame($validator, $validator->setRequired([static::KEY_A, static::KEY_B]));
+        $this->assertSame($validator, $validator->setRequiredKeys([static::KEY_A, static::KEY_B]));
         $this->assertTrue($validator->isValid($this->data));
     }
 
     public function testMissingRequired()
     {
         $validator = new AttributesValidator();
-        $validator->setRequired([static::KEY_A, static::KEY_C]);
+        $validator->setRequiredKeys([static::KEY_A, static::KEY_C]);
 
         $this->assertFalse($validator->isValid($this->data));
 
