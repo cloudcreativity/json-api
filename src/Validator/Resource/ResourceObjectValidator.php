@@ -25,7 +25,7 @@ use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
  * Class ResourceObjectValidator
  * @package CloudCreativity\JsonApi
  */
-class ResourceObjectValidator extends AbstractResourceValidator
+class ResourceObjectValidator extends AbstractResourceObjectValidator
 {
 
     use AttributesValidatorTrait,
@@ -40,6 +40,15 @@ class ResourceObjectValidator extends AbstractResourceValidator
      * @var mixed
      */
     protected $_id;
+
+    /**
+     * @param $type
+     * @param $id
+     */
+    public function __construct($type = null, $id = null)
+    {
+        $this->type($type)->id($id);
+    }
 
     /**
      * Set the expected type for the resource object.
@@ -110,7 +119,7 @@ class ResourceObjectValidator extends AbstractResourceValidator
     public function hasMany($key, $typeOrTypes, array $options = [])
     {
         $this->getRelationships()
-            ->belongsTo($key, $typeOrTypes, $options);
+            ->hasMany($key, $typeOrTypes, $options);
 
         return $this;
     }

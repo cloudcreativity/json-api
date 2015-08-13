@@ -50,10 +50,14 @@ trait AttributesValidatorTrait
     }
 
     /**
-     * @return ValidatorInterface|null
+     * @return ValidatorInterface
      */
     public function getAttributesValidator()
     {
+        if (!$this->_attributesValidator instanceof ValidatorInterface) {
+            $this->_attributesValidator = new AttributesValidator();
+        }
+
         return $this->_attributesValidator;
     }
 
@@ -81,14 +85,12 @@ trait AttributesValidatorTrait
      */
     public function getAttributes()
     {
-        if (is_null($this->_attributesValidator)) {
-            $this->_attributesValidator = new AttributesValidator();
-        }
+        $validator = $this->getAttributesValidator();
 
-        if (!$this->_attributesValidator instanceof AttributesValidator) {
+        if (!$validator instanceof AttributesValidator) {
             throw new \RuntimeException(sprintf('Attributes validator is not a %s instance.', AttributesValidator::class));
         }
 
-        return $this->_attributesValidator;
+        return $validator;
     }
 }

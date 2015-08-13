@@ -28,7 +28,7 @@ use CloudCreativity\JsonApi\Validator\AbstractValidator;
  * Class AbstractResourceValidator
  * @package CloudCreativity\JsonApi
  */
-abstract class AbstractResourceValidator extends AbstractValidator
+abstract class AbstractResourceObjectValidator extends AbstractValidator
 {
 
     const ERROR_INVALID_VALUE = 'invalid-value';
@@ -36,7 +36,6 @@ abstract class AbstractResourceValidator extends AbstractValidator
     const ERROR_MISSING_ID = 'missing-id';
     const ERROR_UNEXPECTED_ID = 'unexpected-id';
     const ERROR_MISSING_ATTRIBUTES = 'missing-attributes';
-    const ERROR_UNEXPECTED_ATTRIBUTES = 'unexpected-attributes';
     const ERROR_MISSING_RELATIONSHIPS = 'missing-relationships';
     const ERROR_UNEXPECTED_RELATIONSHIPS = 'unexpected-relationships';
 
@@ -73,12 +72,6 @@ abstract class AbstractResourceValidator extends AbstractValidator
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Missing Resource Attributes',
             ErrorObject::DETAIL => 'Resource object must have an attributes member.',
-        ],
-        self::ERROR_UNEXPECTED_ATTRIBUTES => [
-            ErrorObject::CODE => self::ERROR_UNEXPECTED_ATTRIBUTES,
-            ErrorObject::STATUS => 400,
-            ErrorObject::TITLE => 'Unexpected Resource Attributes',
-            ErrorObject::DETAIL => 'Not expecting resource object to have an attributes member.',
         ],
         self::ERROR_MISSING_RELATIONSHIPS => [
             ErrorObject::CODE => self::ERROR_MISSING_RELATIONSHIPS,
@@ -130,7 +123,7 @@ abstract class AbstractResourceValidator extends AbstractValidator
     /**
      * Get the relationships validator or null if the resource object must not have relationships.
      *
-     * @return ValidatorInterface|null
+     * @return ValidatorInterface
      */
     abstract public function getRelationshipsValidator();
 
@@ -140,22 +133,6 @@ abstract class AbstractResourceValidator extends AbstractValidator
     public function hasIdValidator()
     {
         return $this->getIdValidator() instanceof ValidatorInterface;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasAttributesValidator()
-    {
-        return $this->getAttributesValidator() instanceof ValidatorInterface;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasRelationshipsValidator()
-    {
-        return $this->getRelationshipsValidator() instanceof ValidatorInterface;
     }
 
     /**
@@ -211,7 +188,7 @@ abstract class AbstractResourceValidator extends AbstractValidator
         }
 
         if (!$object->has(ResourceObject::ID) && $this->hasIdValidator()) {
-            $this->error(static::ERROR_MISSING_ID);
+            $this->error(static::ERROR_MISSING_ID, '/');
             return $this;
         } elseif ($object->has(ResourceObject::ID) && !$this->hasIdValidator()) {
             $this->error(static::ERROR_UNEXPECTED_ID, '/' . ResourceObject::ID);
@@ -244,9 +221,6 @@ abstract class AbstractResourceValidator extends AbstractValidator
         if (!$object->has(ResourceObject::ATTRIBUTES) && $this->isExpectingAttributes()) {
             $this->error(static::ERROR_MISSING_ATTRIBUTES);
             return $this;
-        } elseif ($object->has(ResourceObject::ATTRIBUTES) && !$this->hasAttributesValidator()) {
-            $this->error(static::ERROR_UNEXPECTED_ATTRIBUTES, '/' . ResourceObject::ATTRIBUTES);
-            return $this;
         }
 
         $validator = $this->getAttributesValidator();
@@ -276,9 +250,6 @@ abstract class AbstractResourceValidator extends AbstractValidator
 
         if (!$object->has(ResourceObject::RELATIONSHIPS) && $this->isExpectingRelationships()) {
             $this->error(static::ERROR_MISSING_RELATIONSHIPS);
-            return $this;
-        } elseif ($object->has(ResourceObject::RELATIONSHIPS) && !$this->hasRelationshipsValidator()) {
-            $this->error(static::ERROR_UNEXPECTED_RELATIONSHIPS, '/' . ResourceObject::RELATIONSHIPS);
             return $this;
         }
 

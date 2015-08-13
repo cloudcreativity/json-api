@@ -24,7 +24,7 @@ use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
 use Neomerx\JsonApi\Document\Error;
 
-class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
+class AbstractResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
 {
 
     const EXPECTED_TYPE = 'foo';
@@ -33,7 +33,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
     protected $type;
 
     /**
-     * @var AbstractResourceValidator
+     * @var AbstractResourceObjectValidator
      */
     protected $validator;
 
@@ -49,7 +49,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->validator = $this->getMockForAbstractClass(AbstractResourceValidator::class);
+        $this->validator = $this->getMockForAbstractClass(AbstractResourceObjectValidator::class);
         $this->type = $this->getMock(ValidatorInterface::class);
 
         $this->validator
@@ -83,7 +83,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         $error = current($this->validator->getErrors()->getAll());
 
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_INVALID_VALUE, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
 
@@ -95,7 +95,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         $error = current($this->validator->getErrors()->getAll());
 
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_MISSING_TYPE, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_MISSING_TYPE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
 
@@ -125,7 +125,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var ErrorObject $error */
         $error = current($this->validator->getErrors()->getAll());
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_MISSING_ID, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_MISSING_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
 
@@ -138,7 +138,7 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var ErrorObject $error */
         $error = current($this->validator->getErrors()->getAll());
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_UNEXPECTED_ID, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_UNEXPECTED_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/' . ResourceObject::ID, $error->source()->getPointer());
     }
@@ -193,22 +193,8 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var ErrorObject $error */
         $error = current($this->validator->getErrors()->getAll());
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_MISSING_ATTRIBUTES, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_MISSING_ATTRIBUTES, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
-    }
-
-    public function testUnexpectedAttributes()
-    {
-        $this->input->{ResourceObject::ATTRIBUTES} = new \stdClass();
-
-        $this->assertFalse($this->validator->isValid($this->input));
-
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-        $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_UNEXPECTED_ATTRIBUTES, $error->getCode());
-        $this->assertEquals(400, $error->getStatus());
-        $this->assertEquals('/' . ResourceObject::ATTRIBUTES, $error->source()->getPointer());
     }
 
     public function testValidAttributes()
@@ -269,22 +255,8 @@ class AbstractResourceValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var ErrorObject $error */
         $error = current($this->validator->getErrors()->getAll());
         $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_MISSING_RELATIONSHIPS, $error->getCode());
+        $this->assertEquals(AbstractResourceObjectValidator::ERROR_MISSING_RELATIONSHIPS, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
-    }
-
-    public function testUnexpectedRelationships()
-    {
-        $this->input->{ResourceObject::RELATIONSHIPS} = new \stdClass();
-
-        $this->assertFalse($this->validator->isValid($this->input));
-
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-        $this->assertInstanceOf(ErrorObject::class, $error);
-        $this->assertEquals(AbstractResourceValidator::ERROR_UNEXPECTED_RELATIONSHIPS, $error->getCode());
-        $this->assertEquals(400, $error->getStatus());
-        $this->assertEquals('/' . ResourceObject::RELATIONSHIPS, $error->source()->getPointer());
     }
 
     public function testValidRelationships()

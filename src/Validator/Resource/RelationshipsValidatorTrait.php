@@ -50,10 +50,14 @@ trait RelationshipsValidatorTrait
     }
 
     /**
-     * @return ValidatorInterface|null
+     * @return ValidatorInterface
      */
     public function getRelationshipsValidator()
     {
+        if (!$this->_relationshipsValidator instanceof ValidatorInterface) {
+            $this->_relationshipsValidator = new RelationshipsValidator();
+        }
+
         return $this->_relationshipsValidator;
     }
 
@@ -81,14 +85,12 @@ trait RelationshipsValidatorTrait
      */
     public function getRelationships()
     {
-        if (is_null($this->_relationshipsValidator)) {
-            $this->_relationshipsValidator = new RelationshipsValidator();
-        }
+        $validator = $this->getRelationshipsValidator();
 
-        if (!$this->_relationshipsValidator instanceof RelationshipsValidator) {
+        if (!$validator instanceof RelationshipsValidator) {
             throw new \RuntimeException(sprintf('Relationships validator is not a %s instance.', RelationshipsValidator::class));
         }
 
-        return $this->_relationshipsValidator;
+        return $validator;
     }
 }
