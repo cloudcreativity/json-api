@@ -42,6 +42,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
     const ERROR_INVALID_VALUE = BelongsToValidator::ERROR_INVALID_VALUE;
     const ERROR_INVALID_TYPE = BelongsToValidator::ERROR_INVALID_TYPE;
     const ERROR_INVALID_ID = BelongsToValidator::ERROR_INVALID_ID;
+    const ERROR_INCOMPLETE_IDENTIFIER = BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER;
     const ERROR_EMPTY_DISALLOWED = BelongsToValidator::ERROR_NULL_DISALLOWED;
     const ERROR_INVALID_COLLECTION = 'invalid-resources';
     const ERROR_NOT_FOUND = BelongsToValidator::ERROR_NOT_FOUND;
@@ -64,6 +65,12 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Invalid Relationship',
             ErrorObject::DETAIL => 'The supplied relationship id is missing or invalid.',
+        ],
+        self::ERROR_INCOMPLETE_IDENTIFIER => [
+            ErrorObject::CODE => self::ERROR_INCOMPLETE_IDENTIFIER,
+            ErrorObject::STATUS => 400,
+            ErrorObject::TITLE => 'Incomplete Resource Identifier',
+            ErrorObject::DETAIL => 'The supplied resource identifier object is not complete.',
         ],
         self::ERROR_EMPTY_DISALLOWED => [
             ErrorObject::CODE => self::ERROR_EMPTY_DISALLOWED,
@@ -220,9 +227,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
 
         // must be a has many relationship
         if (!$object->isHasMany()) {
-            $this->error(static::ERROR_INVALID_VALUE)
-                ->source()
-                ->setPointer('/' . Relationship::DATA);
+            $this->error(static::ERROR_INVALID_VALUE, '/' . Relationship::DATA);
             return;
         }
 
@@ -231,11 +236,11 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
 
         // if empty, empty relationship must be allowed.
         if ($data->isEmpty() && !$this->isEmptyAllowed()) {
-            $this->error(static::ERROR_EMPTY_DISALLOWED)
-                ->source()
-                ->setPointer('/' . Relationship::DATA);
-            return;
-        } elseif ($data->isEmpty()) {
+            $this->error(static::ERROR_EMPTY_DISALLOWED, '/' . Relationship::DATA);
+        }
+
+        // if empty, is valid at this point
+        if ($data->isEmpty()) {
             return;
         }
 
@@ -255,22 +260,23 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     protected function validateIdentifier(ResourceIdentifier $identifier, $index)
     {
-        $pointer = sprintf('/%s/%s/', Relationship::DATA, $index);
+        $pointer = sprintf('/%s/%s', Relationship::DATA, $index);
+
+        // type and id must both be present
+        if (!$identifier->hasType() || !$identifier->hasId()) {
+            $this->error(static::ERROR_INCOMPLETE_IDENTIFIER, $pointer);
+        }
 
         // type must be acceptable
-        if (!$identifier->hasType() || !$this->isType($identifier->getType())) {
-            $this->error(static::ERROR_INVALID_TYPE)
-                ->source()
-                ->setPointer($pointer . ResourceIdentifier::TYPE);
+        if ($identifier->hasType() && !$this->isType($identifier->getType())) {
+            $this->error(static::ERROR_INVALID_TYPE, $pointer . '/' . ResourceIdentifier::TYPE);
         }
 
         $id = $identifier->hasId() ? $identifier->getId() : null;
 
-        // id must be set an be either a non-empty string or an integer.
-        if ((!is_string($id) && !is_int($id)) || (is_string($id) && empty($id))) {
-            $this->error(static::ERROR_INVALID_ID)
-                ->source()
-                ->setPointer($pointer . ResourceIdentifier::ID);
+        // id must be set and be either a non-empty string or an integer.
+        if ($identifier->hasId() && ((!is_string($id) && !is_int($id)) || (is_string($id) && empty($id)))) {
+            $this->error(static::ERROR_INVALID_ID, $pointer . '/' . ResourceIdentifier::ID);
         }
     }
 
@@ -283,9 +289,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
         $pointer = '/' . Relationship::DATA;
 
         if (!is_array($check) && false == $check) {
-            $this->error(static::ERROR_INVALID_COLLECTION)
-                ->source()
-                ->setPointer($pointer);
+            $this->error(static::ERROR_INVALID_COLLECTION, $pointer);
         }
 
         if (!is_array($check)) {
@@ -300,9 +304,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
                 throw new \RuntimeException('Invalid error index.');
             }
 
-            $this->error(static::ERROR_NOT_FOUND)
-                ->source()
-                ->setPointer($pointer . '/' . $index);
+            $this->error(static::ERROR_NOT_FOUND, $pointer . '/' . $index);
         }
     }
 }

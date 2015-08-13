@@ -35,6 +35,10 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
     protected $a;
     protected $b;
     protected $input;
+
+    /**
+     * @var HasManyValidator
+     */
     protected $validator;
 
     protected function setUp()
@@ -54,6 +58,24 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->setTypes([static::TYPE_A, static::TYPE_B]);
     }
 
+    /**
+     * @return ErrorObject
+     */
+    protected function getError()
+    {
+        if (1 !== count($this->validator->getErrors())) {
+            $this->fail('Did not find a single error.');
+        }
+
+        $error = current($this->validator->getErrors()->getAll());
+
+        if (!$error instanceof ErrorObject) {
+            $this->fail('Not an error object.');
+        }
+
+        return $error;
+    }
+
     public function testValid()
     {
         $this->assertTrue($this->validator->isValid($this->input));
@@ -65,10 +87,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->validator->isValid([]));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -78,10 +97,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->input->{Relationship::DATA} = null;
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -92,13 +108,21 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->setTypes(static::TYPE_A);
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_INVALID_TYPE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1/type', $error->source()->getPointer());
+    }
+
+    public function testMissingType()
+    {
+        unset($this->b->{ResourceIdentifier::TYPE});
+
+        $this->assertFalse($this->validator->isValid($this->input));
+        $error = $this->getError();
+        $this->assertEquals(HasManyValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/data/1', $error->source()->getPointer());
     }
 
     public function testInvalidId()
@@ -106,13 +130,22 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->b->{ResourceIdentifier::ID} = null;
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_INVALID_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1/id', $error->source()->getPointer());
+    }
+
+
+    public function testMissingId()
+    {
+        unset($this->b->{ResourceIdentifier::ID});
+
+        $this->assertFalse($this->validator->isValid($this->input));
+        $error = $this->getError();
+        $this->assertEquals(HasManyValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/data/1', $error->source()->getPointer());
     }
 
     public function testEmptyNotAcceptable()
@@ -121,10 +154,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->validator, $this->validator->setAllowEmpty(false));
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_EMPTY_DISALLOWED, $error->getCode());
         $this->assertEquals(422, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -160,10 +190,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_INVALID_COLLECTION, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -180,10 +207,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(HasManyValidator::ERROR_NOT_FOUND, $error->getCode());
         $this->assertEquals(404, $error->getStatus());
         $this->assertEquals('/data/1', $error->source()->getPointer());

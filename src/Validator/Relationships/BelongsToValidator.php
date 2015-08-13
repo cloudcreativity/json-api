@@ -40,7 +40,8 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
     // Error constants
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_INVALID_TYPE = 'invalid-resource-type';
-    const ERROR_INVALID_ID = 'invalid-resouce-id';
+    const ERROR_INVALID_ID = 'invalid-resource-id';
+    const ERROR_INCOMPLETE_IDENTIFIER = 'incomplete-identifier';
     const ERROR_NULL_DISALLOWED = 'relationship-required';
     const ERROR_NOT_FOUND = 'not-found';
 
@@ -80,6 +81,12 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Invalid Relationship',
             ErrorObject::DETAIL => 'The supplied belongs-to relationship id is missing or invalid.',
+        ],
+        self::ERROR_INCOMPLETE_IDENTIFIER => [
+            ErrorObject::CODE => self::ERROR_INCOMPLETE_IDENTIFIER,
+            ErrorObject::STATUS => 400,
+            ErrorObject::TITLE => 'Incomplete Resource Identifier',
+            ErrorObject::DETAIL => 'The supplied resource identifier object is not complete.',
         ],
         self::ERROR_NULL_DISALLOWED => [
             ErrorObject::CODE => self::ERROR_NULL_DISALLOWED,
@@ -215,9 +222,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
 
         // must be a belongs to relationship
         if (!$object->isBelongsTo()) {
-            $this->error(static::ERROR_INVALID_VALUE)
-                ->source()
-                ->setPointer('/' . Relationship::DATA);
+            $this->error(static::ERROR_INVALID_VALUE, '/' . Relationship::DATA);
             return;
         }
 
@@ -225,9 +230,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
 
         // must not be empty if empty is not allowed.
         if (!$data && !$this->isEmptyAllowed()) {
-            $this->error(static::ERROR_NULL_DISALLOWED)
-                ->source()
-                ->setPointer('/' . Relationship::DATA);
+            $this->error(static::ERROR_NULL_DISALLOWED, '/' . Relationship::DATA);
         }
 
         // if empty, is valid at this point so return.
@@ -235,27 +238,27 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
             return;
         }
 
+        // must have type and id.
+        if (!$data->hasType() || !$data->hasId()) {
+            $this->error(static::ERROR_INCOMPLETE_IDENTIFIER, '/' . Relationship::DATA);
+            return;
+        }
+
         // type must be acceptable
         if (!$data->hasType() || !$this->isType($data->getType())) {
-            $this->error(static::ERROR_INVALID_TYPE)
-                ->source()
-                ->setPointer('/' . Relationship::DATA . '/' . ResourceIdentifier::TYPE);
+            $this->error(static::ERROR_INVALID_TYPE, '/' . Relationship::DATA . '/' . ResourceIdentifier::TYPE);
         }
 
         $id = $data->hasId() ? $data->getId() : null;
 
         // id must be set an be either a non-empty string or an integer.
         if ((!is_string($id) && !is_int($id)) || (is_string($id) && empty($id))) {
-            $this->error(static::ERROR_INVALID_ID)
-                ->source()
-                ->setPointer('/' . Relationship::DATA . '/' . ResourceIdentifier::ID);
+            $this->error(static::ERROR_INVALID_ID, '/' . Relationship::DATA . '/' . ResourceIdentifier::ID);
         }
 
         // check the callback, if one exists.
         if ($this->hasCallback() && false == call_user_func($this->getCallback(), $data)) {
-            $this->error(static::ERROR_NOT_FOUND)
-                ->source()
-                ->setPointer('/' . Relationship::DATA);
+            $this->error(static::ERROR_NOT_FOUND, '/' . Relationship::DATA);
         }
     }
 }

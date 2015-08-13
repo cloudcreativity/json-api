@@ -31,7 +31,14 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
     const ID = 123;
     const INVALID_ID = 456;
 
+    /**
+     * @var \stdClass
+     */
     protected $valid;
+
+    /**
+     * @var BelongsToValidator
+     */
     protected $validator;
 
     protected function setUp()
@@ -43,6 +50,24 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator = new BelongsToValidator();
         $this->validator->setTypes(static::TYPE);
+    }
+
+    /**
+     * @return ErrorObject
+     */
+    protected function getError()
+    {
+        if (1 !== count($this->validator->getErrors())) {
+            $this->fail('Did not find a single error.');
+        }
+
+        $error = current($this->validator->getErrors()->getAll());
+
+        if (!$error instanceof ErrorObject) {
+            $this->fail('Not an error object.');
+        }
+
+        return $error;
     }
 
     public function testValid()
@@ -71,13 +96,21 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->valid));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(BelongsToValidator::ERROR_INVALID_TYPE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/type', $error->source()->getPointer());
+    }
+
+    public function testMissingType()
+    {
+        unset($this->valid->{Relationship::DATA}->{ResourceIdentifier::TYPE});
+
+        $this->assertFalse($this->validator->isValid($this->valid));
+        $error = $this->getError();
+        $this->assertEquals(BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/data', $error->source()->getPointer());
     }
 
     public function testInvalidId()
@@ -85,13 +118,21 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
         $this->valid->{Relationship::DATA}->{ResourceIdentifier::ID} = null;
         $this->assertFalse($this->validator->isValid($this->valid));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(BelongsToValidator::ERROR_INVALID_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/id', $error->source()->getPointer());
+    }
+
+    public function testMissingId()
+    {
+        unset($this->valid->{Relationship::DATA}->{ResourceIdentifier::ID});
+
+        $this->assertFalse($this->validator->isValid($this->valid));
+        $error = $this->getError();
+        $this->assertEquals(BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/data', $error->source()->getPointer());
     }
 
     public function testHasMany()
@@ -99,10 +140,7 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
         $this->valid->{Relationship::DATA} = [];
         $this->assertFalse($this->validator->isValid($this->valid));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(BelongsToValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -120,10 +158,7 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->validator, $this->validator->setAllowEmpty(false));
         $this->assertFalse($this->validator->isValid($this->valid));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(BelongsToValidator::ERROR_NULL_DISALLOWED, $error->getCode());
         $this->assertEquals(422, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -155,10 +190,7 @@ class BelongsToValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->valid));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError();
         $this->assertEquals(BelongsToValidator::ERROR_NOT_FOUND, $error->getCode());
         $this->assertEquals(404, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
