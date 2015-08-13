@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
  * Class Resource
  * @package CloudCreativity\JsonApi
  */
-class Resource extends StandardObject
+class ResourceObject extends StandardObject
 {
 
     const TYPE = 'type';

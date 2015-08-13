@@ -27,8 +27,6 @@ use CloudCreativity\JsonApi\Error\ErrorObject;
 class BooleanValidator extends TypeValidator
 {
 
-    use NullableTrait;
-
     /**
      * @param bool $nullable
      */

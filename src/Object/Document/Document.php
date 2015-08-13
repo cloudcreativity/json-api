@@ -16,35 +16,38 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validator\Type;
+namespace CloudCreativity\JsonApi\Object\Document;
 
-use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Object\Relationships\Relationship;
+use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
+use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
- * Class StringValidator
+ * Class Document
  * @package CloudCreativity\JsonApi
  */
-class StringValidator extends TypeValidator
+class Document extends StandardObject
 {
 
-    /**
-     * @param bool $nullable
-     */
-    public function __construct($nullable = false)
-    {
-        parent::__construct($nullable);
+    const DATA = 'data';
 
-        $this->updateTemplate(static::ERROR_INVALID_VALUE, [
-            ErrorObject::DETAIL => 'Expecting a string value.',
-        ]);
+    /**
+     * Get the primary data as a resource object.
+     *
+     * @return ResourceObject
+     */
+    public function getResource()
+    {
+        return new ResourceObject($this->get(static::DATA));
     }
 
     /**
-     * @param $value
-     * @return bool
+     * Get the primary data as a relationship object.
+     *
+     * @return Relationship
      */
-    protected function isType($value)
+    public function getRelationship()
     {
-        return is_string($value);
+        return new Relationship($this->get(static::DATA));
     }
 }

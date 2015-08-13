@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Validator\Resource;
 
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
-use CloudCreativity\JsonApi\Object\Resource\Resource;
+use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 
@@ -182,18 +182,18 @@ abstract class AbstractResourceValidator extends AbstractValidator
      */
     protected function validateType(StandardObject $object)
     {
-        if (!$object->has(Resource::TYPE)) {
+        if (!$object->has(ResourceObject::TYPE)) {
             $this->error(static::ERROR_MISSING_TYPE);
             return $this;
         }
 
         $type = $this->getTypeValidator();
 
-        if (!$type->isValid($object->get(Resource::TYPE))) {
+        if (!$type->isValid($object->get(ResourceObject::TYPE))) {
             $this->getErrors()
                 ->merge($type
                     ->getErrors()
-                    ->setSourcePointer('/' . Resource::TYPE));
+                    ->setSourcePointer('/' . ResourceObject::TYPE));
         }
 
         return $this;
@@ -206,25 +206,25 @@ abstract class AbstractResourceValidator extends AbstractValidator
     protected function validateId(StandardObject $object)
     {
         // Is valid if no id and $this does not have an id validator.
-        if (!$object->has(Resource::ID) && !$this->hasIdValidator()) {
+        if (!$object->has(ResourceObject::ID) && !$this->hasIdValidator()) {
             return $this;
         }
 
-        if (!$object->has(Resource::ID) && $this->hasIdValidator()) {
+        if (!$object->has(ResourceObject::ID) && $this->hasIdValidator()) {
             $this->error(static::ERROR_MISSING_ID);
             return $this;
-        } elseif ($object->has(Resource::ID) && !$this->hasIdValidator()) {
-            $this->error(static::ERROR_UNEXPECTED_ID, '/' . Resource::ID);
+        } elseif ($object->has(ResourceObject::ID) && !$this->hasIdValidator()) {
+            $this->error(static::ERROR_UNEXPECTED_ID, '/' . ResourceObject::ID);
             return $this;
         }
 
         $validator = $this->getIdValidator();
 
-        if (!$validator->isValid($object->get(Resource::ID))) {
+        if (!$validator->isValid($object->get(ResourceObject::ID))) {
             $this->getErrors()
                 ->merge($validator
                     ->getErrors()
-                    ->setSourcePointer('/' . Resource::ID));
+                    ->setSourcePointer('/' . ResourceObject::ID));
         }
 
         return $this;
@@ -237,26 +237,26 @@ abstract class AbstractResourceValidator extends AbstractValidator
     protected function validateAttributes(StandardObject $object)
     {
         // valid if the object does not have attributes, and attributes are not expected.
-        if (!$object->has(Resource::ATTRIBUTES) && !$this->isExpectingAttributes()) {
+        if (!$object->has(ResourceObject::ATTRIBUTES) && !$this->isExpectingAttributes()) {
             return $this;
         }
 
-        if (!$object->has(Resource::ATTRIBUTES) && $this->isExpectingAttributes()) {
+        if (!$object->has(ResourceObject::ATTRIBUTES) && $this->isExpectingAttributes()) {
             $this->error(static::ERROR_MISSING_ATTRIBUTES);
             return $this;
-        } elseif ($object->has(Resource::ATTRIBUTES) && !$this->hasAttributesValidator()) {
-            $this->error(static::ERROR_UNEXPECTED_ATTRIBUTES, '/' . Resource::ATTRIBUTES);
+        } elseif ($object->has(ResourceObject::ATTRIBUTES) && !$this->hasAttributesValidator()) {
+            $this->error(static::ERROR_UNEXPECTED_ATTRIBUTES, '/' . ResourceObject::ATTRIBUTES);
             return $this;
         }
 
         $validator = $this->getAttributesValidator();
 
-        if (!$validator->isValid($object->get(Resource::ATTRIBUTES))) {
+        if (!$validator->isValid($object->get(ResourceObject::ATTRIBUTES))) {
             $this->getErrors()
                 ->merge($validator
                     ->getErrors()
                     ->setSourcePointer(function ($current) {
-                        return sprintf('/%s%s', Resource::ATTRIBUTES, $current);
+                        return sprintf('/%s%s', ResourceObject::ATTRIBUTES, $current);
                     }));
         }
 
@@ -270,26 +270,26 @@ abstract class AbstractResourceValidator extends AbstractValidator
     protected function validateRelationships(StandardObject $object)
     {
         // valid if no relationships and not expecting relationships
-        if (!$object->has(Resource::RELATIONSHIPS) && !$this->isExpectingRelationships()) {
+        if (!$object->has(ResourceObject::RELATIONSHIPS) && !$this->isExpectingRelationships()) {
             return $this;
         }
 
-        if (!$object->has(Resource::RELATIONSHIPS) && $this->isExpectingRelationships()) {
+        if (!$object->has(ResourceObject::RELATIONSHIPS) && $this->isExpectingRelationships()) {
             $this->error(static::ERROR_MISSING_RELATIONSHIPS);
             return $this;
-        } elseif ($object->has(Resource::RELATIONSHIPS) && !$this->hasRelationshipsValidator()) {
-            $this->error(static::ERROR_UNEXPECTED_RELATIONSHIPS, '/' . Resource::RELATIONSHIPS);
+        } elseif ($object->has(ResourceObject::RELATIONSHIPS) && !$this->hasRelationshipsValidator()) {
+            $this->error(static::ERROR_UNEXPECTED_RELATIONSHIPS, '/' . ResourceObject::RELATIONSHIPS);
             return $this;
         }
 
         $validator = $this->getRelationshipsValidator();
 
-        if (!$validator->isValid($object->get(Resource::RELATIONSHIPS))) {
+        if (!$validator->isValid($object->get(ResourceObject::RELATIONSHIPS))) {
             $this->getErrors()
                 ->merge($validator
                     ->getErrors()
                     ->setSourcePointer(function ($current) {
-                        return sprintf('/%s%s', Resource::RELATIONSHIPS, $current);
+                        return sprintf('/%s%s', ResourceObject::RELATIONSHIPS, $current);
                     }));
         }
 

@@ -27,8 +27,6 @@ use CloudCreativity\JsonApi\Error\ErrorObject;
 class IntegerValidator extends TypeValidator
 {
 
-    use NullableTrait;
-
     /**
      * @param bool $nullable
      */

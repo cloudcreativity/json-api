@@ -18,22 +18,50 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\MultiErrorException;
-use CloudCreativity\JsonApi\Object\Relationships\Relationship;
+use CloudCreativity\JsonApi\Object\Document\Document;
+use CloudCreativity\JsonApi\Validator\Document\DocumentValidator;
 use CloudCreativity\JsonApi\Validator\ValidatorAwareTrait;
 
 /**
- * Class RelationshipDecoder
+ * Class ResourceDecoder
  * @package CloudCreativity\JsonApi
  */
-class RelationshipDecoder extends AbstractDecoder
+class DocumentDecoder extends AbstractDecoder
 {
 
     use ValidatorAwareTrait;
 
     /**
+     * @param ValidatorInterface|null $validator
+     */
+    public function __construct(ValidatorInterface $validator = null)
+    {
+        if ($validator) {
+            $this->setValidator($validator);
+        } else {
+            $this->setValidator(new DocumentValidator());
+        }
+    }
+
+    /**
+     * @return DocumentValidator
+     */
+    public function getDocumentValidator()
+    {
+        $validator = $this->getValidator();
+
+        if (!$validator instanceof DocumentValidator) {
+            throw new \RuntimeException('Expecting a document validator to be set.');
+        }
+
+        return $validator;
+    }
+
+    /**
      * @param string $content
-     * @return Relationship
+     * @return Document
      * @throws MultiErrorException
      */
     public function decode($content)
@@ -45,6 +73,6 @@ class RelationshipDecoder extends AbstractDecoder
             throw new MultiErrorException($validator->getErrors(), 'Invalid request body content.');
         }
 
-        return new Relationship($content);
+        return new Document($content);
     }
 }

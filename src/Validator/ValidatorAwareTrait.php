@@ -54,4 +54,12 @@ trait ValidatorAwareTrait
 
         return $this->_validator;
     }
+
+    /**
+     * @return bool
+     */
+    public function hasValidator()
+    {
+        return $this->_validator instanceof ValidatorInterface;
+    }
 }
