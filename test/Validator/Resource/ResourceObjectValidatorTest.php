@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validator\Resource;
 
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Validator\Relationships\BelongsToValidator;
 use CloudCreativity\JsonApi\Validator\Relationships\HasManyValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
@@ -46,7 +47,7 @@ class ResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($validator, $validator->id($id));
         $this->assertEquals($expected, $validator->getIdValidator());
     }
-    
+
     public function testAttr()
     {
         $key = 'foo';
@@ -61,6 +62,26 @@ class ResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
         ]));
 
         $this->assertEquals($expected, $validator->getAttributes()->getValidator($key));
+    }
+
+    public function testAttrWithClass()
+    {
+        $key = 'foo';
+        $expected = new StringValidator();
+        $validator = new ResourceObjectValidator();
+
+        $validator->attr($key, get_class($expected));
+        $this->assertEquals($expected, $validator->getAttributes()->getValidator($key));
+    }
+
+    public function testAttrWithValidator()
+    {
+        $key = 'foo';
+        $mock = $this->getMock(ValidatorInterface::class);
+        $validator = new ResourceObjectValidator();
+
+        $validator->attr($key, $mock);
+        $this->assertSame($mock, $validator->getAttributes()->getValidator($key));
     }
 
     public function testBelongsTo()

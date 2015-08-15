@@ -80,7 +80,7 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      * Set an attribute of the resource object.
      *
      * @param $key
-     * @param null $type
+     * @param mixed $type
      * @param array $options
      * @return $this
      */

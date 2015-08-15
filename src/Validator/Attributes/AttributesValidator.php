@@ -19,13 +19,13 @@
 namespace CloudCreativity\JsonApi\Validator\Attributes;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Validator\Helper\AllowedKeysTrait;
 use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 use CloudCreativity\JsonApi\Validator\Type\TypeValidator;
-use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 
 /**
  * Class AttributesValidator
@@ -106,24 +106,13 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
      * Helper method to add a type validator for the specified key.
      *
      * @param $key
-     * @param null $type
+     * @param string|ValidatorInterface $type
      * @param array $options
      * @return $this
      */
     public function attr($key, $type = null, array $options = [])
     {
-        if (is_null($type)) {
-            $type = 'type';
-        }
-
-        $class = sprintf('CloudCreativity\JsonApi\Validator\Type\%sValidator', ucfirst($type));
-
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Unrecognised attribute type: %s.', $type));
-        }
-
-        /** @var ValidatorInterface $validator */
-        $validator = new $class();
+        $validator = $this->parseType($type);
 
         if ($validator instanceof ConfigurableInterface) {
             $validator->configure($options);
@@ -229,6 +218,39 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
         $this->getErrors()->merge($errors);
 
         return $this;
+    }
+
+    /**
+     * @param string|null|ValidatorInterface
+     * @return ValidatorInterface
+     */
+    protected function parseType($type)
+    {
+        if ($type instanceof ValidatorInterface) {
+          return $type;
+        } elseif (is_null($type)) {
+          return new TypeValidator();
+        } elseif (!is_string($type)) {
+          throw new \InvalidArgumentException('Expecting a string, ValidatorInterface or null.');
+        }
+
+        if (class_exists($type)) {
+          $class = $type;
+        } else {
+          $class = sprintf('CloudCreativity\JsonApi\Validator\Type\%sValidator', ucfirst($type));
+
+          if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('Unrecognised attribute type: %s.', $type));
+          }
+        }
+
+        $validator = new $class();
+
+        if (!$validator instanceof ValidatorInterface) {
+          throw new \InvalidArgumentException(sprintf('Type %s does not resolve to a %s instance.', $type, ValidatorInterface::class));
+        }
+
+        return $validator;
     }
 
 }
