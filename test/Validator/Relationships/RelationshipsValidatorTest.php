@@ -149,4 +149,9 @@ class RelationshipsValidatorTest extends ValidatorTestCase
         $this->assertEquals(RelationshipsValidator::ERROR_REQUIRED_RELATIONSHIP, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
+
+    public function testAllowed()
+    {
+        $this->markTestIncomplete('@todo');
+    }
 }

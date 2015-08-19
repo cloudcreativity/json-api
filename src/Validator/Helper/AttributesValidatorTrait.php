@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validator\Resource;
+namespace CloudCreativity\JsonApi\Validator\Helper;
 
+use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Validator\Attributes\AttributesValidator;
 
@@ -57,16 +58,16 @@ trait AttributesValidatorTrait
     }
 
     /**
-     * @return AttributesValidator
+     * @return KeyedValidatorInterface
      */
-    public function getAttributes()
+    public function getKeyedAttributes()
     {
-        $validator = $this->getAttributesValidator();
+        $attributes = $this->getAttributesValidator();
 
-        if (!$validator instanceof AttributesValidator) {
-            throw new \RuntimeException(sprintf('Attributes validator is not a %s instance.', AttributesValidator::class));
+        if (!$attributes instanceof KeyedValidatorInterface) {
+            throw new \RuntimeException('%s expects attributes validator to be a %s instance.', static::class, KeyedValidatorInterface::class);
         }
 
-        return $validator;
+        return $attributes;
     }
 }

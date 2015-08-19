@@ -62,7 +62,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
             StringValidator::ACCEPT_NULL => true,
         ]));
 
-        $this->assertEquals($expected, $validator->getAttributes()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyedAttributes()->getValidator($key));
     }
 
     public function testAttrWithClass()
@@ -72,7 +72,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator = new ResourceObjectValidator();
 
         $validator->attr($key, get_class($expected));
-        $this->assertEquals($expected, $validator->getAttributes()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyedAttributes()->getValidator($key));
     }
 
     public function testAttrWithValidator()
@@ -82,7 +82,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator = new ResourceObjectValidator();
 
         $validator->attr($key, $mock);
-        $this->assertSame($mock, $validator->getAttributes()->getValidator($key));
+        $this->assertSame($mock, $validator->getKeyedAttributes()->getValidator($key));
     }
 
     public function testBelongsTo()
@@ -100,7 +100,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
             BelongsToValidator::ALLOW_EMPTY => false,
         ]));
 
-        $this->assertEquals($expected, $validator->getRelationships()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyedRelationships()->getValidator($key));
     }
 
     public function testHasMany()
@@ -118,7 +118,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
             HasManyValidator::ALLOW_EMPTY => false,
         ]));
 
-        $this->assertEquals($expected, $validator->getRelationships()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyedRelationships()->getValidator($key));
     }
 
     public function testGetRelated()
@@ -129,7 +129,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator = new ResourceObjectValidator();
 
         $validator
-            ->getRelationships()
+            ->getKeyedRelationships()
             ->setValidator($key, $expected);
 
         $this->assertSame($expected, $validator->getRelated($key));
@@ -145,8 +145,8 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator->belongsTo($b, 'type');
 
         $this->assertSame($validator, $validator->required([$a, $b]));
-        $this->assertEquals([$a], $validator->getAttributes()->getRequiredKeys());
-        $this->assertEquals([$b], $validator->getRelationships()->getRequiredKeys());
+        $this->assertEquals([$a], $validator->getKeyedAttributes()->getRequiredKeys());
+        $this->assertEquals([$b], $validator->getKeyedRelationships()->getRequiredKeys());
     }
 
     public function testAllowed()
@@ -158,8 +158,10 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator->attr($a);
 
         $this->assertSame($validator, $validator->allowed([$a]));
-        $this->assertTrue($validator->getAttributes()->isAllowedKey($a));
-        $this->assertFalse($validator->getAttributes()->isAllowedKey($b));
+        $this->assertTrue($validator->getKeyedAttributes()->isAllowedKey($a));
+        $this->assertFalse($validator->getKeyedAttributes()->isAllowedKey($b));
+
+        $this->markTestIncomplete('@todo test that relationships are also set as allowed via this method.');
     }
 
     public function testRestrict()
@@ -171,8 +173,8 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator->attr($a);
 
         $this->assertSame($validator, $validator->restrict());
-        $this->assertTrue($validator->getAttributes()->isAllowedKey($a));
-        $this->assertFalse($validator->getAttributes()->isAllowedKey($b));
+        $this->assertTrue($validator->getKeyedAttributes()->isAllowedKey($a));
+        $this->assertFalse($validator->getKeyedAttributes()->isAllowedKey($b));
     }
 
     public function testAcceptsEmptyAttributesAndRelationships()

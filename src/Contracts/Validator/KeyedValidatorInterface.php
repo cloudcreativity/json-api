@@ -27,9 +27,41 @@ interface KeyedValidatorInterface extends ValidatorInterface
 
     /**
      * @param $key
+     * @param ValidatorInterface $validator
+     * @return $this
+     */
+    public function setValidator($key, ValidatorInterface $validator);
+
+    /**
+     * @param $keyOrKeys
+     * @return $this
+     */
+    public function setRequiredKeys($keyOrKeys);
+
+    /**
+     * @param $keyOrKeys
+     * @return $this
+     */
+    public function addRequiredKeys($keyOrKeys);
+
+    /**
+     * @param $key
      * @return ValidatorInterface
      */
     public function getValidator($key);
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function hasValidator($key);
+
+    /**
+     * Get a list of the keys for which there are validators.
+     *
+     * @return array
+     */
+    public function keys();
 
     /**
      * @param $key
@@ -41,4 +73,21 @@ interface KeyedValidatorInterface extends ValidatorInterface
      * @return bool
      */
     public function hasRequiredKeys();
+
+    /**
+     * @param $keyOrKeys
+     * @return $this
+     */
+    public function setAllowedKeys($keyOrKeys);
+
+    /**
+     * @param $keyOrKeys
+     * @return $this
+     */
+    public function addAllowedKeys($keyOrKeys);
+
+    /**
+     * @return bool
+     */
+    public function isAllowedKey($key);
 }

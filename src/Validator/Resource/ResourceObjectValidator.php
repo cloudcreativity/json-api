@@ -18,6 +18,11 @@
 
 namespace CloudCreativity\JsonApi\Validator\Resource;
 
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
+use CloudCreativity\JsonApi\Validator\Helper\AttributesValidatorTrait;
+use CloudCreativity\JsonApi\Validator\Helper\AttributeTrait;
+use CloudCreativity\JsonApi\Validator\Helper\RelationshipsValidatorTrait;
+use CloudCreativity\JsonApi\Validator\Helper\RelationshipTrait;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
 
@@ -29,7 +34,9 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
 {
 
     use AttributesValidatorTrait,
-        RelationshipsValidatorTrait;
+        RelationshipsValidatorTrait,
+        AttributeTrait,
+        RelationshipTrait;
 
     /**
      * @var mixed
@@ -77,54 +84,6 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     }
 
     /**
-     * Set an attribute of the resource object.
-     *
-     * @param $key
-     * @param mixed $type
-     * @param array $options
-     * @return $this
-     */
-    public function attr($key, $type = null, array $options = [])
-    {
-        $this->getAttributes()
-            ->attr($key, $type, $options);
-
-        return $this;
-    }
-
-    /**
-     * Set a belongs-to relationship for the resource object.
-     *
-     * @param $key
-     * @param $typeOrTypes
-     * @param array $options
-     * @return $this
-     */
-    public function belongsTo($key, $typeOrTypes, array $options = [])
-    {
-        $this->getRelationships()
-            ->belongsTo($key, $typeOrTypes, $options);
-
-        return $this;
-    }
-
-    /**
-     * Set a has-many relationship for the resource object.
-     *
-     * @param $key
-     * @param $typeOrTypes
-     * @param array $options
-     * @return $this
-     */
-    public function hasMany($key, $typeOrTypes, array $options = [])
-    {
-        $this->getRelationships()
-            ->hasMany($key, $typeOrTypes, $options);
-
-        return $this;
-    }
-
-    /**
      * Add key or keys as allowed attributes.
      *
      * @param $keyOrKeys
@@ -132,20 +91,43 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function allowed($keyOrKeys)
     {
-        $this->getAttributes()
-            ->addAllowedKeys($keyOrKeys);
+        $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
+
+        $attributes = $this->getKeyedAttributes();
+        $relationships = $this->getKeyedRelationships();
+
+        foreach ($keys as $key) {
+
+            if ($relationships->hasValidator($key)) {
+                $relationships->addAllowedKeys($key);
+            } else {
+                $attributes->addAllowedKeys($key);
+            }
+        }
 
         return $this;
     }
 
     /**
-     * Set attributes to only accept keys for which there are validators.
+     * Set attributes and/or relationships to only accept keys for which there are validators.
      *
+     * @param $attributes
+     *      whether to restrict attributes
+     * @param $relationships
+     *      whether to restrict relationships
      * @return $this
      */
-    public function restrict()
+    public function restrict($attributes = true, $relationships = true)
     {
-        $this->getAttributes()->setRestricted();
+        if ($attributes) {
+            $validator = $this->getKeyedAttributes();
+            $validator->setAllowedKeys($validator->keys());
+        }
+
+        if ($relationships) {
+            $validator = $this->getKeyedRelationships();
+            $validator->setAllowedKeys($validator->keys());
+        }
 
         return $this;
     }
@@ -163,8 +145,8 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     {
         $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
 
-        $attributes = $this->getAttributes();
-        $relationships = $this->getRelationships();
+        $attributes = $this->getKeyedAttributes();
+        $relationships = $this->getKeyedRelationships();
 
         foreach ($keys as $key) {
 
@@ -198,10 +180,11 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      * Get the validator for the specified relationship.
      *
      * @param $key
-     * @return \CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface
+     * @return ValidatorInterface
      */
     public function getRelated($key)
     {
-        return $this->getRelationships()->getValidator($key);
+        return $this->getKeyedRelationships()->getValidator($key);
     }
+
 }

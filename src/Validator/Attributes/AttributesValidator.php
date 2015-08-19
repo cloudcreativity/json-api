@@ -104,36 +104,20 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     }
 
     /**
-     * Helper method to add a type validator for the specified key.
-     *
      * @param $key
-     * @param string|ValidatorInterface $type
-     * @param array $options
-     * @return $this
+     * @return bool
      */
-    public function attr($key, $type = null, array $options = [])
+    public function hasValidator($key)
     {
-        $validator = $this->parseType($type);
-
-        if ($validator instanceof ConfigurableInterface) {
-            $validator->configure($options);
-        }
-
-        $this->setValidator($key, $validator);
-
-        return $this;
+        return isset($this->_validators[$key]);
     }
 
     /**
-     * Only allow keys that have validators.
-     *
-     * @return $this
+     * @return array
      */
-    public function setRestricted()
+    public function keys()
     {
-        $this->setAllowedKeys(array_keys($this->_validators));
-
-        return $this;
+        return array_keys($this->_validators);
     }
 
     /**
@@ -219,39 +203,6 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
         $this->getErrors()->merge($errors);
 
         return $this;
-    }
-
-    /**
-     * @param string|null|ValidatorInterface
-     * @return ValidatorInterface
-     */
-    protected function parseType($type)
-    {
-        if ($type instanceof ValidatorInterface) {
-          return $type;
-        } elseif (is_null($type)) {
-          return new TypeValidator();
-        } elseif (!is_string($type)) {
-          throw new \InvalidArgumentException('Expecting a string, ValidatorInterface or null.');
-        }
-
-        if (class_exists($type)) {
-          $class = $type;
-        } else {
-          $class = sprintf('CloudCreativity\JsonApi\Validator\Type\%sValidator', ucfirst($type));
-
-          if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Unrecognised attribute type: %s.', $type));
-          }
-        }
-
-        $validator = new $class();
-
-        if (!$validator instanceof ValidatorInterface) {
-          throw new \InvalidArgumentException(sprintf('Type %s does not resolve to a %s instance.', $type, ValidatorInterface::class));
-        }
-
-        return $validator;
     }
 
 }

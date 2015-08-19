@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Validator\Helper\AllowedKeysTrait;
 use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 
 /**
@@ -31,7 +32,8 @@ use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 class RelationshipsValidator extends AbstractValidator implements KeyedValidatorInterface
 {
 
-    use RequiredKeysTrait;
+    use RequiredKeysTrait,
+        AllowedKeysTrait;
 
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_UNRECOGNISED_RELATIONSHIP = 'not-recognised';
@@ -119,39 +121,11 @@ class RelationshipsValidator extends AbstractValidator implements KeyedValidator
     }
 
     /**
-     * Helper method to add a belongs to validator for the specified key.
-     *
-     * @param $key
-     * @param $typeOrTypes
-     * @param array $options
-     * @return $this
+     * @return array
      */
-    public function belongsTo($key, $typeOrTypes, array $options = [])
+    public function keys()
     {
-        $validator = new BelongsToValidator($typeOrTypes);
-        $validator->configure($options);
-
-        $this->setValidator($key, $validator);
-
-        return $this;
-    }
-
-    /**
-     * Helper method to add a has-many validator for the specified key.
-     *
-     * @param $key
-     * @param $typeOrTypes
-     * @param array $options
-     * @return $this
-     */
-    public function hasMany($key, $typeOrTypes, array $options = [])
-    {
-        $validator = new HasManyValidator($typeOrTypes);
-        $validator->configure($options);
-
-        $this->setValidator($key, $validator);
-
-        return $this;
+        return array_keys($this->_validators);
     }
 
     /**
