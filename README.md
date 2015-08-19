@@ -9,9 +9,84 @@ JSON should be *semantically* correct. E.g. when a client is providing a resourc
 `attributes` member must be an object.
 
 This package provides framework agnostic validation of the received request body content - so that it can be handled
-knowing that not only has `json_decode` successfully run, but that the structure of the decoded JSON is as expected. 
-Provided decoders also returns decoded content as `StandardObject` instances, an object that provides a number of 
+knowing that not only has `json_decode` successfully run, but that the structure of the decoded JSON is as expected.
+Provided decoders also returns decoded content as `StandardObject` instances, an object that provides a number of
 helper methods for handling the decoded content e.g. within a controller.
+
+## Let's see an example...
+
+A common scenario would be to decode received input for a resource object and then attempt to access its supplied
+attributes within a controller. For example:
+
+``` php
+class ArticleController
+{
+
+  public function createAction()
+  {
+      $content = ... // get HTTP request body content.
+      $data = json_decode($content, true);
+      $attributes = $data['data']['attributes'];
+  }
+}
+```
+
+This is unsafe because the controller is assuming that the decoded `$data` is an array, has a `data` key, which
+itself is an array with an `attributes` key.  This cannot be assumed because a client request cannot be trusted.
+
+Also, the JSON-API spec specifies certain errors that must be sent if the provided input for a create resource under
+certain scenarios - e.g.:
+
+> A server MUST return `409 Conflict` when processing a `POST` request in which the resource object's `type` is not among
+the type(s) that constitute the collection represented by the endpoint.
+
+However, the controller has not checked whether `$data['type']` exists or whether it is an expected type.
+
+The above example can be refactored to use validators to parse the provided content before handling it within the
+controller:
+
+``` php
+
+use CloudCreativity\JsonApi\Validator\Resource\ResourceObjectValidator;
+use CloudCreativity\JsonApi\Validator\Document\DocumentValidator;
+use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
+
+class ArticleController
+{
+
+  public function getArticleValidator()
+  {
+    $validator = new ResourceObjectValidator();
+
+    $validator->type('article')
+      ->attr('title', 'string')
+      ->attr('content', 'string')
+      ->belongsTo('author', 'person')
+      ->required(['author']);
+
+    return $validator;
+  }
+
+  public function getDecoder()
+  {
+    $validator = new DocumentValidator($this->getArticleValidator());
+    return new DocumentDecoder($validator);
+  }
+
+  public function createAction()
+  {
+    $content = ... // get HTTP request body content.
+    /** @var CloudCreativity\JsonApi\Object\Document\Document $data */
+    $data = $this->getDecoder()->decode($content);
+    $attributes = $data->getResourceObject()->getAttributes();
+  }
+}
+
+```
+
+In this refactored controller, `$data` can be used knowing that it has passed validation of the JSON API spec, and has
+been cast to an instance of `CloudCreativity\JsonApi\Object\Document\Document`, providing a fluid interface for
+handling the input within the controller.
 
 ## Status
 

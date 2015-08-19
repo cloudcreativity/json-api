@@ -59,6 +59,16 @@ class DocumentValidator extends AbstractValidator
     protected $_dataValidator;
 
     /**
+     * @param ValidatorInterface|null $dataValidator
+     */
+    public function __construct(ValidatorInterface $dataValidator = null)
+    {
+        if ($dataValidator) {
+            $this->setDataValidator($dataValidator);
+        }
+    }
+
+    /**
      * @param ValidatorInterface $validator
      * @return $this
      */
