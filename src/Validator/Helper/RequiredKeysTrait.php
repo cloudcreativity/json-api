@@ -67,6 +67,23 @@ trait RequiredKeysTrait
     }
 
     /**
+     * @return bool
+     */
+    public function hasRequiredKeys()
+    {
+        return !empty($this->_requiredKeys);
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function isRequiredKey($key)
+    {
+        return in_array($key, $this->_requiredKeys, true);
+    }
+
+    /**
      * @return $this
      */
     public function clearRequiredKeys()

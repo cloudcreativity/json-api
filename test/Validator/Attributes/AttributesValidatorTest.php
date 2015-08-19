@@ -69,8 +69,11 @@ class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
     public function testRequiredKeys()
     {
         $validator = new AttributesValidator();
+
+        $this->assertFalse($validator->hasRequiredKeys());
         $this->assertSame($validator, $validator->setRequiredKeys([static::KEY_A, static::KEY_B]));
         $this->assertTrue($validator->isValid($this->data));
+        $this->assertTrue($validator->hasRequiredKeys());
     }
 
     public function testMissingRequired()

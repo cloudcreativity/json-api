@@ -34,11 +34,6 @@ trait RelationshipsValidatorTrait
     protected $_relationshipsValidator;
 
     /**
-     * @var bool
-     */
-    protected $_expectingRelationships = false;
-
-    /**
      * @param ValidatorInterface $validator
      * @return $this
      */
@@ -59,25 +54,6 @@ trait RelationshipsValidatorTrait
         }
 
         return $this->_relationshipsValidator;
-    }
-
-    /**
-     * @param $bool
-     * @return $this
-     */
-    public function setExpectingRelationships($bool)
-    {
-        $this->_expectingRelationships = (bool) $bool;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExpectingRelationships()
-    {
-        return (bool) $this->_expectingRelationships;
     }
 
     /**

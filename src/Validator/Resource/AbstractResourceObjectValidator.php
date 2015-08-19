@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validator\Resource;
 
+use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
@@ -100,25 +101,11 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     abstract public function getIdValidator();
 
     /**
-     * Whether attributes must always be present in the resource object.
-     *
-     * @return bool
-     */
-    abstract public function isExpectingAttributes();
-
-    /**
      * Get the attributes validator or null if the resource object must not have attributes.
      *
      * @return ValidatorInterface
      */
     abstract public function getAttributesValidator();
-
-    /**
-     * Whether relationships must always be present in the resource object.
-     *
-     * @return bool
-     */
-    abstract public function isExpectingRelationships();
 
     /**
      * Get the relationships validator or null if the resource object must not have relationships.
@@ -133,6 +120,30 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     public function hasIdValidator()
     {
         return $this->getIdValidator() instanceof ValidatorInterface;
+    }
+
+    /**
+     * Whether the resource object expects to have attributes.
+     *
+     * @return bool
+     */
+    public function isExpectingAttributes()
+    {
+        $attr = $this->getAttributesValidator();
+
+        return ($attr instanceof KeyedValidatorInterface && $attr->hasRequiredKeys());
+    }
+
+    /**
+     * Whether the resource object expects to have relationships.
+     *
+     * @return bool
+     */
+    public function isExpectingRelationships()
+    {
+        $rel = $this->getRelationshipsValidator();
+
+        return ($rel instanceof KeyedValidatorInterface && $rel->hasRequiredKeys());
     }
 
     /**
@@ -213,12 +224,14 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
      */
     protected function validateAttributes(StandardObject $object)
     {
+        $expectation = $this->isExpectingAttributes();
+
         // valid if the object does not have attributes, and attributes are not expected.
-        if (!$object->has(ResourceObject::ATTRIBUTES) && !$this->isExpectingAttributes()) {
+        if (!$object->has(ResourceObject::ATTRIBUTES) && !$expectation) {
             return $this;
         }
 
-        if (!$object->has(ResourceObject::ATTRIBUTES) && $this->isExpectingAttributes()) {
+        if (!$object->has(ResourceObject::ATTRIBUTES) && $expectation) {
             $this->error(static::ERROR_MISSING_ATTRIBUTES);
             return $this;
         }
@@ -243,12 +256,14 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
      */
     protected function validateRelationships(StandardObject $object)
     {
+        $expectation = $this->isExpectingRelationships();
+
         // valid if no relationships and not expecting relationships
-        if (!$object->has(ResourceObject::RELATIONSHIPS) && !$this->isExpectingRelationships()) {
+        if (!$object->has(ResourceObject::RELATIONSHIPS) && !$expectation) {
             return $this;
         }
 
-        if (!$object->has(ResourceObject::RELATIONSHIPS) && $this->isExpectingRelationships()) {
+        if (!$object->has(ResourceObject::RELATIONSHIPS) && $expectation) {
             $this->error(static::ERROR_MISSING_RELATIONSHIPS);
             return $this;
         }

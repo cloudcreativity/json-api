@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
+use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
@@ -27,7 +28,7 @@ use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
  * Class RelationshipsValidator
  * @package CloudCreativity\JsonApi
  */
-class RelationshipsValidator extends AbstractValidator
+class RelationshipsValidator extends AbstractValidator implements KeyedValidatorInterface
 {
 
     use RequiredKeysTrait;

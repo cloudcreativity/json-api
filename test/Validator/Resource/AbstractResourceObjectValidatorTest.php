@@ -22,7 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorCollection;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
-use Neomerx\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 
 class AbstractResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -184,9 +184,15 @@ class AbstractResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMissingAttributes()
     {
-        $this->validator
-            ->method('isExpectingAttributes')
+        $mock = $this->getMock(KeyedValidatorInterface::class);
+
+        $mock->expects($this->atLeastOnce())
+            ->method('hasRequiredKeys')
             ->willReturn(true);
+
+        $this->validator
+            ->method('getAttributesValidator')
+            ->willReturn($mock);
 
         $this->assertFalse($this->validator->isValid($this->input));
 
@@ -246,9 +252,15 @@ class AbstractResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMissingRelationships()
     {
-        $this->validator
-            ->method('isExpectingRelationships')
+        $mock = $this->getMock(KeyedValidatorInterface::class);
+
+        $mock->expects($this->atLeastOnce())
+            ->method('hasRequiredKeys')
             ->willReturn(true);
+
+        $this->validator
+            ->method('getRelationshipsValidator')
+            ->willReturn($mock);
 
         $this->assertFalse($this->validator->isValid($this->input));
 

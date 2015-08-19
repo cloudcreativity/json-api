@@ -130,10 +130,14 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRequired()
     {
+        $this->assertFalse($this->validator->hasRequiredKeys());
+
         $this->assertSame($this->validator, $this->validator->setRequiredKeys([
             static::KEY_A,
             static::KEY_B,
         ]));
+
+        $this->assertTrue($this->validator->hasRequiredKeys());
 
         $this->validator->setValidators([
             static::KEY_A => $this->a,

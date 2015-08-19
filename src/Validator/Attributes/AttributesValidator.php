@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Validator\Attributes;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
+use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
@@ -31,7 +32,7 @@ use CloudCreativity\JsonApi\Validator\Type\TypeValidator;
  * Class AttributesValidator
  * @package CloudCreativity\JsonApi
  */
-class AttributesValidator extends AbstractValidator implements ConfigurableInterface
+class AttributesValidator extends AbstractValidator implements ConfigurableInterface, KeyedValidatorInterface
 {
 
     use RequiredKeysTrait,

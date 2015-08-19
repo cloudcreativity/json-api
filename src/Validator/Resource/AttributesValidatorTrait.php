@@ -34,11 +34,6 @@ trait AttributesValidatorTrait
     protected $_attributesValidator;
 
     /**
-     * @var bool
-     */
-    protected $_expectingAttributes = true;
-
-    /**
      * @param ValidatorInterface $validator
      * @return $this
      */
@@ -59,25 +54,6 @@ trait AttributesValidatorTrait
         }
 
         return $this->_attributesValidator;
-    }
-
-    /**
-     * @param $bool
-     * @return $this
-     */
-    public function setExpectingAttributes($bool)
-    {
-        $this->_expectingAttributes = (bool) $bool;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExpectingAttributes()
-    {
-        return (bool) $this->_expectingAttributes;
     }
 
     /**
