@@ -21,9 +21,9 @@ namespace CloudCreativity\JsonApi\Validator\Relationships;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
-use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 
-class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
+class HasManyValidatorTest extends ValidatorTestCase
 {
 
     const TYPE_A = 'foo';
@@ -58,24 +58,6 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->setTypes([static::TYPE_A, static::TYPE_B]);
     }
 
-    /**
-     * @return ErrorObject
-     */
-    protected function getError()
-    {
-        if (1 !== count($this->validator->getErrors())) {
-            $this->fail('Did not find a single error.');
-        }
-
-        $error = current($this->validator->getErrors()->getAll());
-
-        if (!$error instanceof ErrorObject) {
-            $this->fail('Not an error object.');
-        }
-
-        return $error;
-    }
-
     public function testValid()
     {
         $this->assertTrue($this->validator->isValid($this->input));
@@ -87,7 +69,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->validator->isValid([]));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -97,7 +79,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->input->{Relationship::DATA} = null;
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -108,7 +90,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->setTypes(static::TYPE_A);
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INVALID_TYPE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1/type', $error->source()->getPointer());
@@ -119,7 +101,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         unset($this->b->{ResourceIdentifier::TYPE});
 
         $this->assertFalse($this->validator->isValid($this->input));
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1', $error->source()->getPointer());
@@ -130,7 +112,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->b->{ResourceIdentifier::ID} = null;
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INVALID_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1/id', $error->source()->getPointer());
@@ -142,7 +124,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         unset($this->b->{ResourceIdentifier::ID});
 
         $this->assertFalse($this->validator->isValid($this->input));
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/1', $error->source()->getPointer());
@@ -154,7 +136,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->validator, $this->validator->setAllowEmpty(false));
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_EMPTY_DISALLOWED, $error->getCode());
         $this->assertEquals(422, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -190,7 +172,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_INVALID_COLLECTION, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
@@ -207,7 +189,7 @@ class HasManyValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        $error = $this->getError();
+        $error = $this->getError($this->validator);
         $this->assertEquals(HasManyValidator::ERROR_NOT_FOUND, $error->getCode());
         $this->assertEquals(404, $error->getStatus());
         $this->assertEquals('/data/1', $error->source()->getPointer());

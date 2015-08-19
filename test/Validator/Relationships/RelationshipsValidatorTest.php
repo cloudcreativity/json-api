@@ -21,8 +21,9 @@ namespace CloudCreativity\JsonApi\Validator\Relationships;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\ErrorCollection;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
+use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 
-class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
+class RelationshipsValidatorTest extends ValidatorTestCase
 {
 
     const KEY_A = 'foo';
@@ -74,10 +75,7 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->validator->isValid(null));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError($this->validator);
         $this->assertEquals(RelationshipsValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -105,10 +103,7 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError($this->validator);
         $this->assertEquals($expected, $error);
     }
 
@@ -120,10 +115,7 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError($this->validator);
         $this->assertEquals(RelationshipsValidator::ERROR_UNRECOGNISED_RELATIONSHIP, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -153,10 +145,7 @@ class RelationshipsValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($this->input));
 
-        /** @var ErrorObject $error */
-        $error = current($this->validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorObject::class, $error);
+        $error = $this->getError($this->validator);
         $this->assertEquals(RelationshipsValidator::ERROR_REQUIRED_RELATIONSHIP, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }

@@ -24,8 +24,9 @@ use CloudCreativity\JsonApi\Validator\Relationships\HasManyValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
 use CloudCreativity\JsonApi\Validator\Type\StringValidator;
+use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 
-class ResourceObjectValidatorTest extends \PHPUnit_Framework_TestCase
+class ResourceObjectValidatorTest extends ValidatorTestCase
 {
 
     public function testType()

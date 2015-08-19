@@ -21,10 +21,11 @@ namespace CloudCreativity\JsonApi\Validator\Attributes;
 use CloudCreativity\JsonApi\Error\ErrorCollection;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
+use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 
-class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
+class AttributesValidatorTest extends ValidatorTestCase
 {
 
     const KEY_A = 'foo';
@@ -83,10 +84,7 @@ class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($validator->isValid($this->data));
 
-        /** @var ErrorInterface $error */
-        $error = current($validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorInterface::class, $error);
+        $error = $this->getError($validator);
         $this->assertEquals(AttributesValidator::ERROR_REQUIRED_ATTRIBUTE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -132,10 +130,7 @@ class AttributesValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($validator->isValid($this->data));
 
-        /** @var ErrorInterface $err */
-        $err = current($validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorInterface::class, $err);
+        $err = $this->getError($validator);
         $this->assertEquals($expected, $err);
     }
 }

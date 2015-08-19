@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Validator\ResourceIdentifier;
 
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 
-class ExpectedTypeValidatorTest extends \PHPUnit_Framework_TestCase
+class ExpectedTypeValidatorTest extends ValidatorTestCase
 {
 
     const EXPECTED = 'Foo';
@@ -52,10 +52,7 @@ class ExpectedTypeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($validator->isValid(123));
 
-        /** @var ErrorInterface $error */
-        $error = current($validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorInterface::class, $error);
+        $error = $this->getError($validator);
         $this->assertEquals(ExpectedTypeValidator::INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
     }
@@ -67,10 +64,7 @@ class ExpectedTypeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($validator->isValid(static::NOT_EXPECTED));
 
-        /** @var ErrorInterface $error */
-        $error = current($validator->getErrors()->getAll());
-
-        $this->assertInstanceOf(ErrorInterface::class, $error);
+        $error = $this->getError($validator);
         $this->assertEquals(ExpectedTypeValidator::UNSUPPORTED_TYPE, $error->getCode());
         $this->assertEquals(409, $error->getStatus());
     }
