@@ -100,6 +100,14 @@ class DocumentValidator extends AbstractValidator
     }
 
     /**
+     * @return bool
+     */
+    public function isRequired()
+    {
+        return true;
+    }
+
+    /**
      * @param $value
      */
     protected function validate($value)

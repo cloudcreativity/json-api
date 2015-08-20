@@ -67,26 +67,27 @@ class AttributesValidatorTest extends ValidatorTestCase
         $this->assertEquals('/' . static::KEY_B, $error->getSource()->getPointer());
     }
 
-    public function testRequiredKeys()
-    {
-        $validator = new AttributesValidator();
-
-        $this->assertFalse($validator->hasRequiredKeys());
-        $this->assertSame($validator, $validator->setRequiredKeys([static::KEY_A, static::KEY_B]));
-        $this->assertTrue($validator->isValid($this->data));
-        $this->assertTrue($validator->hasRequiredKeys());
-    }
-
     public function testMissingRequired()
     {
-        $validator = new AttributesValidator();
-        $validator->setRequiredKeys([static::KEY_A, static::KEY_C]);
+        $required = $this->getMock(ValidatorInterface::class);
+
+        $required->method('isValid')
+            ->willReturn(true);
+
+        $required->method('isRequired')
+            ->willReturn(true);
+
+        $validator = new AttributesValidator([
+            static::KEY_A => $required,
+            static::KEY_C => $required,
+        ]);
 
         $this->assertFalse($validator->isValid($this->data));
 
         $error = $this->getError($validator);
-        $this->assertEquals(AttributesValidator::ERROR_REQUIRED_ATTRIBUTE, $error->getCode());
+        $this->assertEquals(AttributesValidator::ERROR_REQUIRED, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/' . static::KEY_C, $error->source()->getPointer());
     }
 
     public function testKeyValidator()

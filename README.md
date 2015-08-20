@@ -19,6 +19,8 @@ A common scenario would be to decode received input for a resource object and th
 attributes within a controller. For example:
 
 ``` php
+<?php
+
 class ArticleController
 {
 
@@ -46,6 +48,7 @@ The above example can be refactored to use validators to parse the provided cont
 controller:
 
 ``` php
+<?php
 
 use CloudCreativity\JsonApi\Validator\Resource\ResourceObjectValidator;
 use CloudCreativity\JsonApi\Validator\Document\DocumentValidator;
@@ -61,8 +64,9 @@ class ArticleController
     $validator->type('article')
       ->attr('title', 'string')
       ->attr('content', 'string')
-      ->belongsTo('author', 'person')
-      ->required(['author']);
+      ->belongsTo('author', 'person', [
+        'required' => true,
+      ]);
 
     return $validator;
   }
@@ -87,6 +91,10 @@ class ArticleController
 In this refactored controller, `$data` can be used knowing that it has passed validation of the JSON API spec, and has
 been cast to an instance of `CloudCreativity\JsonApi\Object\Document\Document`, providing a fluid interface for
 handling the input within the controller.
+
+If the provided input did not pass validation, then the decoder throws a
+`CloudCreativity\JsonApi\Error\MultiErrorException` which contains the JSON API error messages indicating what is
+invalid, including JSON pointers to the source of the validation error.
 
 ## Status
 

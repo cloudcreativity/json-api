@@ -19,24 +19,16 @@
 namespace CloudCreativity\JsonApi\Validator\Attributes;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
-use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Error\SourceObject;
-use CloudCreativity\JsonApi\Validator\AbstractValidator;
-use CloudCreativity\JsonApi\Validator\Helper\AllowedKeysTrait;
-use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
-use CloudCreativity\JsonApi\Validator\Type\TypeValidator;
+use CloudCreativity\JsonApi\Validator\AbstractKeyedValidator;
 
 /**
  * Class AttributesValidator
  * @package CloudCreativity\JsonApi
  */
-class AttributesValidator extends AbstractValidator implements ConfigurableInterface, KeyedValidatorInterface
+class AttributesValidator extends AbstractKeyedValidator implements ConfigurableInterface
 {
-
-    use RequiredKeysTrait,
-        AllowedKeysTrait;
 
     // Config constants
     const ALLOWED = 'allowed';
@@ -45,7 +37,6 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     // Error constants
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_UNRECOGNISED_ATTRIBUTE = 'not-recognised';
-    const ERROR_REQUIRED_ATTRIBUTE = 'required';
 
     /**
      * @var array
@@ -63,61 +54,20 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
             ErrorObject::TITLE => 'Unrecognised Attribute',
             ErrorObject::DETAIL => 'Attribute key is not recognised and cannot be accepted.',
         ],
-        self::ERROR_REQUIRED_ATTRIBUTE => [
-            ErrorObject::CODE => self::ERROR_REQUIRED_ATTRIBUTE,
+        self::ERROR_REQUIRED => [
+            ErrorObject::CODE => self::ERROR_REQUIRED,
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Required Attribute',
-            ErrorObject::DETAIL => 'Missing required attribute "%s".',
+            ErrorObject::DETAIL => 'Expecting a value to be provided for this attribute.',
         ],
     ];
 
     /**
-     * Validators for use with keys within the attributes.
-     *
-     * @var array
+     * @param array $validators
      */
-    protected $_validators = [];
-
-    /**
-     * @param $key
-     * @param ValidatorInterface $validator
-     * @return $this
-     */
-    public function setValidator($key, ValidatorInterface $validator)
+    public function __construct(array $validators = [])
     {
-        $this->_validators[$key] = $validator;
-
-        return $this;
-    }
-
-    /**
-     * @param $key
-     * @return ValidatorInterface
-     */
-    public function getValidator($key)
-    {
-        if (!isset($this->_validators[$key])) {
-            $this->_validators[$key] = new TypeValidator();
-        }
-
-        return $this->_validators[$key];
-    }
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    public function hasValidator($key)
-    {
-        return isset($this->_validators[$key]);
-    }
-
-    /**
-     * @return array
-     */
-    public function keys()
-    {
-        return array_keys($this->_validators);
+        $this->setValidators($validators);
     }
 
     /**
@@ -128,10 +78,6 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
     {
         if (isset($config[static::ALLOWED]) && is_array($config[static::ALLOWED])) {
             $this->setAllowedKeys($config[static::ALLOWED]);
-        }
-
-        if (isset($config[static::REQUIRED]) && is_array($config[static::REQUIRED])) {
-            $this->setRequiredKeys($config[static::REQUIRED]);
         }
 
         return $this;
@@ -153,14 +99,7 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
                 ->checkValue($key, $v);
         }
 
-        // Check that required keys exist.
-        foreach ($this->getRequiredKeys() as $key) {
-
-            if (!isset($value->{$key})) {
-                $err = $this->error(static::ERROR_REQUIRED_ATTRIBUTE);
-                $err->setDetail(sprintf($err->getDetail(), $key));
-            }
-        }
+        $this->checkRequired($value);
     }
 
     /**
@@ -188,6 +127,10 @@ class AttributesValidator extends AbstractValidator implements ConfigurableInter
      */
     protected function checkValue($key, $value)
     {
+        if (!$this->hasValidator($key)) {
+            return $this;
+        }
+
         $validator = $this->getValidator($key);
 
         if ($validator->isValid($value)) {

@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
+use CloudCreativity\JsonApi\Validator\Helper\RequiredTrait;
 
 /**
  * Class HasManyValidator
@@ -32,7 +33,10 @@ use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollecti
 class HasManyValidator extends AbstractValidator implements ConfigurableInterface
 {
 
+    use RequiredTrait;
+
     // Config constants
+    const REQUIRED = 'required';
     const TYPES = 'types';
     const TYPE = self::TYPES;
     const ALLOW_EMPTY = 'allowEmpty';
@@ -197,6 +201,10 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function configure(array $config)
     {
+        if (array_key_exists(static::REQUIRED, $config)) {
+            $this->setRequired($config[static::REQUIRED]);
+        }
+
         if (isset($config[static::TYPES])) {
             $this->setTypes($config[static::TYPES]);
         }

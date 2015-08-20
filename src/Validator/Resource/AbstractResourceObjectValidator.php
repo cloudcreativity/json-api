@@ -18,7 +18,6 @@
 
 namespace CloudCreativity\JsonApi\Validator\Resource;
 
-use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
@@ -103,14 +102,14 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     /**
      * Get the attributes validator or null if the resource object must not have attributes.
      *
-     * @return ValidatorInterface
+     * @return ValidatorInterface|null
      */
     abstract public function getAttributesValidator();
 
     /**
      * Get the relationships validator or null if the resource object must not have relationships.
      *
-     * @return ValidatorInterface
+     * @return ValidatorInterface|null
      */
     abstract public function getRelationshipsValidator();
 
@@ -123,6 +122,18 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     }
 
     /**
+     * Whether the resource object expects to have an id.
+     *
+     * @return bool
+     */
+    public function isExpectingId()
+    {
+        $id = $this->getIdValidator();
+
+        return ($id instanceof ValidatorInterface && $id->isRequired());
+    }
+
+    /**
      * Whether the resource object expects to have attributes.
      *
      * @return bool
@@ -131,7 +142,7 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     {
         $attr = $this->getAttributesValidator();
 
-        return ($attr instanceof KeyedValidatorInterface && $attr->hasRequiredKeys());
+        return ($attr instanceof ValidatorInterface && $attr->isRequired());
     }
 
     /**
@@ -143,7 +154,7 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
     {
         $rel = $this->getRelationshipsValidator();
 
-        return ($rel instanceof KeyedValidatorInterface && $rel->hasRequiredKeys());
+        return ($rel instanceof ValidatorInterface && $rel->isRequired());
     }
 
     /**
@@ -170,12 +181,12 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
      */
     protected function validateType(StandardObject $object)
     {
-        if (!$object->has(ResourceObject::TYPE)) {
+        $type = $this->getTypeValidator();
+
+        if ($type->isRequired() && !$object->has(ResourceObject::TYPE)) {
             $this->error(static::ERROR_MISSING_TYPE);
             return $this;
         }
-
-        $type = $this->getTypeValidator();
 
         if (!$type->isValid($object->get(ResourceObject::TYPE))) {
             $this->getErrors()
@@ -193,12 +204,14 @@ abstract class AbstractResourceObjectValidator extends AbstractValidator
      */
     protected function validateId(StandardObject $object)
     {
+        $expectation = $this->isExpectingId();
+
         // Is valid if no id and $this does not have an id validator.
-        if (!$object->has(ResourceObject::ID) && !$this->hasIdValidator()) {
+        if (!$object->has(ResourceObject::ID) && !$expectation) {
             return $this;
         }
 
-        if (!$object->has(ResourceObject::ID) && $this->hasIdValidator()) {
+        if (!$object->has(ResourceObject::ID) && $expectation) {
             $this->error(static::ERROR_MISSING_ID, '/');
             return $this;
         } elseif ($object->has(ResourceObject::ID) && !$this->hasIdValidator()) {

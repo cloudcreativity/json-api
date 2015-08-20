@@ -133,34 +133,6 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     }
 
     /**
-     * Sets required keys, either on the attributes or the relationships.
-     *
-     * If a validator exists for a supplied key on the `RelationshipsValidator` instance, the key will be added as a
-     * required relationship key. Otherwise it will set as required on the `AttributesValidator` instance.
-     *
-     * @param $keyOrKeys
-     * @return $this
-     */
-    public function required($keyOrKeys)
-    {
-        $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
-
-        $attributes = $this->getKeyedAttributes();
-        $relationships = $this->getKeyedRelationships();
-
-        foreach ($keys as $key) {
-
-            if ($relationships->hasValidator($key)) {
-                $relationships->addRequiredKeys($key);
-            } else {
-                $attributes->addRequiredKeys($key);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return ExpectedTypeValidator
      */
     public function getTypeValidator()
@@ -185,6 +157,14 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     public function getRelated($key)
     {
         return $this->getKeyedRelationships()->getValidator($key);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired()
+    {
+        return true;
     }
 
 }

@@ -16,30 +16,33 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Validator;
-
-use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;
+namespace CloudCreativity\JsonApi\Validator\Helper;
 
 /**
- * Interface ValidatorInterface
+ * Class NullableTrait
  * @package CloudCreativity\JsonApi
  */
-interface ValidatorInterface extends ErrorsAwareInterface
+trait NullableTrait
 {
 
-    /**
-     * @param mixed $value
-     * @return bool
-     */
-    public function isValid($value);
+    protected $_acceptNull;
 
     /**
-     * Whether a value must be provided for validation.
-     *
-     * If the validator is being used as a dependent validator, then the parent validator can use this method to detect
-     * if there must be a provided value to pass to the dependent validator.
-     *
+     * @param $accept
+     * @return $this
+     */
+    public function setAcceptNull($accept)
+    {
+        $this->_acceptNull = (bool) $accept;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
-    public function isRequired();
+    public function isNullAllowed()
+    {
+        return (bool) $this->_acceptNull;
+    }
 }

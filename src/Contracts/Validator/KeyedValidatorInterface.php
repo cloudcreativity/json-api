@@ -22,7 +22,7 @@ namespace CloudCreativity\JsonApi\Contracts\Validator;
  * Interface KeyedValidatorInterface
  * @package CloudCreativity\JsonApi
  */
-interface KeyedValidatorInterface extends ValidatorInterface
+interface KeyedValidatorInterface extends ValidatorInterface, \IteratorAggregate
 {
 
     /**
@@ -31,18 +31,6 @@ interface KeyedValidatorInterface extends ValidatorInterface
      * @return $this
      */
     public function setValidator($key, ValidatorInterface $validator);
-
-    /**
-     * @param $keyOrKeys
-     * @return $this
-     */
-    public function setRequiredKeys($keyOrKeys);
-
-    /**
-     * @param $keyOrKeys
-     * @return $this
-     */
-    public function addRequiredKeys($keyOrKeys);
 
     /**
      * @param $key
@@ -62,17 +50,6 @@ interface KeyedValidatorInterface extends ValidatorInterface
      * @return array
      */
     public function keys();
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    public function isRequiredKey($key);
-
-    /**
-     * @return bool
-     */
-    public function hasRequiredKeys();
 
     /**
      * @param $keyOrKeys

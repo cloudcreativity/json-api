@@ -18,26 +18,18 @@
 
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
-use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
-use CloudCreativity\JsonApi\Validator\AbstractValidator;
-use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
+use CloudCreativity\JsonApi\Validator\AbstractKeyedValidator;
 use CloudCreativity\JsonApi\Error\ErrorObject;
-use CloudCreativity\JsonApi\Validator\Helper\AllowedKeysTrait;
-use CloudCreativity\JsonApi\Validator\Helper\RequiredKeysTrait;
 
 /**
  * Class RelationshipsValidator
  * @package CloudCreativity\JsonApi
  */
-class RelationshipsValidator extends AbstractValidator implements KeyedValidatorInterface
+class RelationshipsValidator extends AbstractKeyedValidator
 {
-
-    use RequiredKeysTrait,
-        AllowedKeysTrait;
 
     const ERROR_INVALID_VALUE = 'invalid-value';
     const ERROR_UNRECOGNISED_RELATIONSHIP = 'not-recognised';
-    const ERROR_REQUIRED_RELATIONSHIP = 'required';
 
     /**
      * @var array
@@ -49,8 +41,8 @@ class RelationshipsValidator extends AbstractValidator implements KeyedValidator
             ErrorObject::TITLE => 'Invalid Value',
             ErrorObject::DETAIL => 'Invalid relationships object value.',
         ],
-        self::ERROR_REQUIRED_RELATIONSHIP => [
-            ErrorObject::CODE => self::ERROR_REQUIRED_RELATIONSHIP,
+        self::ERROR_REQUIRED => [
+            ErrorObject::CODE => self::ERROR_REQUIRED,
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Required Relationship',
             ErrorObject::DETAIL => 'Missing required relationship "%s".',
@@ -64,68 +56,11 @@ class RelationshipsValidator extends AbstractValidator implements KeyedValidator
     ];
 
     /**
-     * @var array
+     * @param array $validators
      */
-    protected $_validators = [];
-
-    /**
-     * @param ValidatorInterface[] $validators
-     * @return $this
-     */
-    public function setValidators(array $validators)
+    public function __construct(array $validators = [])
     {
-        foreach ($validators as $key => $validator) {
-
-            if (!$validator instanceof ValidatorInterface) {
-                throw new \InvalidArgumentException('Expecting array to only contain ValidatorInterface objects.');
-            }
-
-            $this->setValidator($key, $validator);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $key
-     * @param ValidatorInterface $validator
-     * @return $this
-     */
-    public function setValidator($key, ValidatorInterface $validator)
-    {
-        $this->_validators[$key] = $validator;
-
-        return $this;
-    }
-
-    /**
-     * @param $key
-     * @return ValidatorInterface
-     */
-    public function getValidator($key)
-    {
-        if (!$this->hasValidator($key)) {
-            throw new \RuntimeException(sprintf('No validator set for "%s".', $key));
-        }
-
-        return $this->_validators[$key];
-    }
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    public function hasValidator($key)
-    {
-        return isset($this->_validators[$key]);
-    }
-
-    /**
-     * @return array
-     */
-    public function keys()
-    {
-        return array_keys($this->_validators);
+        $this->setValidators($validators);
     }
 
     /**
@@ -145,13 +80,7 @@ class RelationshipsValidator extends AbstractValidator implements KeyedValidator
         }
 
         // Check required relationships
-        foreach ($this->getRequiredKeys() as $key) {
-
-            if (!isset($value->{$key})) {
-                $error = $this->error(static::ERROR_REQUIRED_RELATIONSHIP);
-                $error->setDetail(sprintf($error->getDetail(), $key));
-            }
-        }
+        $this->checkRequired($value);
     }
 
     /**

@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validator\Type;
+namespace CloudCreativity\JsonApi\Validator\Helper;
 
 /**
- * Class NullableTrait
- * @package CloudCreativity\JsonApi
+ * Class RequiredTrait
+ * @package CloudCreativity\JsonApi\Validator\Helper
  */
-trait NullableTrait
+trait RequiredTrait
 {
 
-    protected $_acceptNull;
+    /**
+     * @var bool|null
+     */
+    protected $_required;
 
     /**
-     * @param $accept
+     * @param $required
      * @return $this
      */
-    public function setAcceptNull($accept)
+    public function setRequired($required)
     {
-        $this->_acceptNull = (bool) $accept;
+        $this->_required = (bool) $required;
 
         return $this;
     }
@@ -41,8 +44,8 @@ trait NullableTrait
     /**
      * @return bool
      */
-    public function isNullAllowed()
+    public function isRequired()
     {
-        return (bool) $this->_acceptNull;
+        return (bool) $this->_required;
     }
 }

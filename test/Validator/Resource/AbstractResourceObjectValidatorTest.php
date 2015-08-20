@@ -87,6 +87,11 @@ class AbstractResourceObjectValidatorTest extends ValidatorTestCase
 
     public function testMissingType()
     {
+        $this->type
+            ->expects($this->atLeastOnce())
+            ->method('isRequired')
+            ->willReturn(true);
+
         $this->assertFalse($this->validator->isValid(new \stdClass()));
 
         $error = $this->getError($this->validator);
@@ -111,9 +116,18 @@ class AbstractResourceObjectValidatorTest extends ValidatorTestCase
 
     public function testMissingId()
     {
+        $mock = $this->getMock(ValidatorInterface::class);
+
+        $mock->method('isValid')
+            ->willReturn(true);
+
+        $mock->expects($this->atLeastOnce())
+            ->method('isRequired')
+            ->willReturn(true);
+
         $this->validator
             ->method('getIdValidator')
-            ->willReturn($this->getMock(ValidatorInterface::class));
+            ->willReturn($mock);
 
         $this->assertFalse($this->validator->isValid($this->input));
 
@@ -178,7 +192,7 @@ class AbstractResourceObjectValidatorTest extends ValidatorTestCase
         $mock = $this->getMock(KeyedValidatorInterface::class);
 
         $mock->expects($this->atLeastOnce())
-            ->method('hasRequiredKeys')
+            ->method('isRequired')
             ->willReturn(true);
 
         $this->validator
@@ -244,7 +258,7 @@ class AbstractResourceObjectValidatorTest extends ValidatorTestCase
         $mock = $this->getMock(KeyedValidatorInterface::class);
 
         $mock->expects($this->atLeastOnce())
-            ->method('hasRequiredKeys')
+            ->method('isRequired')
             ->willReturn(true);
 
         $this->validator

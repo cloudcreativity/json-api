@@ -135,20 +135,6 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $this->assertSame($expected, $validator->getRelated($key));
     }
 
-    public function testRequired()
-    {
-        $a = 'foo';
-        $b = 'bar';
-
-        $validator = new ResourceObjectValidator();
-        $validator->attr($a);
-        $validator->belongsTo($b, 'type');
-
-        $this->assertSame($validator, $validator->required([$a, $b]));
-        $this->assertEquals([$a], $validator->getKeyedAttributes()->getRequiredKeys());
-        $this->assertEquals([$b], $validator->getKeyedRelationships()->getRequiredKeys());
-    }
-
     public function testAllowed()
     {
         $a = 'foo';

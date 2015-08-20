@@ -122,32 +122,23 @@ class RelationshipsValidatorTest extends ValidatorTestCase
 
     public function testRequired()
     {
-        $this->assertFalse($this->validator->hasRequiredKeys());
-
-        $this->assertSame($this->validator, $this->validator->setRequiredKeys([
-            static::KEY_A,
-            static::KEY_B,
-        ]));
-
-        $this->assertTrue($this->validator->hasRequiredKeys());
-
         $this->validator->setValidators([
             static::KEY_A => $this->a,
             static::KEY_B => $this->b,
         ]);
 
         $this->a->method('isValid')->willReturn(true);
+        $this->a->method('isRequired')->willReturn(false);
         $this->b->method('isValid')->willReturn(true);
+        $this->b->method('isRequired')->willReturn(true);
 
         $this->assertTrue($this->validator->isValid($this->input));
-
-        unset($this->input->{static::KEY_B});
-
-        $this->assertFalse($this->validator->isValid($this->input));
+        $this->assertFalse($this->validator->isValid(new \stdClass()));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(RelationshipsValidator::ERROR_REQUIRED_RELATIONSHIP, $error->getCode());
+        $this->assertEquals(RelationshipsValidator::ERROR_REQUIRED, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
+        $this->assertEquals('/' . static::KEY_B, $error->source()->getPointer());
     }
 
     public function testAllowed()

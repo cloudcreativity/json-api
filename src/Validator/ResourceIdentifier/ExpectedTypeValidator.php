@@ -101,6 +101,14 @@ class ExpectedTypeValidator extends AbstractValidator
     }
 
     /**
+     * @return bool
+     */
+    public function isRequired()
+    {
+        return true;
+    }
+
+    /**
      * @param mixed $value
      * @return void
      */
