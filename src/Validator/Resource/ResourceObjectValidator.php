@@ -109,6 +109,28 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     }
 
     /**
+     * Helper method to set attribute and/or relationship key validators as required.
+     *
+     * @param $keyOrKeys
+     * @return $this
+     */
+    public function required($keyOrKeys)
+    {
+        $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
+
+        foreach ($keys as $key) {
+
+            $validator = $this->getKeyValidator($key);
+
+            if (method_exists($validator, 'setRequired')) {
+                $validator->setRequired(true);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Set attributes and/or relationships to only accept keys for which there are validators.
      *
      * @param $attributes
@@ -130,6 +152,27 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
         }
 
         return $this;
+    }
+
+    /**
+     * @param $key
+     * @return ValidatorInterface
+     */
+    public function getKeyValidator($key)
+    {
+        $attributes = $this->getKeyedAttributes();
+
+        if ($attributes->hasValidator($key)) {
+            return $attributes->getValidator($key);
+        }
+
+        $relationships = $this->getKeyedRelationships();
+
+        if ($relationships->hasValidator($key)) {
+            return $relationships->getValidator($key);
+        }
+
+        throw new \OutOfBoundsException(sprintf('Key "%s" does not exist as a validator on attributes or relationships.', $key));
     }
 
     /**
