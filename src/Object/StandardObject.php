@@ -18,11 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+
 /**
  * Class StandardObject
  * @package CloudCreativity\JsonApi
  */
-class StandardObject implements \IteratorAggregate, \Countable
+class StandardObject implements \IteratorAggregate, StandardObjectInterface
 {
 
     use ObjectProxyTrait;
