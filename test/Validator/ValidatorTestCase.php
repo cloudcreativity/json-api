@@ -10,7 +10,7 @@ class ValidatorTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ValidatorInterface $validator
-     * @return mixed
+     * @return ErrorObject
      */
     protected function getError(ValidatorInterface $validator)
     {
