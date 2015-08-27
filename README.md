@@ -10,8 +10,8 @@ JSON should be *semantically* correct. E.g. when a client is providing a resourc
 
 This package provides framework agnostic validation of the received request body content - so that it can be handled
 knowing that not only has `json_decode` successfully run, but that the structure of the decoded JSON is as expected.
-Provided decoders also returns decoded content as `StandardObject` instances, an object that provides a number of
-helper methods for handling the decoded content e.g. within a controller.
+Provided decoders also returns decoded content as `StandardObjectInterface` instances, an object that provides a
+number of helper methods for handling the decoded content e.g. within a controller.
 
 ## Let's see an example...
 
@@ -57,23 +57,11 @@ use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 class ArticleController
 {
 
-  public function getArticleValidator()
-  {
-    $validator = new ResourceObjectValidator();
-
-    $validator->type('article')
-      ->attr('title', 'string')
-      ->attr('content', 'string')
-      ->belongsTo('author', 'person', [
-        'required' => true,
-      ]);
-
-    return $validator;
-  }
-
   public function getDecoder()
   {
-    $validator = new DocumentValidator($this->getArticleValidator());
+    // We provide a ResourceObjectValidator so that the data member in the
+    // document is validated as a resource object.
+    $validator = new DocumentValidator(new ResourceObjectValidator('article'));
     return new DocumentDecoder($validator);
   }
 
@@ -95,6 +83,15 @@ handling the input within the controller.
 If the provided input did not pass validation, then the decoder throws a
 `CloudCreativity\JsonApi\Error\MultiErrorException` which contains the JSON API error messages indicating what is
 invalid, including JSON pointers to the source of the validation error.
+
+## Extensibility
+
+Each validator is built on the concept that each expected member has its own validator, which can be overridden by any
+object that implements `CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface`.
+
+For example, a JSON-API resource object has `type`, `id`, `attributes` and `relationships` members. If you
+want to use a custom validator to validate the `attributes` member, then that custom validator can be used on a
+`ResourceObjectValidator` by calling `ResourceObjectValidator::setAttributesValidator()`.
 
 ## Status
 
