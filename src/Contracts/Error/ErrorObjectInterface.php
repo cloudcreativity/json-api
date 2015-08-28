@@ -44,13 +44,13 @@ interface ErrorObjectInterface extends ErrorInterface
     public function setId($id);
 
     /**
-     * @param $links
+     * @param null|string[]|LinkInterface[] $links
      * @return mixed
      */
     public function setLinks($links);
 
     /**
-     * @param null|string[]|LinkInterface[] $status
+     * @param string|int|null $status
      * @return $this
      */
     public function setStatus($status);
