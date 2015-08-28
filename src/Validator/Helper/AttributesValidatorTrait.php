@@ -65,7 +65,7 @@ trait AttributesValidatorTrait
         $attributes = $this->getAttributesValidator();
 
         if (!$attributes instanceof KeyedValidatorInterface) {
-            throw new \RuntimeException('%s expects attributes validator to be a %s instance.', static::class, KeyedValidatorInterface::class);
+            throw new \RuntimeException(sprintf('%s expects attributes validator to be a %s instance.', static::class, KeyedValidatorInterface::class));
         }
 
         return $attributes;
