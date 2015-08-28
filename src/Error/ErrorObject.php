@@ -18,24 +18,16 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use CloudCreativity\JsonApi\Contracts\Error\ErrorObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Error\SourceObjectInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
 /**
  * Class ErrorObject
  * @package CloudCreativity\JsonApi
  */
-class ErrorObject implements ErrorInterface
+class ErrorObject implements ErrorObjectInterface
 {
-
-    const ID = 'id';
-    const LINKS = 'links';
-    const STATUS = 'status';
-    const CODE = 'code';
-    const TITLE = 'title';
-    const DETAIL = 'detail';
-    const SOURCE = 'source';
-    const META = 'meta';
 
     protected $_id;
     protected $_links;
@@ -202,6 +194,7 @@ class ErrorObject implements ErrorInterface
 
     /**
      * @return SourceObject
+     * @deprecated use `getSourceObject()`
      */
     public function source()
     {
@@ -218,15 +211,13 @@ class ErrorObject implements ErrorInterface
      */
     public function setSource($source)
     {
-        if (is_null($source)) {
-            $this->_source = null;
-        } elseif (is_array($source)) {
-            $this->source()->exchangeArray($source);
-        } elseif ($source instanceof SourceObject) {
-            $this->_source = $source;
-        } else {
+        if (is_array($source)) {
+            $source = (new SourceObject())->exchangeArray($source);
+        } elseif (!is_null($source) && !$source instanceof SourceObjectInterface) {
             throw new \InvalidArgumentException('Expecting a SourceObject, array or null');
         }
+
+        $this->_source = $source;
 
         return $this;
     }
@@ -236,7 +227,19 @@ class ErrorObject implements ErrorInterface
      */
     public function getSource()
     {
-        return $this->hasSource() ? $this->_source : null;
+        return $this->_source;
+    }
+
+    /**
+     * @return SourceObjectInterface
+     */
+    public function getSourceObject()
+    {
+        if (!$this->_source instanceof SourceObjectInterface) {
+            $this->_source = new SourceObject();
+        }
+
+        return $this->_source;
     }
 
     /**
@@ -251,8 +254,12 @@ class ErrorObject implements ErrorInterface
      * @param array|null $meta
      * @return $this
      */
-    public function setMeta(array $meta = null)
+    public function setMeta($meta)
     {
+        if (!is_array($meta) && !is_null($meta)) {
+            throw new \InvalidArgumentException('Expecting meta to be an array or null.');
+        }
+
         $this->_meta = $meta;
 
         return $this;

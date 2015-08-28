@@ -18,17 +18,15 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
+use CloudCreativity\JsonApi\Contracts\Error\SourceObjectInterface;
 use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
  * Class SourceObject
  * @package CloudCreativity\JsonApi
  */
-class SourceObject extends StandardObject implements \JsonSerializable
+class SourceObject extends StandardObject implements SourceObjectInterface
 {
-
-    const POINTER = 'pointer';
-    const PARAMETER = 'parameter';
 
     /**
      * @param $pointer
