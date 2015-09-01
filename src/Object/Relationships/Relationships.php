@@ -37,6 +37,24 @@ class Relationships extends StandardObject
     }
 
     /**
+     * @param $method
+     * @param array $args
+     * @return Relationship
+     */
+    public function __call($method, array $args)
+    {
+        $matches = [];
+
+        if (!preg_match("/^get{1}(?<relationship>[A-Z]{1}[a-zA-Z]+)$/", $method, $matches)) {
+            throw new \BadMethodCallException(sprintf('Cannot call %s::%s()', static::class, $method));
+        }
+
+        array_unshift($args, lcfirst($matches['relationship']));
+
+        return call_user_func_array([$this, 'get'], $args);
+    }
+
+    /**
      * @param $key
      * @param $default
      * @return Relationship

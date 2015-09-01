@@ -34,11 +34,17 @@ class ErrorException extends \RuntimeException implements ErrorsAwareInterface
     protected $_error;
 
     /**
-     * @param ErrorInterface $error
+     * @param ErrorInterface|array $error
      * @param \Exception|null $previous
      */
-    public function __construct(ErrorInterface $error, \Exception $previous = null)
+    public function __construct($error, \Exception $previous = null)
     {
+        if (is_array($error)) {
+            $error = ErrorObject::create($error);
+        } elseif (!$error instanceof ErrorInterface) {
+            throw new \RuntimeException('Expecting an ErrorInterface instance or an array.');
+        }
+
         $code = is_numeric($error->getCode()) ? (int) $error->getCode() : null;
 
         parent::__construct($error->getTitle(), $code, $previous);
