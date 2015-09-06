@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorAwareInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\MultiErrorException;
 use CloudCreativity\JsonApi\Object\Document\Document;
@@ -28,7 +29,7 @@ use CloudCreativity\JsonApi\Validator\ValidatorAwareTrait;
  * Class ResourceDecoder
  * @package CloudCreativity\JsonApi
  */
-class DocumentDecoder extends AbstractDecoder
+class DocumentDecoder extends AbstractDecoder implements ValidatorAwareInterface
 {
 
     use ValidatorAwareTrait;

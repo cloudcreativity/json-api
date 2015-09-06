@@ -23,7 +23,7 @@ use Neomerx\JsonApi\Contracts\Integration\ExceptionThrowerInterface;
 
 /**
  * Class ExceptionThrower
- * @package CloudCreativity\JsonApi\Error
+ * @package CloudCreativity\JsonApi
  */
 class ExceptionThrower implements ExceptionThrowerInterface
 {
