@@ -94,7 +94,7 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
     {
         $status = (int) $this->_statusCode;
 
-        return 500 <= $status && 600 > $status;
+        return 400 <= $status && 600 > $status;
     }
 
     /**
