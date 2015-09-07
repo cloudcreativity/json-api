@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Error\Renderer;
+namespace CloudCreativity\JsonApi\Exceptions\Renderer;
 
 use CloudCreativity\JsonApi\Codec\CodecMatcherAwareTrait;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorCollectionInterface;
-use CloudCreativity\JsonApi\Contracts\Error\Renderer\HttpErrorStatusRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
 use CloudCreativity\JsonApi\Responses\ResponsesAwareTrait;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;

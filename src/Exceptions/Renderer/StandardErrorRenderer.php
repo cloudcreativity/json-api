@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Error\Renderer;
+namespace CloudCreativity\JsonApi\Exceptions\Renderer;
 
 use CloudCreativity\JsonApi\Contracts\Error\ErrorObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;

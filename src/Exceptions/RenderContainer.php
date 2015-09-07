@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
-use CloudCreativity\JsonApi\Contracts\Error\Renderer\ErrorRendererInterface;
-use CloudCreativity\JsonApi\Contracts\Error\Renderer\HttpErrorStatusRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ErrorRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
 use Neomerx\JsonApi\Contracts\Exceptions\RenderContainerInterface;
 
 /**
