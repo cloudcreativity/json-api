@@ -24,8 +24,12 @@ use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendere
 use CloudCreativity\JsonApi\Responses\ResponsesAwareTrait;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
+use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Responses\ResponsesInterface;
+use Neomerx\JsonApi\Encoder\Encoder;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class AbstractErrorRenderer
@@ -128,9 +132,10 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
      */
     public function render(\Exception $e)
     {
-        $matcher = $this->getCodecMatcher();
-        $encoder = $matcher->getEncoder();
-        $outputMediaType = $matcher->getEncoderRegisteredMatchedType();
+        /** @var EncoderInterface $encoder */
+        /** @var MediaTypeInterface $outputMediaType */
+        list($encoder, $outputMediaType) = $this->encoder();
+
         $parsed = $this->parse($e);
         $errors = ($parsed instanceof ErrorCollectionInterface) ? $parsed->getAll() : [$parsed];
         $statusCode = $this->hasStatusCode() ? $this->getStatusCode() : $parsed->getStatus();
@@ -144,5 +149,31 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
         return $this
             ->getResponses()
             ->getResponse((int) $statusCode, $outputMediaType, $content, $this->getSupportedExtensions());
+    }
+
+    /**
+     * Ensures an encoder is always returned.
+     *
+     * As an error can be triggered by there not being a suitable encoder, this method ensures an encoder is always
+     * returned so that an encoded response is always returned.
+     *
+     * @return array
+     */
+    protected function encoder()
+    {
+        $matcher = $this->getCodecMatcher();
+        $encoder = $matcher->getEncoder();
+        $outputMediaType = $matcher->getEncoderRegisteredMatchedType();
+
+        if (!$encoder instanceof EncoderInterface) {
+            $factory = new Factory();
+            $encoder = new Encoder($factory, []);
+            $outputMediaType = $factory->createMediaType(
+                MediaTypeInterface::JSON_API_MEDIA_TYPE,
+                MediaTypeInterface::JSON_API_SUB_TYPE
+            );
+        }
+
+        return [$encoder, $outputMediaType];
     }
 }

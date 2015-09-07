@@ -57,8 +57,12 @@ trait DocumentProviderTrait
             $matcher->findDecoder($this->getParameters()->getContentTypeHeader());
         }
 
-        /** @var DecoderInterface $decoder */
         $decoder = $matcher->getDecoder();
+
+        if (!$decoder instanceof DecoderInterface) {
+            throw new \RuntimeException('No decoder instance available.');
+        }
+
         $content = $decoder->decode($this->getCurrentRequest()->getContent());
 
         if (is_object($content) && !$content instanceof Document) {
