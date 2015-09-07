@@ -50,9 +50,9 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
     /**
      * @param CodecMatcherInterface $matcher
      * @param ResponsesInterface $responses
-     * @param SupportedExtensionsInterface|null $extensions
+     * @param SupportedExtensionsInterface|\Closure|null $extensions
      */
-    public function __construct(CodecMatcherInterface $matcher, ResponsesInterface $responses, SupportedExtensionsInterface $extensions = null)
+    public function __construct(CodecMatcherInterface $matcher, ResponsesInterface $responses, $extensions = null)
     {
         $this->setCodecMatcher($matcher)
             ->setResponses($responses);
@@ -98,11 +98,15 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
     }
 
     /**
-     * @param SupportedExtensionsInterface $extensions
+     * @param SupportedExtensionsInterface|\Closure $extensions
      * @return $this
      */
-    public function setSupportedExtensions(SupportedExtensionsInterface $extensions)
+    public function setSupportedExtensions($extensions)
     {
+        if (!$extensions instanceof SupportedExtensionsInterface && !$extensions instanceof \Closure) {
+            throw new \InvalidArgumentException(sprintf('Expecting a %s instance or a closure.', SupportedExtensionsInterface::class));
+        }
+
         $this->_extensions = $extensions;
 
         return $this;
@@ -113,7 +117,9 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
      */
     public function getSupportedExtensions()
     {
-        return $this->_extensions;
+        $extensions = ($this->_extensions instanceof \Closure) ? call_user_func($this->_extensions) : $this->_extensions;
+
+        return ($extensions instanceof SupportedExtensionsInterface) ? $extensions : null;
     }
 
     /**
@@ -137,6 +143,6 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
 
         return $this
             ->getResponses()
-            ->getResponse($statusCode, $outputMediaType, $content, $this->getSupportedExtensions());
+            ->getResponse((int) $statusCode, $outputMediaType, $content, $this->getSupportedExtensions());
     }
 }

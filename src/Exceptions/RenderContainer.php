@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Exceptions;
 
 use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ErrorRendererInterface;
 use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
