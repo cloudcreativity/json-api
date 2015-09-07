@@ -20,14 +20,19 @@ namespace CloudCreativity\JsonApi\Error;
 
 use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ErrorRendererInterface;
 use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Exceptions\RenderContainerInterface;
 
 /**
  * Class RenderContainer
  * @package CloudCreativity\JsonApi
  */
-class RenderContainer implements RenderContainerInterface
+class RenderContainer implements RenderContainerInterface, ConfigurableInterface
 {
+
+    // Config keys
+    const HTTP_CODE_MAPPING = 'http-code-mapping';
+    const JSON_API_ERROR_MAPPING = 'json-api-error-mapping';
 
     /**
      * @var array
@@ -181,6 +186,23 @@ class RenderContainer implements RenderContainerInterface
                 ->getDefaultRenderer()
                 ->render($e);
         };
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function configure(array $config)
+    {
+        if (isset($config[static::HTTP_CODE_MAPPING]) && is_array($config[static::HTTP_CODE_MAPPING])) {
+            $this->registerHttpCodeMapping($config[static::HTTP_CODE_MAPPING]);
+        }
+
+        if (isset($config[static::JSON_API_ERROR_MAPPING]) && is_array($config[static::JSON_API_ERROR_MAPPING])) {
+            $this->registerJsonApiErrorMapping($config[static::JSON_API_ERROR_MAPPING]);
+        }
+
+        return $this;
     }
 
     /**
