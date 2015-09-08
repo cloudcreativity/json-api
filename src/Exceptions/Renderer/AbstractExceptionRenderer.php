@@ -20,13 +20,12 @@ namespace CloudCreativity\JsonApi\Exceptions\Renderer;
 
 use CloudCreativity\JsonApi\Codec\CodecMatcherAwareTrait;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorCollectionInterface;
-use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ExceptionRendererInterface;
 use CloudCreativity\JsonApi\Responses\ResponsesAwareTrait;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Responses\ResponsesInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Factories\Factory;
@@ -35,35 +34,21 @@ use Neomerx\JsonApi\Factories\Factory;
  * Class AbstractErrorRenderer
  * @package CloudCreativity\JsonApi
  */
-abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
+abstract class AbstractExceptionRenderer implements ExceptionRendererInterface
 {
 
     use CodecMatcherAwareTrait,
-        ResponsesAwareTrait;
-
-    /**
-     * @var SupportedExtensionsInterface|null
-     */
-    protected $_extensions;
-
-    /**
-     * @var int|string
-     */
-    protected $_statusCode;
+        ResponsesAwareTrait,
+        ExceptionRendererTrait;
 
     /**
      * @param CodecMatcherInterface $matcher
      * @param ResponsesInterface $responses
-     * @param SupportedExtensionsInterface|\Closure|null $extensions
      */
-    public function __construct(CodecMatcherInterface $matcher, ResponsesInterface $responses, $extensions = null)
+    public function __construct(CodecMatcherInterface $matcher, ResponsesInterface $responses)
     {
         $this->setCodecMatcher($matcher)
             ->setResponses($responses);
-
-        if ($extensions) {
-            $this->setSupportedExtensions($extensions);
-        }
     }
 
     /**
@@ -71,60 +56,6 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
      * @return ErrorCollectionInterface|ErrorInterface
      */
     abstract public function parse(\Exception $e);
-
-    /**
-     * @param int|string $status
-     * @return $this
-     */
-    public function setStatusCode($status)
-    {
-        $this->_statusCode = $status;
-
-        return $this;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getStatusCode()
-    {
-        return $this->hasStatusCode() ? $this->_statusCode : 500;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasStatusCode()
-    {
-        $status = (int) $this->_statusCode;
-
-        return 400 <= $status && 600 > $status;
-    }
-
-    /**
-     * @param SupportedExtensionsInterface|\Closure $extensions
-     * @return $this
-     */
-    public function setSupportedExtensions($extensions)
-    {
-        if (!$extensions instanceof SupportedExtensionsInterface && !$extensions instanceof \Closure) {
-            throw new \InvalidArgumentException(sprintf('Expecting a %s instance or a closure.', SupportedExtensionsInterface::class));
-        }
-
-        $this->_extensions = $extensions;
-
-        return $this;
-    }
-
-    /**
-     * @return SupportedExtensionsInterface|null
-     */
-    public function getSupportedExtensions()
-    {
-        $extensions = ($this->_extensions instanceof \Closure) ? call_user_func($this->_extensions) : $this->_extensions;
-
-        return ($extensions instanceof SupportedExtensionsInterface) ? $extensions : null;
-    }
 
     /**
      * @param \Exception $e
@@ -138,17 +69,17 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
 
         $parsed = $this->parse($e);
         $errors = ($parsed instanceof ErrorCollectionInterface) ? $parsed->getAll() : [$parsed];
-        $statusCode = $this->hasStatusCode() ? $this->getStatusCode() : $parsed->getStatus();
-        $content = $encoder->encodeErrors($errors);
-
-        // just in case $parsed has not returned anything for `getStatus`
-        if (!$statusCode) {
-            $statusCode = $this->getStatusCode();
-        }
+        $statusCode = (int) $parsed->getStatus();
 
         return $this
             ->getResponses()
-            ->getResponse((int) $statusCode, $outputMediaType, $content, $this->getSupportedExtensions());
+            ->getResponse(
+                $this->isStatusCode($statusCode) ? $statusCode : $this->getStatusCode(),
+                $outputMediaType,
+                $encoder->encodeErrors($errors),
+                $this->getSupportedExtensions(),
+                $this->getHeaders()
+            );
     }
 
     /**
@@ -169,7 +100,7 @@ abstract class AbstractErrorRenderer implements HttpErrorStatusRendererInterface
             $factory = new Factory();
             $encoder = new Encoder($factory, []);
             $outputMediaType = $factory->createMediaType(
-                MediaTypeInterface::JSON_API_MEDIA_TYPE,
+                MediaTypeInterface::JSON_API_TYPE,
                 MediaTypeInterface::JSON_API_SUB_TYPE
             );
         }

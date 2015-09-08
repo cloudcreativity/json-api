@@ -28,7 +28,7 @@ use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
  * Class StandardErrorRenderer
  * @package CloudCreativity\JsonApi
  */
-class StandardErrorRenderer extends AbstractErrorRenderer
+class StandardExceptionRenderer extends AbstractExceptionRenderer
 {
 
     /**

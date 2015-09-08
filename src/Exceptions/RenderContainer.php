@@ -18,10 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ErrorRendererInterface;
-use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\HttpErrorStatusRendererInterface;
+use CloudCreativity\JsonApi\Contracts\Exceptions\Renderer\ExceptionRendererInterface;
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Exceptions\RenderContainerInterface;
+use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 
 /**
  * Class RenderContainer
@@ -40,25 +40,25 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
     protected $_renderers = [];
 
     /**
-     * @var ErrorRendererInterface|null
+     * @var ExceptionRendererInterface|null
      */
     protected $_defaultRenderer;
 
     /**
-     * @var HttpErrorStatusRendererInterface|null
+     * @var ExceptionRendererInterface|null
      */
     protected $_httpStatusRenderer;
 
     /**
-     * @var ErrorRendererInterface|null
+     * @var ExceptionRendererInterface|null
      */
     protected $_jsonApiErrorRenderer;
 
     /**
-     * @param ErrorRendererInterface $renderer
+     * @param ExceptionRendererInterface $renderer
      * @return $this
      */
-    public function setDefaultRenderer(ErrorRendererInterface $renderer)
+    public function setDefaultRenderer(ExceptionRendererInterface $renderer)
     {
         $this->_defaultRenderer = $renderer;
 
@@ -66,22 +66,22 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
     }
 
     /**
-     * @return ErrorRendererInterface
+     * @return ExceptionRendererInterface
      */
     public function getDefaultRenderer()
     {
-        if (!$this->_defaultRenderer instanceof ErrorRendererInterface) {
-            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ErrorRendererInterface::class));
+        if (!$this->_defaultRenderer instanceof ExceptionRendererInterface) {
+            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ExceptionRendererInterface::class));
         }
 
         return $this->_defaultRenderer;
     }
 
     /**
-     * @param HttpErrorStatusRendererInterface $renderer
+     * @param ExceptionRendererInterface $renderer
      * @return $this
      */
-    public function setHttpStatusRenderer(HttpErrorStatusRendererInterface $renderer)
+    public function setHttpStatusRenderer(ExceptionRendererInterface $renderer)
     {
         $this->_httpStatusRenderer = $renderer;
 
@@ -89,22 +89,22 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
     }
 
     /**
-     * @return HttpErrorStatusRendererInterface
+     * @return ExceptionRendererInterface
      */
     public function getHttpStatusRenderer()
     {
-        if (!$this->_httpStatusRenderer instanceof HttpErrorStatusRendererInterface) {
-            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, HttpErrorStatusRendererInterface::class));
+        if (!$this->_httpStatusRenderer instanceof ExceptionRendererInterface) {
+            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ExceptionRendererInterface::class));
         }
 
         return $this->_httpStatusRenderer;
     }
 
     /**
-     * @param ErrorRendererInterface $renderer
+     * @param ExceptionRendererInterface $renderer
      * @return $this
      */
-    public function setJsonApiErrorRenderer(ErrorRendererInterface $renderer)
+    public function setJsonApiErrorRenderer(ExceptionRendererInterface $renderer)
     {
         $this->_jsonApiErrorRenderer = $renderer;
 
@@ -112,12 +112,12 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
     }
 
     /**
-     * @return ErrorRendererInterface
+     * @return ExceptionRendererInterface
      */
     public function getJsonApiErrorRenderer()
     {
-        if (!$this->_jsonApiErrorRenderer instanceof ErrorRendererInterface) {
-            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ErrorRendererInterface::class));
+        if (!$this->_jsonApiErrorRenderer instanceof ExceptionRendererInterface) {
+            throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ExceptionRendererInterface::class));
         }
 
         return $this->_jsonApiErrorRenderer;
@@ -145,8 +145,10 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
      */
     public function registerHttpCodeMapping(array $exceptionMapping)
     {
+        $renderer = $this->getHttpStatusRenderer();
+
         foreach ($exceptionMapping as $exceptionClass => $statusCode) {
-            $this->registerRender($exceptionClass, $this->getHttpCodeRenderer($statusCode));
+            $this->registerRender($exceptionClass, $this->renderer($renderer, (int) $statusCode));
         }
 
         return $this;
@@ -160,8 +162,10 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
      */
     public function registerJsonApiErrorMapping(array $exceptionMapping)
     {
+        $renderer = $this->getJsonApiErrorRenderer();
+
         foreach ($exceptionMapping as $exceptionClass) {
-            $this->registerRender($exceptionClass, $this->getErrorsRenderer());
+            $this->registerRender($exceptionClass, $this->renderer($renderer));
         }
 
         return $this;
@@ -181,11 +185,7 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
             return $this->_renderers[$class];
         }
 
-        return function (\Exception $e) {
-            return $this
-                ->getDefaultRenderer()
-                ->render($e);
-        };
+        return $this->renderer($this->getDefaultRenderer());
     }
 
     /**
@@ -206,28 +206,41 @@ class RenderContainer implements RenderContainerInterface, ConfigurableInterface
     }
 
     /**
-     * @param $statusCode
+     * @param ExceptionRendererInterface $renderer
+     * @param int|null $defaultStatusCode
      * @return \Closure
      */
-    protected function getHttpCodeRenderer($statusCode)
+    protected function renderer(ExceptionRendererInterface $renderer, $defaultStatusCode = null)
     {
-        return function (\Exception $e) use ($statusCode) {
+        /**
+         * @param \Exception $e
+         * @param int|null $statusCode
+         * @param array|null $headers
+         * @param SupportedExtensionsInterface|null $extensions
+         * @return mixed
+         */
+        return function (
+            \Exception $e,
+            $statusCode = null,
+            array $headers = null,
+            SupportedExtensionsInterface $extensions = null
+        ) use ($renderer, $defaultStatusCode) {
 
-            return $this
-                ->getHttpStatusRenderer()
-                ->setStatusCode($statusCode)
-                ->render($e);
-        };
-    }
+            if ($statusCode) {
+                $renderer->withStatusCode($statusCode);
+            } elseif ($defaultStatusCode) {
+                $renderer->withStatusCode($defaultStatusCode);
+            }
 
-    /**
-     * @return \Closure
-     */
-    protected function getErrorsRenderer()
-    {
-        return function (\Exception $e) {
-            return $this->getJsonApiErrorRenderer()
-                ->render($e);
+            if (is_array($headers)) {
+                $renderer->withHeaders($headers);
+            }
+
+            if ($extensions) {
+                $renderer->withSupportedExtensions($extensions);
+            }
+
+            return $renderer->render($e);
         };
     }
 

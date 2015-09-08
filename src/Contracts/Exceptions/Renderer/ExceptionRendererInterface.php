@@ -17,13 +17,32 @@
  */
 
 namespace CloudCreativity\JsonApi\Contracts\Exceptions\Renderer;
+use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 
 /**
  * Interface ErrorRendererInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorRendererInterface
+interface ExceptionRendererInterface
 {
+
+    /**
+     * @param int $statusCode
+     * @return $this
+     */
+    public function withStatusCode($statusCode);
+
+    /**
+     * @param array $headers
+     * @return $this
+     */
+    public function withHeaders(array $headers);
+
+    /**
+     * @param SupportedExtensionsInterface $extensions
+     * @return $this
+     */
+    public function withSupportedExtensions(SupportedExtensionsInterface $extensions);
 
     /**
      * @param \Exception $e
