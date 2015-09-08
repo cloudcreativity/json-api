@@ -45,7 +45,7 @@ class AttributesValidatorTest extends ValidatorTestCase
 
     public function testIsValid()
     {
-        $validator = new AttributesValidator();
+        $validator = new RulesValidator();
 
         $this->assertTrue($validator->isValid($this->data));
         $this->assertTrue($validator->getErrors()->isEmpty());
@@ -53,7 +53,7 @@ class AttributesValidatorTest extends ValidatorTestCase
 
     public function testNotAllowed()
     {
-        $validator = new AttributesValidator();
+        $validator = new RulesValidator();
 
         $this->assertSame($validator, $validator->setAllowedKeys([static::KEY_A]));
         $this->assertFalse($validator->isValid($this->data));
@@ -62,7 +62,7 @@ class AttributesValidatorTest extends ValidatorTestCase
         $error = current($validator->getErrors()->getAll());
 
         $this->assertInstanceOf(ErrorInterface::class, $error);
-        $this->assertEquals(AttributesValidator::ERROR_UNRECOGNISED_ATTRIBUTE, $error->getCode());
+        $this->assertEquals(RulesValidator::ERROR_UNRECOGNISED_ATTRIBUTE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/' . static::KEY_B, $error->getSource()->getPointer());
     }
@@ -77,7 +77,7 @@ class AttributesValidatorTest extends ValidatorTestCase
         $required->method('isRequired')
             ->willReturn(true);
 
-        $validator = new AttributesValidator([
+        $validator = new RulesValidator([
             static::KEY_A => $required,
             static::KEY_C => $required,
         ]);
@@ -85,7 +85,7 @@ class AttributesValidatorTest extends ValidatorTestCase
         $this->assertFalse($validator->isValid($this->data));
 
         $error = $this->getError($validator);
-        $this->assertEquals(AttributesValidator::ERROR_REQUIRED, $error->getCode());
+        $this->assertEquals(RulesValidator::ERROR_REQUIRED, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/' . static::KEY_C, $error->source()->getPointer());
     }
@@ -99,7 +99,7 @@ class AttributesValidatorTest extends ValidatorTestCase
             ->with($this->data->{static::KEY_A})
             ->willReturn(true);
 
-        $validator = new AttributesValidator();
+        $validator = new RulesValidator();
 
         $this->assertSame($validator, $validator->setValidator(static::KEY_A, $mock));
 
@@ -126,7 +126,7 @@ class AttributesValidatorTest extends ValidatorTestCase
         $mock->method('getErrors')
             ->willReturn(new ErrorCollection([$error]));
 
-        $validator = new AttributesValidator();
+        $validator = new RulesValidator();
         $validator->setValidator(static::KEY_A, $mock);
 
         $this->assertFalse($validator->isValid($this->data));
