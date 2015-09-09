@@ -1,106 +1,80 @@
 <?php
 
+/**
+ * Copyright 2015 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi\Config;
 
 use CloudCreativity\JsonApi\Contracts\Config\EncoderOptionsRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Config\EncodersRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Config\SchemasRepositoryInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
 
 /**
  * Class EncodersRepository
  * @package CloudCreativity\JsonApi
+ *
+ * If a config array is provided to this class, it passes the config on
+ * to the schema repository and/or encoder options repository.
  */
 class EncodersRepository implements EncodersRepositoryInterface
 {
 
-    /** Config key for schemas configuration */
-    const SCHEMAS = 'schemas';
-
-    /** Config key for encoder options configuration */
-    const ENCODER_OPTIONS = 'encoder-options';
-
-    /**
-     * @var FactoryInterface
-     */
-    private $_factory;
-
     /**
      * @var SchemasRepositoryInterface
      */
-    private $_schemas;
+    private $schemas;
 
     /**
      * @var EncoderOptionsRepositoryInterface
      */
-    private $_encoderOptions;
+    private $encoderOptions;
 
     /**
-     * @param FactoryInterface $factory
      * @param SchemasRepositoryInterface $schemas
      * @param EncoderOptionsRepositoryInterface $encoderOptions
+     * @param array|null $config
      */
     public function __construct(
-        FactoryInterface $factory,
         SchemasRepositoryInterface $schemas,
-        EncoderOptionsRepositoryInterface $encoderOptions
+        EncoderOptionsRepositoryInterface $encoderOptions,
+        array $config = null
     ) {
-        $this->_factory = $factory;
-        $this->_schemas = $schemas;
-        $this->_encoderOptions = $encoderOptions;
+        $this->schemas = $schemas;
+        $this->encoderOptions = $encoderOptions;
+
+        if (is_array($config)) {
+            $this->configure($config);
+        }
     }
 
     /**
-     * @return FactoryInterface
-     */
-    public function getFactory()
-    {
-        return $this->_factory;
-    }
-
-    /**
-     * @param $name
-     * @return array
-     */
-    public function getSchemas($name)
-    {
-        return $this->_schemas->get($name);
-    }
-
-    /**
-     * @param $name
-     * @param array $extras
-     * @return \Neomerx\JsonApi\Encoder\EncoderOptions
-     */
-    public function getEncoderOptions($name, array $extras)
-    {
-        return $this->_encoderOptions->get($name, $extras);
-    }
-
-    /**
-     * @param string $schemas
-     *      the name of the schemas to use.
-     * @param string $encoderOptions
-     *      the name of the encoder options to use.
-     * @param array $extras
-     *      extra runtime configuration to add to encoder options.
+     * @param string|null $schemas
+     *      the named schema set to use, or empty to use the default schemas.
+     * @param null $options
+     *      the named encoder options to use, or empty to use the default options.
      * @return EncoderInterface
      */
-    public function get(
-        $schemas = SchemasRepositoryInterface::DEFAULTS,
-        $encoderOptions = EncoderOptionsRepositoryInterface::DEFAULTS,
-        array $extras = []
-    ) {
-        $schemas ?: SchemasRepositoryInterface::DEFAULTS;
-        $encoderOptions ?: EncoderOptionsRepositoryInterface::DEFAULTS;
+    public function getEncoder($schemas = null, $options = null)
+    {
+        $schemas = $this->schemas->getSchemas($schemas);
+        $options = $this->encoderOptions->getEncoderOptions($options);
 
-        return new Encoder(
-            $this->getFactory(),
-            $this->getSchemas($schemas),
-            $this->getEncoderOptions($encoderOptions, $extras)
-        );
+        return Encoder::instance($schemas, $options);
     }
 
     /**
@@ -110,11 +84,11 @@ class EncodersRepository implements EncodersRepositoryInterface
     public function configure(array $config)
     {
         if (isset($config[static::SCHEMAS]) && is_array($config[static::SCHEMAS])) {
-            $this->_schemas->configure($config[static::SCHEMAS]);
+            $this->schemas->configure($config[static::SCHEMAS]);
         }
 
-        if (isset($config[static::ENCODER_OPTIONS]) && is_array($config[static::ENCODER_OPTIONS])) {
-            $this->_encoderOptions->configure($config[static::ENCODER_OPTIONS]);
+        if (isset($config[static::OPTIONS]) && is_array($config[static::OPTIONS])) {
+            $this->encoderOptions->configure($config[static::OPTIONS]);
         }
 
         return $this;

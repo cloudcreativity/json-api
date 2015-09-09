@@ -1,23 +1,34 @@
 <?php
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+/**
+ * Copyright 2015 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
+namespace CloudCreativity\JsonApi\Contracts\Config;
 
 /**
  * Interface SchemaRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface SchemasRepositoryInterface extends ConfigurableInterface
+interface SchemasRepositoryInterface extends ConfigRepositoryInterface
 {
 
-    /** The name of the default set of schemas. */
-    const DEFAULTS = 'defaults';
-
     /**
-     * @param string $schemas
-     *      The name of the schema set. If omitted, will return the default set.
+     * @param string|null $schemas
+     *      The name of the schema set, or empty to get the default schemas.
      * @return array
      */
-    public function get($schemas = self::DEFAULTS);
+    public function getSchemas($schemas = null);
 }

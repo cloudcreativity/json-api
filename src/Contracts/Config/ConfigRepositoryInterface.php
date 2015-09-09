@@ -19,27 +19,30 @@
 namespace CloudCreativity\JsonApi\Contracts\Config;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
-use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 
 /**
- * Interface EncodersRepositoryInterface
+ * Interface RepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface EncodersRepositoryInterface extends ConfigurableInterface
+interface ConfigRepositoryInterface extends ConfigurableInterface
 {
 
-    /** Config key for schemas configuration */
-    const SCHEMAS = 'schemas';
-
-    /** Config key for encoder options cnofiguration */
-    const OPTIONS = 'options';
+    /** Config key for default configuration */
+    const DEFAULTS = 'defaults';
 
     /**
-     * @param string|null $schemas
-     *      the named schema set to use, or empty to use the default schemas.
-     * @param null $options
-     *      the named encoder options to use, or empty to use the default options.
-     * @return EncoderInterface
+     * Provide a callback to apply runtime configuration options.
+     *
+     * The callback will be invoked after the repository has loaded the config, but before it is used (either to
+     * generate an object or to return a config array). The provided callback will receive the following two
+     * arguments:
+     *
+     * `function (MutableConfigInterface $config, string $name)`
+     *
+     * Where `$name` is the name of whatever has been loaded.
+     *
+     * @param \Closure $callback
+     * @return $this
      */
-    public function getEncoder($schemas = null, $options = null);
+    public function addModifier(\Closure $callback);
 }

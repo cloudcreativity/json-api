@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2015 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi\Config;
 
 use CloudCreativity\JsonApi\Contracts\Config\EncoderOptionsRepositoryInterface;
@@ -8,14 +24,31 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
 /**
  * Class EncoderOptionsRepository
  * @package CloudCreativity\JsonApi
+ *
+ * Example provided array:
+ *
+ * ````
+ * [
+ *      'defaults' => [
+ *           'version' => true,
+ *           'version-meta' => [
+ *              'version' => '1.0',
+ *          ],
+ *      ],
+ *      'humanized' => [
+ *          'options' => JSON_PRETTY_PRINT,
+ *      ],
+ * ]
+ * ````
+ *
+ * If the `humanized` encoder options are requested, 'humanized' will be recursively merged into 'defaults' and then
+ * used to generate an EncoderOptions instance.
+ *
  */
 class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
 {
 
-    /**
-     * @var array
-     */
-    protected $_config;
+    use RepositoryTrait;
 
     /**
      * @param array $config
@@ -30,94 +63,18 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
      * @param array $extras
      * @return EncoderOptions
      */
-    public function get($name = self::DEFAULTS, array $extras = [])
+    public function getEncoderOptions($name = null, array $extras = [])
     {
-        $config = $this->config($name, $extras);
-
-        $options = array_key_exists(static::OPTIONS, $config) ?
-            $config[static::OPTIONS] : static::OPTIONS_DEFAULT;
-
-        $urlPrefix = array_key_exists(static::URL_PREFIX, $config) ?
-            $config[static::URL_PREFIX] : static::URL_PREFIX_DEFAULT;
-
-        $isShowVersionInfo = array_key_exists(static::IS_SHOW_VERSION_INFO, $config) ?
-            $config[static::IS_SHOW_VERSION_INFO] : static::IS_SHOW_VERSION_INFO_DEFAULT;
-
-        $versionMeta = array_key_exists(static::VERSION_META, $config) ?
-            $config[static::VERSION_META] : static::VERSION_META_DEFAULT;
-
-        $depth = array_key_exists(static::DEPTH, $config) ?
-            $config[static::DEPTH] : static::DEPTH_DEFAULT;
+        $name = ($name) ?: static::DEFAULTS;
+        $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
+        $config = $this->modify($this->merge($merge, true), $name);
 
         return new EncoderOptions(
-            $options,
-            $urlPrefix,
-            $isShowVersionInfo,
-            $versionMeta,
-            $depth
+            $config->get(static::OPTIONS, static::OPTIONS_DEFAULT),
+            $config->get(static::URL_PREFIX, static::URL_PREFIX_DEFAULT),
+            $config->get(static::IS_SHOW_VERSION_INFO, static::IS_SHOW_VERSION_INFO_DEFAULT),
+            $config->get(static::VERSION_META, static::VERSION_META_DEFAULT),
+            $config->get(static::DEPTH, static::DEPTH_DEFAULT)
         );
-    }
-
-    /**
-     * @param array $config
-     * @return $this
-     */
-    public function configure(array $config)
-    {
-        $this->_config = $config;
-
-        return $this;
-    }
-
-    /**
-     * @param $key
-     * @param array $extras
-     * @return array
-     */
-    protected function config($key, array $extras = [])
-    {
-        $set = (static::DEFAULTS === $key) ? $this->defaults() : $this->merge($key);
-
-        return array_merge_recursive($extras, $set);
-    }
-
-    /**
-     * @param $key
-     * @return array
-     */
-    protected function merge($key)
-    {
-        return array_merge_recursive($this->defaults(), $this->find($key));
-    }
-
-    /**
-     * @param $key
-     * @return array
-     */
-    protected function find($key)
-    {
-        return array_key_exists($key, $this->_config) ? (array) $this->_config[$key] : [];
-    }
-
-    /**
-     * @return array
-     */
-    protected function defaults()
-    {
-        return $this->find(static::DEFAULTS);
-    }
-
-    /**
-     * @return array
-     */
-    public static function defaultOptions()
-    {
-        return [
-            static::OPTIONS => static::OPTIONS_DEFAULT,
-            static::URL_PREFIX => static::URL_PREFIX_DEFAULT,
-            static::IS_SHOW_VERSION_INFO => static::IS_SHOW_VERSION_INFO_DEFAULT,
-            static::VERSION_META => static::VERSION_META,
-            static::DEPTH => static::DEPTH,
-        ];
     }
 }

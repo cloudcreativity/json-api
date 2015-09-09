@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Validator\Helper;
 
 use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
-use CloudCreativity\JsonApi\Validator\Attributes\RulesValidator;
+use CloudCreativity\JsonApi\Validator\Attributes\AttributesValidator;
 
 /**
  * Class AttributesValidatorTrait
@@ -51,7 +51,7 @@ trait AttributesValidatorTrait
     public function getAttributesValidator()
     {
         if (!$this->_attributesValidator instanceof ValidatorInterface) {
-            $this->_attributesValidator = new RulesValidator();
+            $this->_attributesValidator = new AttributesValidator();
         }
 
         return $this->_attributesValidator;

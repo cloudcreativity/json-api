@@ -18,29 +18,24 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Config;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 
 /**
- * Interface CodecMatcherRepositoryInterface
+ * Interface DecodersRepository
  * @package CloudCreativity\JsonApi
  */
-interface CodecMatcherRepositoryInterface extends ConfigRepositoryInterface
+interface DecodersRepositoryInterface extends ConfigRepositoryInterface
 {
 
-
-    /** Config key for a codec matcher's encoders */
-    const ENCODERS = 'encoders';
-    /** Config key for named schemas to use for an encoder. */
-    const ENCODER_SCHEMAS = 'schemas';
-    /** Config key for named encoder options to use for an encoder. */
-    const ENCODER_OPTIONS = 'options';
-    /** Config key for a codec matcher's decoders */
-    const DECODERS = 'decoders';
+    /** The type (fqn) of the decoder. */
+    const TYPE = 'type';
+    /** Options to set on the decoder. */
+    const OPTIONS = 'options';
 
     /**
      * @param string|null $name
-     *      the name of the codec matcher or empty to get the default codec matcher.
-     * @return CodecMatcherInterface
+     *      get the named decoder or the default decoder if empty.
+     * @return DecoderInterface
      */
-    public function getCodecMatcher($name = null);
+    public function getDecoder($name = null);
 }
