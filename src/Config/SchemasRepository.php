@@ -40,11 +40,20 @@ use CloudCreativity\JsonApi\Contracts\Config\SchemasRepositoryInterface;
  *
  * If the 'foo' schema is requested, the return array will have Author, Schema and Comment in it.
  *
+ * This repository also accepts non-namespaced schemas. I.e. if the config array does not have a 'defaults' key, it
+ * will be loaded as the default schemas.
  */
 class SchemasRepository implements SchemasRepositoryInterface
 {
 
-    use RepositoryTrait;
+    use RepositoryTrait {
+        configure as traitConfigure;
+    }
+
+    /**
+     * @var bool
+     */
+    private $namespaced = false;
 
     /**
      * @param array $config
@@ -61,12 +70,35 @@ class SchemasRepository implements SchemasRepositoryInterface
     public function getSchemas($name = null)
     {
         $name = ($name) ?: static::DEFAULTS;
+
+        if (static::DEFAULTS !== $name && !$this->namespaced) {
+            throw new \RuntimeException(sprintf('Schemas configuration is not namespaced, so cannot get "%s".', $name));
+        }
+
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
         $config = $this->merge($merge);
 
         return $this
             ->modify($config, $name)
             ->toArray();
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function configure(array $config)
+    {
+        if (!isset($config[static::DEFAULTS])) {
+            $config = [static::DEFAULTS => $config];
+            $this->namespaced = false;
+        } else {
+            $this->namespaced = true;
+        }
+
+        $this->traitConfigure($config);
+
+        return $this;
     }
 
 }

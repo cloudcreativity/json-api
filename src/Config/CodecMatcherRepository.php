@@ -68,6 +68,9 @@ use Neomerx\JsonApi\Parameters\Headers\MediaType;
  * ]
  * ```
  *
+ * This repository also accepts non-namespaced config: i.e. the provided config array will be loaded as the default if
+ * it does not contain the `defaults` key.
+ *
  */
 class CodecMatcherRepository implements CodecMatcherRepositoryInterface
 {
@@ -85,6 +88,11 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
      * @var DecodersRepositoryInterface
      */
     private $decoders;
+
+    /**
+     * @var bool
+     */
+    private $namespaced = false;
 
     /**
      * @param EncodersRepositoryInterface $encoders
@@ -109,6 +117,11 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     public function getCodecMatcher($name = null)
     {
         $name = ($name) ?: static::DEFAULTS;
+
+        if (static::DEFAULTS !== $name && !$this->namespaced) {
+            throw new \RuntimeException(sprintf('Codec Matcher configuration is not namespaced, so cannot get "%s".', $name));
+        }
+
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
         $config = $this->merge($merge);
 
@@ -126,6 +139,13 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
      */
     public function configure(array $config)
     {
+        if (!isset($config[static::DEFAULTS])) {
+            $config = [static::DEFAULTS => $config];
+            $this->namespaced = false;
+        } else {
+            $this->namespaced = true;
+        }
+
         $this->traitConfigure($this->parseConfig($config));
 
         return $this;

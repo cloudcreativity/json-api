@@ -70,6 +70,8 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $this->repository->getEncoderOptions());
         $this->assertEquals($expected, $this->repository->getEncoderOptions(EncoderOptionsRepository::DEFAULTS));
+
+        return $expected;
     }
 
     public function testGetVariant()
@@ -87,6 +89,20 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         return [$expected, $settings];
+    }
+
+    /**
+     * @depends testGetDefault
+     * @param EncoderOptions $expected
+     */
+    public function testRootConfig(EncoderOptions $expected)
+    {
+        $repository = new EncoderOptionsRepository($this->config[EncoderOptionsRepository::DEFAULTS]);
+
+        $this->assertEquals($expected, $repository->getEncoderOptions());
+
+        $this->setExpectedException(\RuntimeException::class);
+        $repository->getEncoderOptions('foo');
     }
 
     /**

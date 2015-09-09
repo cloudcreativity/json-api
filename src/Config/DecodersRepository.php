@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Config;
 
+use CloudCreativity\JsonApi\Contracts\Config\ConfigInterface;
 use CloudCreativity\JsonApi\Contracts\Config\DecodersRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
@@ -25,6 +26,24 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 /**
  * Class DecodersRepository
  * @package CloudCreativity\JsonApi
+ *
+ * Example config:
+ *
+ * ````
+ * [
+ *      'defaults' => ObjectDecoder::class,
+ *      'array' => [
+ *          'type' => ArrayDecoder::class,
+ *          'options' => [],
+ *      ],
+ * ]
+ * ````
+ *
+ * I.e. either a string for class name, or an array can be provided. Although no decoders accept 'options' at the
+ * moment, it is reserved for future use.
+ *
+ * This repository also accepts non-namespaced config. I.e. if the provided config array does not have the 'defaults'
+ * key, it will be loaded as the default configuration.
  */
 class DecodersRepository implements DecodersRepositoryInterface
 {
@@ -33,34 +52,35 @@ class DecodersRepository implements DecodersRepositoryInterface
         configure as traitConfigure;
     }
 
+    /**
+     * @var bool
+     */
+    private $namespaced = false;
+
+    /**
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $this->configure($config);
     }
 
+    /**
+     * @param string|null $name
+     * @return DecoderInterface
+     */
     public function getDecoder($name = null)
     {
         $name = ($name) ?: static::DEFAULTS;
+
+        if (static::DEFAULTS !== $name && !$this->namespaced) {
+            throw new \RuntimeException(sprintf('Decoder configuration is not namespaced, so cannot get "%s".', $name));
+        }
+
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
         $config = $this->modify($this->merge($merge), $name);
 
-        $class = $config->get(static::TYPE);
-
-        if (!class_exists($class)) {
-            throw new \RuntimeException(sprintf('Not a fully qualified class name for decoder "%s".', $name));
-        }
-
-        $decoder = new $class();
-
-        if (!$decoder instanceof DecoderInterface) {
-            throw new \RuntimeException(sprintf('Invalid decoder type for decoder "%s".', $name));
-        }
-
-        if ($decoder instanceof ConfigurableInterface) {
-            $decoder->configure((array) $config->get(static::OPTIONS, []));
-        }
-
-        return $decoder;
+        return $this->make($config);
     }
 
     /**
@@ -69,6 +89,13 @@ class DecodersRepository implements DecodersRepositoryInterface
      */
     public function configure(array $config)
     {
+        if (!isset($config[static::DEFAULTS])) {
+            $config = [static::DEFAULTS => $config];
+            $this->namespaced = false;
+        } else {
+            $this->namespaced = true;
+        }
+
         $this->traitConfigure($this->parseConfig($config));
 
         return $this;
@@ -94,6 +121,31 @@ class DecodersRepository implements DecodersRepositoryInterface
         }
 
         return $decoders;
+    }
+
+    /**
+     * @param ConfigInterface $config
+     * @return DecoderInterface
+     */
+    private function make(ConfigInterface $config)
+    {
+        $class = $config->get(static::TYPE);
+
+        if (!class_exists($class)) {
+            throw new \RuntimeException(sprintf('Not a fully qualified class name for decoder "%s".', $name));
+        }
+
+        $decoder = new $class();
+
+        if (!$decoder instanceof DecoderInterface) {
+            throw new \RuntimeException(sprintf('Invalid decoder type for decoder "%s".', $name));
+        }
+
+        if ($decoder instanceof ConfigurableInterface) {
+            $decoder->configure((array) $config->get(static::OPTIONS, []));
+        }
+
+        return $decoder;
     }
 
 }

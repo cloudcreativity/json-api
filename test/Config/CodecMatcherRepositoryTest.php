@@ -83,6 +83,9 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $repository;
 
+    private $encoders;
+    private $decoders;
+
     protected function setUp()
     {
         $defaultSchemas = ['foo' => 'bar'];
@@ -117,6 +120,8 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
             ]));
 
         $this->repository = new CodecMatcherRepository($encoders, $decoders, $this->config);
+        $this->encoders = $encoders;
+        $this->decoders = $decoders;
     }
 
     public function testDefault()
@@ -161,6 +166,26 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($this->paramEncoder, $codecMatcher->getEncoder());
         $this->assertEquals($this->paramDecoder, $codecMatcher->getDecoder());
+    }
+
+    /**
+     * @depends testDefault
+     */
+    public function testRootConfig()
+    {
+        $config = $this->config[CodecMatcherRepository::DEFAULTS];
+
+        $repository = new CodecMatcherRepository($this->encoders, $this->decoders, $config);
+
+        $codecMatcher = $repository->getCodecMatcher();
+
+        $this->match($codecMatcher, MediaTypeInterface::JSON_API_MEDIA_TYPE);
+
+        $this->assertEquals($this->defaultEncoder, $codecMatcher->getEncoder());
+        $this->assertEquals($this->defaultDecoder, $codecMatcher->getDecoder());
+
+        $this->setExpectedException(\RuntimeException::class);
+        $repository->getCodecMatcher('foo');
     }
 
     /**

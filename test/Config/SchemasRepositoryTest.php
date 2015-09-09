@@ -83,4 +83,18 @@ class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->repository, $this->repository->addModifier($callback));
         $this->assertEquals($expected, $this->repository->getSchemas(static::VARIANT));
     }
+
+    /**
+     * @depends testGetDefaults
+     */
+    public function testRootConfig()
+    {
+        $defaults = $this->config[SchemasRepository::DEFAULTS];
+
+        $repository = new SchemasRepository($defaults);
+        $this->assertEquals($defaults, $repository->getSchemas());
+
+        $this->setExpectedException(\RuntimeException::class);
+        $repository->getSchemas('foo');
+    }
 }

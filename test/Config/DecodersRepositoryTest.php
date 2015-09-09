@@ -39,6 +39,11 @@ class DecodersRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $repository;
 
+    /**
+     * @var array
+     */
+    private $config;
+
     protected function setUp()
     {
         $this->defaultDecoder = new ObjectDecoder();
@@ -51,6 +56,7 @@ class DecodersRepositoryTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
+        $this->config = $config;
         $this->repository = new DecodersRepository($config);
     }
 
@@ -63,6 +69,19 @@ class DecodersRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $actual = $this->repository->getDecoder(static::VARIANT);
         $this->assertEquals($this->variantDecoder, $actual);
+    }
+
+    /**
+     * @depends testDefault
+     */
+    public function testRootConfig()
+    {
+        $repository = new DecodersRepository($this->config[static::VARIANT]);
+
+        $this->assertEquals($this->variantDecoder, $repository->getDecoder());
+
+        $this->setExpectedException(\RuntimeException::class);
+        $repository->getDecoder('foo');
     }
 
     public function testModifier()

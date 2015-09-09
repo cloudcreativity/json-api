@@ -44,11 +44,21 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
  * If the `humanized` encoder options are requested, 'humanized' will be recursively merged into 'defaults' and then
  * used to generate an EncoderOptions instance.
  *
+ * This repository also accepts config that is not namespaced - i.e. if the config array does not have a 'defaults'
+ * key, it will be loaded as the default configuration.
+ *
  */
 class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
 {
 
-    use RepositoryTrait;
+    use RepositoryTrait {
+        configure as traitConfigure;
+    }
+
+    /**
+     * @var bool
+     */
+    private $namespaced = false;
 
     /**
      * @param array $config
@@ -66,6 +76,11 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
     public function getEncoderOptions($name = null, array $extras = [])
     {
         $name = ($name) ?: static::DEFAULTS;
+
+        if (static::DEFAULTS !== $name && !$this->namespaced) {
+            throw new \RuntimeException(sprintf('Encoder Options configuration is not namespaced, so cannot get "%s".', $name));
+        }
+
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
         $config = $this->modify($this->merge($merge, true), $name);
 
@@ -76,5 +91,23 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
             $config->get(static::VERSION_META, static::VERSION_META_DEFAULT),
             $config->get(static::DEPTH, static::DEPTH_DEFAULT)
         );
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function configure(array $config)
+    {
+        if (!isset($config[static::DEFAULTS])) {
+            $config = [static::DEFAULTS => $config];
+            $this->namespaced = false;
+        } else {
+            $this->namespaced = true;
+        }
+
+        $this->traitConfigure($config);
+
+        return $this;
     }
 }
