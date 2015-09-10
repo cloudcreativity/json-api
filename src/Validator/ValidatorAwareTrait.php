@@ -30,7 +30,7 @@ trait ValidatorAwareTrait
     /**
      * @var ValidatorInterface|null
      */
-    protected $_validator;
+    private $validator;
 
     /**
      * @param ValidatorInterface $validator
@@ -38,7 +38,7 @@ trait ValidatorAwareTrait
      */
     public function setValidator(ValidatorInterface $validator)
     {
-        $this->_validator = $validator;
+        $this->validator = $validator;
 
         return $this;
     }
@@ -48,11 +48,11 @@ trait ValidatorAwareTrait
      */
     public function getValidator()
     {
-        if (!$this->_validator instanceof ValidatorInterface) {
+        if (!$this->validator instanceof ValidatorInterface) {
             throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ValidatorInterface::class));
         }
 
-        return $this->_validator;
+        return $this->validator;
     }
 
     /**
@@ -60,6 +60,6 @@ trait ValidatorAwareTrait
      */
     public function hasValidator()
     {
-        return $this->_validator instanceof ValidatorInterface;
+        return $this->validator instanceof ValidatorInterface;
     }
 }

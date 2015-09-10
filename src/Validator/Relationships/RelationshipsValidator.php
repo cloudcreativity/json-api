@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Validator\Relationships;
 
-use CloudCreativity\JsonApi\Validator\AbstractKeyedValidator;
 use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Validator\AbstractKeyedValidator;
 
 /**
  * Class RelationshipsValidator

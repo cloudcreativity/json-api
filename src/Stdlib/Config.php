@@ -16,28 +16,28 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Stdlib;
 
-use CloudCreativity\JsonApi\Contracts\Config\ConfigInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigInterface;
 
 /**
  * Class ImmutableConfig
  * @package CloudCreativity\JsonApi
  */
-class ImmutableConfig implements ConfigInterface
+class Config implements ConfigInterface
 {
 
     /**
      * @var array
      */
-    protected $_config = [];
+    protected $config = [];
 
     /**
      * @param array $config
      */
     public function __construct(array $config = [])
     {
-        $this->_config = $config;
+        $this->config = $config;
     }
 
     /**
@@ -47,7 +47,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function get($key, $default = null)
     {
-        return array_key_exists($key, $this->_config) ? $this->_config[$key] : $default;
+        return array_key_exists($key, $this->config) ? $this->config[$key] : $default;
     }
 
     /**
@@ -74,7 +74,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function exists($key)
     {
-        return array_key_exists($key, $this->_config);
+        return array_key_exists($key, $this->config);
     }
 
     /**
@@ -85,7 +85,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function has($key)
     {
-        return isset($this->_config[$key]);
+        return isset($this->config[$key]);
     }
 
     /**
@@ -111,7 +111,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function toArray()
     {
-        return $this->_config;
+        return $this->config;
     }
 
     /**
@@ -119,7 +119,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function isEmpty()
     {
-        return empty($this->_config);
+        return empty($this->config);
     }
 
     /**
@@ -127,7 +127,7 @@ class ImmutableConfig implements ConfigInterface
      */
     public function count()
     {
-        return count($this->_config);
+        return count($this->config);
     }
 
     /**

@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\CodecMatcherRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Config\ConfigInterface;
-use CloudCreativity\JsonApi\Contracts\Config\DecodersRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Config\EncodersRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\DecodersRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\EncodersRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigInterface;
+use CloudCreativity\JsonApi\Stdlib\Config;
 use Neomerx\JsonApi\Codec\CodecMatcher;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Parameters\Headers\MediaType;
@@ -165,8 +166,8 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
             $decoders = isset($codecMatcherConfig[static::DECODERS]) ? $codecMatcherConfig[static::DECODERS] : [];
 
             $parsed[$codecMatcherName] = [
-                static::ENCODERS => new ImmutableConfig($this->parseEncodersConfig((array) $encoders)),
-                static::DECODERS => new ImmutableConfig($this->parseDecodersConfig((array) $decoders)),
+                static::ENCODERS => new Config($this->parseEncodersConfig((array) $encoders)),
+                static::DECODERS => new Config($this->parseDecodersConfig((array) $decoders)),
             ];
         }
 

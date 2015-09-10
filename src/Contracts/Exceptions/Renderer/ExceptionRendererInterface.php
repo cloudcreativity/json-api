@@ -17,6 +17,7 @@
  */
 
 namespace CloudCreativity\JsonApi\Contracts\Exceptions\Renderer;
+
 use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 
 /**

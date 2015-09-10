@@ -62,7 +62,7 @@ class ExpectedTypeValidator extends AbstractValidator
     /**
      * @var string|null
      */
-    protected $_expected;
+    protected $expected;
 
     /**
      * @param string $type
@@ -74,7 +74,7 @@ class ExpectedTypeValidator extends AbstractValidator
             throw new \InvalidArgumentException('Expecting a non-empty string expected type.');
         }
 
-        $this->_expected = $type;
+        $this->expected = $type;
 
         return $this;
     }
@@ -84,11 +84,11 @@ class ExpectedTypeValidator extends AbstractValidator
      */
     public function getExpected()
     {
-        if (!is_string($this->_expected)) {
+        if (!is_string($this->expected)) {
             throw new \RuntimeException('No expected type set.');
         }
 
-        return $this->_expected;
+        return $this->expected;
     }
 
     /**

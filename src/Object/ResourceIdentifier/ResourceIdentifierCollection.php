@@ -28,7 +28,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
     /**
      * @var array
      */
-    protected $_stack = [];
+    private $stack = [];
 
     /**
      * @param array $identifiers
@@ -45,7 +45,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
     public function add(ResourceIdentifier $identifier)
     {
         if (!$this->has($identifier)) {
-            $this->_stack[] = $identifier;
+            $this->stack[] = $identifier;
         }
 
         return $this;
@@ -57,7 +57,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function has(ResourceIdentifier $identifier)
     {
-        return in_array($identifier, $this->_stack);
+        return in_array($identifier, $this->stack);
     }
 
     /**
@@ -94,7 +94,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function getAll()
     {
-        return $this->_stack;
+        return $this->stack;
     }
 
     /**
@@ -102,7 +102,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function clear()
     {
-        $this->_stack = [];
+        $this->stack = [];
 
         return $this;
     }
@@ -120,7 +120,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->_stack);
+        return count($this->stack);
     }
 
     /**
@@ -128,7 +128,7 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
      */
     public function isEmpty()
     {
-        return empty($this->_stack);
+        return empty($this->stack);
     }
 
     /**

@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 /**
  * Interface SchemaRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface SchemasRepositoryInterface extends ConfigRepositoryInterface
+interface SchemasRepositoryInterface extends MutableRepositoryInterface
 {
 
     /**

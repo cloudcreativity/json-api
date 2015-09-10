@@ -25,7 +25,7 @@ namespace CloudCreativity\JsonApi\Validator\Helper;
 trait NullableTrait
 {
 
-    protected $_acceptNull;
+    private $acceptNull;
 
     /**
      * @param $accept
@@ -33,7 +33,7 @@ trait NullableTrait
      */
     public function setAcceptNull($accept)
     {
-        $this->_acceptNull = (bool) $accept;
+        $this->acceptNull = (bool) $accept;
 
         return $this;
     }
@@ -43,6 +43,6 @@ trait NullableTrait
      */
     public function isNullAllowed()
     {
-        return (bool) $this->_acceptNull;
+        return (bool) $this->acceptNull;
     }
 }

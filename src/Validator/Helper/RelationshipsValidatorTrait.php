@@ -32,7 +32,7 @@ trait RelationshipsValidatorTrait
     /**
      * @var ValidatorInterface|null
      */
-    protected $_relationshipsValidator;
+    protected $relationshipsValidator;
 
     /**
      * @param ValidatorInterface $validator
@@ -40,7 +40,7 @@ trait RelationshipsValidatorTrait
      */
     public function setRelationshipsValidator(ValidatorInterface $validator)
     {
-        $this->_relationshipsValidator = $validator;
+        $this->relationshipsValidator = $validator;
 
         return $this;
     }
@@ -50,11 +50,11 @@ trait RelationshipsValidatorTrait
      */
     public function getRelationshipsValidator()
     {
-        if (!$this->_relationshipsValidator instanceof ValidatorInterface) {
-            $this->_relationshipsValidator = new RelationshipsValidator();
+        if (!$this->relationshipsValidator instanceof ValidatorInterface) {
+            $this->relationshipsValidator = new RelationshipsValidator();
         }
 
-        return $this->_relationshipsValidator;
+        return $this->relationshipsValidator;
     }
 
     /**

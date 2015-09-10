@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;

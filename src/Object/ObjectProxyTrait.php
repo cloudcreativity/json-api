@@ -28,7 +28,7 @@ trait ObjectProxyTrait
     /**
      * @var object|null
      */
-    protected $_proxy;
+    private $proxy;
 
     /**
      * @param object $proxy
@@ -40,7 +40,7 @@ trait ObjectProxyTrait
             throw new \InvalidArgumentException('Expecting an object.');
         }
 
-        $this->_proxy = $proxy;
+        $this->proxy = $proxy;
 
         return $this;
     }
@@ -50,11 +50,11 @@ trait ObjectProxyTrait
      */
     public function getProxy()
     {
-        if (!is_object($this->_proxy)) {
-            $this->_proxy = new \stdClass();
+        if (!is_object($this->proxy)) {
+            $this->proxy = new \stdClass();
         }
 
-        return $this->_proxy;
+        return $this->proxy;
     }
 
     /**

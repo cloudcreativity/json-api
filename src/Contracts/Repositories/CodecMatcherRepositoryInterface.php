@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 
@@ -24,7 +24,7 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
  * Interface CodecMatcherRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface CodecMatcherRepositoryInterface extends ConfigRepositoryInterface
+interface CodecMatcherRepositoryInterface extends MutableRepositoryInterface
 {
 
 

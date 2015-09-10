@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\EncodersRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Config\DecodersRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\EncodersRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\DecodersRepositoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;

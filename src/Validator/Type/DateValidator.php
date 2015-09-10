@@ -35,7 +35,7 @@ class DateValidator extends TypeValidator
     /**
      * @var array
      */
-    protected $_formats = [];
+    private $formats = [];
 
     /**
      * @param array $formats
@@ -82,7 +82,7 @@ class DateValidator extends TypeValidator
             throw new \InvalidArgumentException('Expecting a non-empty string format.');
         }
 
-        $this->_formats[] = $format;
+        $this->formats[] = $format;
 
         return $this;
     }
@@ -92,7 +92,7 @@ class DateValidator extends TypeValidator
      */
     public function getFormats()
     {
-        return $this->_formats;
+        return $this->formats;
     }
 
     /**

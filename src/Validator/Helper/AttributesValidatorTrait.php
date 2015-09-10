@@ -32,7 +32,7 @@ trait AttributesValidatorTrait
     /**
      * @var ValidatorInterface|null
      */
-    protected $_attributesValidator;
+    private $attributesValidator;
 
     /**
      * @param ValidatorInterface $validator
@@ -40,7 +40,7 @@ trait AttributesValidatorTrait
      */
     public function setAttributesValidator(ValidatorInterface $validator)
     {
-        $this->_attributesValidator = $validator;
+        $this->attributesValidator = $validator;
 
         return $this;
     }
@@ -50,11 +50,11 @@ trait AttributesValidatorTrait
      */
     public function getAttributesValidator()
     {
-        if (!$this->_attributesValidator instanceof ValidatorInterface) {
-            $this->_attributesValidator = new AttributesValidator();
+        if (!$this->attributesValidator instanceof ValidatorInterface) {
+            $this->attributesValidator = new AttributesValidator();
         }
 
-        return $this->_attributesValidator;
+        return $this->attributesValidator;
     }
 
     /**

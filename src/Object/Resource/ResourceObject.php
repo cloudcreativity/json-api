@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Object\Resource;
 
-use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\Object\Relationships\Relationships;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
+use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
  * Class Resource

@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\SchemasRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Config\EncoderOptionsRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\EncoderOptionsRepositoryInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 

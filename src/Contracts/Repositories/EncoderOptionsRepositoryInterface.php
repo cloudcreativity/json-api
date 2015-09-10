@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 
@@ -24,7 +24,7 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
  * Interface EncoderRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface EncoderOptionsRepositoryInterface extends ConfigRepositoryInterface
+interface EncoderOptionsRepositoryInterface extends MutableRepositoryInterface
 {
 
     /** Options config key and its default setting. */

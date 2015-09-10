@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 
@@ -24,7 +24,7 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
  * Interface DecodersRepository
  * @package CloudCreativity\JsonApi
  */
-interface DecodersRepositoryInterface extends ConfigRepositoryInterface
+interface DecodersRepositoryInterface extends MutableRepositoryInterface
 {
 
     /** The type (fqn) of the decoder. */

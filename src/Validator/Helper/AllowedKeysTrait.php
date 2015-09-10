@@ -29,7 +29,7 @@ trait AllowedKeysTrait
      * @var array|null
      *      null means any allowed, array means only the contained keys are allowed.
      */
-    protected $_allowedKeys;
+    private $allowedKeys;
 
     /**
      * @param $keyOrKeys
@@ -37,7 +37,7 @@ trait AllowedKeysTrait
      */
     public function setAllowedKeys($keyOrKeys)
     {
-        $this->_allowedKeys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
+        $this->allowedKeys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
 
         return $this;
     }
@@ -50,11 +50,11 @@ trait AllowedKeysTrait
     {
         $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
 
-        if (!is_array($this->_allowedKeys)) {
-            $this->_allowedKeys = [];
+        if (!is_array($this->allowedKeys)) {
+            $this->allowedKeys = [];
         }
 
-        $this->_allowedKeys = array_merge($this->_allowedKeys, $keys);
+        $this->allowedKeys = array_merge($this->allowedKeys, $keys);
 
         return $this;
     }
@@ -65,6 +65,6 @@ trait AllowedKeysTrait
      */
     public function isAllowedKey($key)
     {
-        return is_array($this->_allowedKeys) ? in_array($key, $this->_allowedKeys) : true;
+        return is_array($this->allowedKeys) ? in_array($key, $this->allowedKeys) : true;
     }
 }

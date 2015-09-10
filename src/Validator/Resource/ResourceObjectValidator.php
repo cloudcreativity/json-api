@@ -41,12 +41,12 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     /**
      * @var mixed
      */
-    protected $_type;
+    private $type;
 
     /**
      * @var mixed
      */
-    protected $_id;
+    private $id;
 
     /**
      * @param $type
@@ -65,7 +65,7 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function type($type)
     {
-        $this->_type = $type;
+        $this->type = $type;
 
         return $this;
     }
@@ -78,7 +78,7 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function id($id)
     {
-        $this->_id = $id;
+        $this->id = $id;
 
         return $this;
     }
@@ -180,7 +180,7 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function getTypeValidator()
     {
-        return new ExpectedTypeValidator($this->_type);
+        return new ExpectedTypeValidator($this->type);
     }
 
     /**
@@ -188,7 +188,7 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function getIdValidator()
     {
-        return !is_null($this->_id) ? new ExpectedIdValidator($this->_id) : null;
+        return !is_null($this->id) ? new ExpectedIdValidator($this->id) : null;
     }
 
     /**

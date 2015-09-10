@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Exceptions\Renderer;
 
+use CloudCreativity\JsonApi\Contracts\Error\ErrorCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;
-use CloudCreativity\JsonApi\Contracts\Error\ErrorCollectionInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 

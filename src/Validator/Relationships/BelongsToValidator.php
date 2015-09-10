@@ -52,17 +52,17 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
     /**
      * @var array
      */
-    protected $_types = [];
+    private $types = [];
 
     /**
      * @var bool
      */
-    protected $_allowEmpty = true;
+    private $allowEmpty = true;
 
     /**
      * @var callable|null
      */
-    protected $_callback;
+    private $callback;
 
     /**
      * @var array
@@ -122,7 +122,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
      */
     public function setTypes($typeOrTypes)
     {
-        $this->_types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
+        $this->types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
 
         return $this;
     }
@@ -133,7 +133,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
      */
     public function isType($type)
     {
-        return in_array($type, $this->_types, true);
+        return in_array($type, $this->types, true);
     }
 
     /**
@@ -142,7 +142,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
      */
     public function setAllowEmpty($bool)
     {
-        $this->_allowEmpty = (bool) $bool;
+        $this->allowEmpty = (bool) $bool;
 
         return $this;
     }
@@ -152,7 +152,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
      */
     public function isEmptyAllowed()
     {
-        return (bool) $this->_allowEmpty;
+        return (bool) $this->allowEmpty;
     }
 
     /**
@@ -165,7 +165,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
             throw new \InvalidArgumentException('Expecting a valid callback.');
         }
 
-        $this->_callback = $callback;
+        $this->callback = $callback;
 
         return $this;
     }
@@ -179,7 +179,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
             throw new \RuntimeException('No callback set.');
         }
 
-        return $this->_callback;
+        return $this->callback;
     }
 
     /**
@@ -187,7 +187,7 @@ class BelongsToValidator extends AbstractValidator implements ConfigurableInterf
      */
     public function hasCallback()
     {
-        return is_callable($this->_callback);
+        return is_callable($this->callback);
     }
 
     /**

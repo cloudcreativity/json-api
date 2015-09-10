@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\ConfigInterface;
-use CloudCreativity\JsonApi\Contracts\Config\MutableConfigInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\MutableConfigInterface;
+use CloudCreativity\JsonApi\Stdlib\Config;
+use CloudCreativity\JsonApi\Stdlib\MutableConfig;
 
 /**
  * Class RepositoryTrait
@@ -31,12 +33,12 @@ trait RepositoryTrait
     /**
      * @var array
      */
-    private $_modifiers = [];
+    private $modifiers = [];
 
     /**
      * @var ConfigInterface|null
      */
-    private $_config;
+    private $config;
 
     /**
      * @param \Closure $callback
@@ -44,7 +46,7 @@ trait RepositoryTrait
      */
     public function addModifier(\Closure $callback)
     {
-        $this->_modifiers[] = $callback;
+        $this->modifiers[] = $callback;
 
         return $this;
     }
@@ -55,7 +57,7 @@ trait RepositoryTrait
      */
     public function configure(array $config)
     {
-        $this->_config = new ImmutableConfig($config);
+        $this->config = new Config($config);
 
         return $this;
     }
@@ -65,11 +67,11 @@ trait RepositoryTrait
      */
     protected function config()
     {
-        if (!$this->_config instanceof ConfigInterface) {
-            $this->_config = new ImmutableConfig();
+        if (!$this->config instanceof ConfigInterface) {
+            $this->config = new Config();
         }
 
-        return $this->_config;
+        return $this->config;
     }
 
     /**
@@ -116,8 +118,7 @@ trait RepositoryTrait
     protected function modify(MutableConfigInterface $config, $name)
     {
         /** @var \Closure $modifier */
-        foreach ($this->_modifiers as $modifier) {
-
+        foreach ($this->modifiers as $modifier) {
             $modifier($config, $name);
         }
 

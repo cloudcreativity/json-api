@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\MutableConfigInterface;
+use CloudCreativity\JsonApi\Contracts\Stdlib\MutableConfigInterface;
 
 /**
  * Class SchemasRepositoryTest
@@ -29,6 +29,9 @@ class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
 
     const VARIANT = 'foo';
 
+    /**
+     * @var array
+     */
     private $config = [
         SchemasRepository::DEFAULTS => [
             'Author' => 'AuthorSchema',

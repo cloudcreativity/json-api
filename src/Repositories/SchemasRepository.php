@@ -16,39 +16,34 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Config;
+namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Config\EncoderOptionsRepositoryInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
+use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
 
 /**
- * Class EncoderOptionsRepository
+ * Class SchemasRepository
  * @package CloudCreativity\JsonApi
  *
- * Example provided array:
+ * Example provided config array:
  *
  * ````
  * [
  *      'defaults' => [
- *           'version' => true,
- *           'version-meta' => [
- *              'version' => '1.0',
- *          ],
+ *          'Author' => 'AuthorSchema',
+ *          'Post' => 'PostSchema',
  *      ],
- *      'humanized' => [
- *          'options' => JSON_PRETTY_PRINT,
+ *      'foo' => [
+ *           'Comment' => 'CommentSchema',
  *      ],
  * ]
  * ````
  *
- * If the `humanized` encoder options are requested, 'humanized' will be recursively merged into 'defaults' and then
- * used to generate an EncoderOptions instance.
+ * If the 'foo' schema is requested, the return array will have Author, Schema and Comment in it.
  *
- * This repository also accepts config that is not namespaced - i.e. if the config array does not have a 'defaults'
- * key, it will be loaded as the default configuration.
- *
+ * This repository also accepts non-namespaced schemas. I.e. if the config array does not have a 'defaults' key, it
+ * will be loaded as the default schemas.
  */
-class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
+class SchemasRepository implements SchemasRepositoryInterface
 {
 
     use RepositoryTrait {
@@ -70,27 +65,22 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
 
     /**
      * @param string $name
-     * @param array $extras
-     * @return EncoderOptions
+     * @return array
      */
-    public function getEncoderOptions($name = null, array $extras = [])
+    public function getSchemas($name = null)
     {
         $name = ($name) ?: static::DEFAULTS;
 
         if (static::DEFAULTS !== $name && !$this->namespaced) {
-            throw new \RuntimeException(sprintf('Encoder Options configuration is not namespaced, so cannot get "%s".', $name));
+            throw new \RuntimeException(sprintf('Schemas configuration is not namespaced, so cannot get "%s".', $name));
         }
 
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
-        $config = $this->modify($this->merge($merge, true), $name);
+        $config = $this->merge($merge);
 
-        return new EncoderOptions(
-            $config->get(static::OPTIONS, static::OPTIONS_DEFAULT),
-            $config->get(static::URL_PREFIX, static::URL_PREFIX_DEFAULT),
-            $config->get(static::IS_SHOW_VERSION_INFO, static::IS_SHOW_VERSION_INFO_DEFAULT),
-            $config->get(static::VERSION_META, static::VERSION_META_DEFAULT),
-            $config->get(static::DEPTH, static::DEPTH_DEFAULT)
-        );
+        return $this
+            ->modify($config, $name)
+            ->toArray();
     }
 
     /**
@@ -110,4 +100,5 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
 
         return $this;
     }
+
 }

@@ -30,7 +30,7 @@ trait CodecMatcherAwareTrait
     /**
      * @var CodecMatcherInterface|null
      */
-    protected $_codecMatcher;
+    private $codecMatcher;
 
     /**
      * @param CodecMatcherInterface $matcher
@@ -38,7 +38,7 @@ trait CodecMatcherAwareTrait
      */
     public function setCodecMatcher(CodecMatcherInterface $matcher)
     {
-        $this->_codecMatcher = $matcher;
+        $this->codecMatcher = $matcher;
 
         return $this;
     }
@@ -48,10 +48,10 @@ trait CodecMatcherAwareTrait
      */
     public function getCodecMatcher()
     {
-        if (!$this->_codecMatcher instanceof CodecMatcherInterface) {
-            $this->_codecMatcher = new CodecMatcher();
+        if (!$this->codecMatcher instanceof CodecMatcherInterface) {
+            $this->codecMatcher = new CodecMatcher();
         }
 
-        return $this->_codecMatcher;
+        return $this->codecMatcher;
     }
 }

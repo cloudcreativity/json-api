@@ -16,28 +16,41 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Stdlib;
+
+use CloudCreativity\JsonApi\Contracts\Stdlib\MutableConfigInterface;
 
 /**
- * Interface MutableConfigInterface
+ * Class MutableConfig
  * @package CloudCreativity\JsonApi
  */
-interface MutableConfigInterface extends ConfigInterface
+class MutableConfig extends Config implements MutableConfigInterface
 {
-
     /**
      * @param string|int $key
      * @param mixed $value
      * @return $this
      */
-    public function set($key, $value);
+    public function set($key, $value)
+    {
+        $this->config[$key] = $value;
+
+        return $this;
+    }
 
     /**
      * @param array $values
      *      of `key` => `value` pairs.
      * @return $this
      */
-    public function setMany(array $values);
+    public function setMany(array $values)
+    {
+        foreach ($values as $key => $value) {
+            $this->set($key, $value);
+        }
+
+        return $this;
+    }
 
     /**
      * Add a value to the config if it is not already set.
@@ -48,7 +61,16 @@ interface MutableConfigInterface extends ConfigInterface
      *      whether an existing null value should be overwritten.
      * @return $this
      */
-    public function add($key, $value, $overwriteNull = false);
+    public function add($key, $value, $overwriteNull = false)
+    {
+        $set = ($overwriteNull && !$this->has($key)) || (!$overwriteNull && !$this->exists($key));
+
+        if ($set) {
+            $this->set($key, $value);
+        }
+
+        return $this;
+    }
 
     /**
      * Add values if they are not already set.
@@ -58,26 +80,51 @@ interface MutableConfigInterface extends ConfigInterface
      *      whether an existing null value should be overwritten.
      * @return $this
      */
-    public function addMany(array $values, $overwriteNull = false);
+    public function addMany(array $values, $overwriteNull = false)
+    {
+        foreach ($values as $key => $value) {
+            $this->add($key, $value, $overwriteNull);
+        }
+
+        return $this;
+    }
 
     /**
      * @param string|int $key
      * @return $this
      */
-    public function remove($key);
+    public function remove($key)
+    {
+        unset($this->config[$key]);
+
+        return $this;
+    }
 
     /**
      * @param array $keys
      * @return $this
      */
-    public function removeMany(array $keys);
+    public function removeMany(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->remove($key);
+        }
+
+        return $this;
+    }
 
     /**
      * @param array $values
      * @param bool $recursive
-     *      whether merging should be recursive.
      * @return $this
      */
-    public function merge(array $values, $recursive = false);
+    public function merge(array $values, $recursive = false)
+    {
+        $this->config = ($recursive) ?
+            array_merge_recursive($this->config, $values) : array_merge($this->config, $values);
+
+        return $this;
+    }
+
 
 }

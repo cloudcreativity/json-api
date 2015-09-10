@@ -38,7 +38,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      *
      * @var array
      */
-    protected $_validators = [];
+    private $validators = [];
 
     /**
      * @param $key
@@ -47,7 +47,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function setValidator($key, ValidatorInterface $validator)
     {
-        $this->_validators[$key] = $validator;
+        $this->validators[$key] = $validator;
 
         return $this;
     }
@@ -76,11 +76,11 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function getValidator($key)
     {
-        if (!isset($this->_validators[$key])) {
+        if (!isset($this->validators[$key])) {
             throw new \RuntimeException(sprintf('No validator for key "%s".', $key));
         }
 
-        return $this->_validators[$key];
+        return $this->validators[$key];
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function getValidators()
     {
-        return $this->_validators;
+        return $this->validators;
     }
 
     /**
@@ -97,7 +97,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function hasValidator($key)
     {
-        return isset($this->_validators[$key]);
+        return isset($this->validators[$key]);
     }
 
     /**
@@ -105,7 +105,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function keys()
     {
-        return array_keys($this->_validators);
+        return array_keys($this->validators);
     }
 
     /**
@@ -144,7 +144,7 @@ abstract class AbstractKeyedValidator extends AbstractValidator implements Keyed
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->_validators);
+        return new \ArrayIterator($this->validators);
     }
 
     /**

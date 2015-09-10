@@ -56,7 +56,7 @@ class DocumentValidator extends AbstractValidator
     /**
      * @var ValidatorInterface|null
      */
-    protected $_dataValidator;
+    private $dataValidator;
 
     /**
      * @param ValidatorInterface|null $dataValidator
@@ -74,7 +74,7 @@ class DocumentValidator extends AbstractValidator
      */
     public function setDataValidator(ValidatorInterface $validator)
     {
-        $this->_dataValidator = $validator;
+        $this->dataValidator = $validator;
 
         return $this;
     }
@@ -84,11 +84,11 @@ class DocumentValidator extends AbstractValidator
      */
     public function getDataValidator()
     {
-        if (!$this->_dataValidator instanceof ValidatorInterface) {
+        if (!$this->dataValidator instanceof ValidatorInterface) {
             throw new \RuntimeException('No data validator set.');
         }
 
-        return $this->_dataValidator;
+        return $this->dataValidator;
     }
 
     /**
@@ -96,7 +96,7 @@ class DocumentValidator extends AbstractValidator
      */
     public function hasDataValidator()
     {
-        return $this->_dataValidator instanceof ValidatorInterface;
+        return $this->dataValidator instanceof ValidatorInterface;
     }
 
     /**

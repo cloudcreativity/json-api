@@ -30,7 +30,7 @@ trait ResponsesAwareTrait
     /**
      * @var ResponsesInterface
      */
-    protected $_responses;
+    private $responses;
 
     /**
      * @param ResponsesInterface $responses
@@ -38,7 +38,7 @@ trait ResponsesAwareTrait
      */
     public function setResponses(ResponsesInterface $responses)
     {
-        $this->_responses = $responses;
+        $this->responses = $responses;
 
         return $this;
     }
@@ -48,10 +48,10 @@ trait ResponsesAwareTrait
      */
     public function getResponses()
     {
-        if (!$this->_responses instanceof ResponsesInterface) {
+        if (!$this->responses instanceof ResponsesInterface) {
             throw new \RuntimeException(sprintf('%s expects to be injected with a %s instance.', static::class, ResponsesInterface::class));
         }
 
-        return $this->_responses;
+        return $this->responses;
     }
 }

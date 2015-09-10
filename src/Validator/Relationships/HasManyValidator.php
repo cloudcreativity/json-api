@@ -20,10 +20,10 @@ namespace CloudCreativity\JsonApi\Validator\Relationships;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use CloudCreativity\JsonApi\Error\ErrorObject;
-use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
+use CloudCreativity\JsonApi\Validator\AbstractValidator;
 use CloudCreativity\JsonApi\Validator\Helper\RequiredTrait;
 
 /**
@@ -99,17 +99,17 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
     /**
      * @var array
      */
-    protected $_types = [];
+    private $types = [];
 
     /**
      * @var bool
      */
-    protected $_allowEmpty = true;
+    private $allowEmpty = true;
 
     /**
      * @var callable|null
      */
-    protected $_callback;
+    private $callback;
 
     /**
      * @param $typeOrTypes
@@ -127,7 +127,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function setTypes($typeOrTypes)
     {
-        $this->_types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
+        $this->types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
 
         return $this;
     }
@@ -138,7 +138,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function isType($type)
     {
-        return in_array($type, $this->_types, true);
+        return in_array($type, $this->types, true);
     }
 
     /**
@@ -147,7 +147,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function setAllowEmpty($allow)
     {
-        $this->_allowEmpty = (bool) $allow;
+        $this->allowEmpty = (bool) $allow;
 
         return $this;
     }
@@ -157,7 +157,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function isEmptyAllowed()
     {
-        return (bool) $this->_allowEmpty;
+        return (bool) $this->allowEmpty;
     }
 
     /**
@@ -170,7 +170,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
             throw new \InvalidArgumentException('Expecting a valid callback.');
         }
 
-        $this->_callback = $callback;
+        $this->callback = $callback;
 
         return $this;
     }
@@ -184,7 +184,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
             throw new \RuntimeException('No callback set.');
         }
 
-        return $this->_callback;
+        return $this->callback;
     }
 
     /**
@@ -192,7 +192,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
      */
     public function hasCallback()
     {
-        return is_callable($this->_callback);
+        return is_callable($this->callback);
     }
 
     /**

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http;
+namespace CloudCreativity\JsonApi\Helpers;
 
 use CloudCreativity\JsonApi\Object\Document\Document;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;

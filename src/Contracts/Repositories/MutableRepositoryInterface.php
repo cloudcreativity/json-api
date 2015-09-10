@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Config;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 
@@ -24,7 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
  * Interface RepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface ConfigRepositoryInterface extends ConfigurableInterface
+interface MutableRepositoryInterface extends ConfigurableInterface
 {
 
     /** Config key for default configuration */

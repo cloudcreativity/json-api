@@ -28,7 +28,7 @@ trait RequiredTrait
     /**
      * @var bool|null
      */
-    protected $_required;
+    private $required;
 
     /**
      * @param $required
@@ -36,7 +36,7 @@ trait RequiredTrait
      */
     public function setRequired($required)
     {
-        $this->_required = (bool) $required;
+        $this->required = (bool) $required;
 
         return $this;
     }
@@ -46,6 +46,6 @@ trait RequiredTrait
      */
     public function isRequired()
     {
-        return (bool) $this->_required;
+        return (bool) $this->required;
     }
 }

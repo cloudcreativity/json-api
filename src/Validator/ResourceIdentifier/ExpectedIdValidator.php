@@ -52,7 +52,7 @@ class ExpectedIdValidator extends AbstractValidator
     /**
      * @var int|string|null
      */
-    protected $_expected;
+    private $expected;
 
     /**
      * @param null $expected
@@ -74,7 +74,7 @@ class ExpectedIdValidator extends AbstractValidator
             throw new \InvalidArgumentException('Expecting an integer or string.');
         }
 
-        $this->_expected = $id;
+        $this->expected = $id;
 
         return $this;
     }
@@ -84,11 +84,11 @@ class ExpectedIdValidator extends AbstractValidator
      */
     public function getExpected()
     {
-        if (!is_int($this->_expected) && !is_string($this->_expected)) {
+        if (!is_int($this->expected) && !is_string($this->expected)) {
             throw new \RuntimeException('No expected id set.');
         }
 
-        return $this->_expected;
+        return $this->expected;
     }
 
     /**
