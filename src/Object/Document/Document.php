@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object\Document;
 
+use CloudCreativity\JsonApi\Contracts\Object\Document\DocumentInterface;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
 use CloudCreativity\JsonApi\Object\StandardObject;
@@ -26,10 +27,16 @@ use CloudCreativity\JsonApi\Object\StandardObject;
  * Class Document
  * @package CloudCreativity\JsonApi
  */
-class Document extends StandardObject
+class Document extends StandardObject implements DocumentInterface
 {
 
-    const DATA = 'data';
+    /**
+     * @return StandardObject
+     */
+    public function getData()
+    {
+        return new StandardObject($this->get(static::DATA));
+    }
 
     /**
      * Get the primary data as a resource object.
@@ -49,5 +56,13 @@ class Document extends StandardObject
     public function getRelationship()
     {
         return new Relationship($this->getProxy());
+    }
+
+    /**
+     * @return StandardObject
+     */
+    public function getMeta()
+    {
+        return new StandardObject($this->get(static::META));
     }
 }

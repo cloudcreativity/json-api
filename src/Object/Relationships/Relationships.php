@@ -18,13 +18,15 @@
 
 namespace CloudCreativity\JsonApi\Object\Relationships;
 
+use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
 use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
  * Class Relationships
  * @package CloudCreativity\JsonApi
  */
-class Relationships extends StandardObject
+class Relationships extends StandardObject implements RelationshipsInterface
 {
 
     /**
@@ -57,7 +59,7 @@ class Relationships extends StandardObject
     /**
      * @param $key
      * @param $default
-     * @return Relationship
+     * @return RelationshipInterface
      */
     public function get($key, $default = null)
     {

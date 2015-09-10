@@ -18,13 +18,15 @@
 
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
  * Class ResourceIdentifier
  * @package CloudCreativity\JsonApi
  */
-class ResourceIdentifier extends StandardObject
+class ResourceIdentifier extends StandardObject implements ResourceIdentifierInterface
 {
 
     const TYPE = 'type';
@@ -136,7 +138,7 @@ class ResourceIdentifier extends StandardObject
     }
 
     /**
-     * @return StandardObject
+     * @return StandardObjectInterface
      */
     public function getMeta()
     {

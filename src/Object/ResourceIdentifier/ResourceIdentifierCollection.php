@@ -18,11 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierCollectionInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+
 /**
  * Class ResourceIdentifierCollection
  * @package CloudCreativity\JsonApi
  */
-class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
+class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterface
 {
 
     /**
@@ -39,10 +42,10 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param ResourceIdentifierInterface $identifier
      * @return $this
      */
-    public function add(ResourceIdentifier $identifier)
+    public function add(ResourceIdentifierInterface $identifier)
     {
         if (!$this->has($identifier)) {
             $this->stack[] = $identifier;
@@ -52,10 +55,10 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param ResourceIdentifierInterface $identifier
      * @return bool
      */
-    public function has(ResourceIdentifier $identifier)
+    public function has(ResourceIdentifierInterface $identifier)
     {
         return in_array($identifier, $this->stack);
     }
@@ -68,8 +71,8 @@ class ResourceIdentifierCollection implements \IteratorAggregate, \Countable
     {
         foreach ($identifiers as $identifier) {
 
-            if (!$identifier instanceof ResourceIdentifier) {
-                throw new \InvalidArgumentException('Expecting only Identifier objects.');
+            if (!$identifier instanceof ResourceIdentifierInterface) {
+                throw new \InvalidArgumentException('Expecting only identifier objects.');
             }
 
             $this->add($identifier);

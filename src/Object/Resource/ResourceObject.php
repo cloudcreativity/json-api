@@ -18,6 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Object\Resource;
 
+use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Resource\ResourceObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Object\Relationships\Relationships;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\StandardObject;
@@ -26,7 +30,7 @@ use CloudCreativity\JsonApi\Object\StandardObject;
  * Class Resource
  * @package CloudCreativity\JsonApi
  */
-class ResourceObject extends StandardObject
+class ResourceObject extends StandardObject implements ResourceObjectInterface
 {
 
     const TYPE = 'type';
@@ -70,7 +74,7 @@ class ResourceObject extends StandardObject
     }
 
     /**
-     * @return ResourceIdentifier
+     * @return ResourceIdentifierInterface
      */
     public function getIdentifier()
     {
@@ -85,7 +89,7 @@ class ResourceObject extends StandardObject
     }
 
     /**
-     * @return StandardObject
+     * @return StandardObjectInterface
      */
     public function getAttributes()
     {
@@ -101,7 +105,7 @@ class ResourceObject extends StandardObject
     }
 
     /**
-     * @return Relationships
+     * @return RelationshipsInterface
      */
     public function getRelationships()
     {
@@ -117,7 +121,7 @@ class ResourceObject extends StandardObject
     }
 
     /**
-     * @return StandardObject
+     * @return StandardObjectInterface
      */
     public function getMeta()
     {

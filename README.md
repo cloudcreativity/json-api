@@ -139,7 +139,7 @@ The controller can do this:
 class ArticleController
 {
 
-    // ...
+    use CloudCreativity\JsonApi\Helpers\DocumentProviderTrait;
 
     public function getValidator($id = null)
     {
@@ -147,7 +147,7 @@ class ArticleController
 
        $validator->attr('title', 'string')
          ->attr('content', 'string')
-         ->belongsTo('author', ['required' => true]);
+         ->belongsTo('author', 'person', ['required' => true]);
 
        return $validator;
     }
@@ -158,10 +158,8 @@ class ArticleController
       $content = ... // get HTTP request body content.
       $validator = $this->getValidator($id);
 
-      /** @var CloudCreativity\JsonApi\Object\Document\Document $data */
       $resourceObject = $this
-        ->getDecoder($validator)
-        ->decode($content)
+        ->getDocument($validator)
         ->getResourceObject();
 
       $model->fill($resourceObject

@@ -18,11 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Helpers;
 
-use CloudCreativity\JsonApi\Object\Document\Document;
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
-use Neomerx\JsonApi\Contracts\Integration\CurrentRequestInterface;
-use Neomerx\JsonApi\Contracts\Parameters\ParametersInterface;
+use CloudCreativity\JsonApi\Contracts\Decoders\DocumentDecoderInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Document\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 
 /**
  * Class DocumentProviderTrait
@@ -32,47 +30,27 @@ trait DocumentProviderTrait
 {
 
     /**
-     * @return CodecMatcherInterface
+     * @return DocumentDecoderInterface
      */
-    abstract public function getCodecMatcher();
+    abstract protected function getDecoder();
 
     /**
-     * @return ParametersInterface
+     * @return mixed
      */
-    abstract public function getParameters();
+    abstract protected function getRequestContent();
 
     /**
-     * @return CurrentRequestInterface
+     * @param ValidatorInterface|null $dataValidator
+     * @return DocumentInterface
      */
-    abstract public function getCurrentRequest();
-
-    /**
-     * @return Document
-     */
-    public function getDocument()
+    public function getDocument(ValidatorInterface $dataValidator = null)
     {
-        $matcher = $this->getCodecMatcher();
+        $decoder = $this->getDecoder();
 
-        if (!$matcher->getDecoder() === null) {
-            $matcher->findDecoder($this->getParameters()->getContentTypeHeader());
+        if ($dataValidator) {
+            $decoder->setValidator($dataValidator);
         }
 
-        $decoder = $matcher->getDecoder();
-
-        if (!$decoder instanceof DecoderInterface) {
-            throw new \RuntimeException('No decoder instance available.');
-        }
-
-        $content = $decoder->decode($this->getCurrentRequest()->getContent());
-
-        if (is_object($content) && !$content instanceof Document) {
-            $content = new Document($content);
-        }
-
-        if ($content instanceof Document) {
-            throw new \RuntimeException('Expecting decoding to return an object or Document object.');
-        }
-
-        return $content;
+        return $decoder->decodeDocument($this->getRequestContent());
     }
 }

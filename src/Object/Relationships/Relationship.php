@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object\Relationships;
 
+use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\Object\StandardObject;
@@ -26,7 +27,7 @@ use CloudCreativity\JsonApi\Object\StandardObject;
  * Class Relationship
  * @package CloudCreativity\JsonApi
  */
-class Relationship extends StandardObject
+class Relationship extends StandardObject implements RelationshipInterface
 {
 
     const DATA = 'data';

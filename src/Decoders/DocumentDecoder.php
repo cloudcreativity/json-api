@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
-use CloudCreativity\JsonApi\Contracts\Validator\ValidatorAwareInterface;
+use CloudCreativity\JsonApi\Contracts\Decoders\DocumentDecoderInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Error\MultiErrorException;
 use CloudCreativity\JsonApi\Object\Document\Document;
@@ -29,7 +29,7 @@ use CloudCreativity\JsonApi\Validator\ValidatorAwareTrait;
  * Class ResourceDecoder
  * @package CloudCreativity\JsonApi
  */
-class DocumentDecoder extends AbstractDecoder implements ValidatorAwareInterface
+class DocumentDecoder extends AbstractDecoder implements DocumentDecoderInterface
 {
 
     use ValidatorAwareTrait;
@@ -74,6 +74,15 @@ class DocumentDecoder extends AbstractDecoder implements ValidatorAwareInterface
             throw new MultiErrorException($validator->getErrors(), 'Invalid request body content.');
         }
 
-        return new Document($content);
+        return $content;
+    }
+
+    /**
+     * @param string $content
+     * @return Document
+     */
+    public function decodeDocument($content)
+    {
+        return new Document($this->decode($content));
     }
 }
