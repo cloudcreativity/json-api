@@ -35,16 +35,12 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $config = [
         EncoderOptionsRepository::DEFAULTS => [
-            EncoderOptionsRepository::IS_SHOW_VERSION_INFO => true,
-            EncoderOptionsRepository::VERSION_META => [
-                'version' => '1.0',
-            ],
+            EncoderOptionsRepository::OPTIONS => JSON_HEX_AMP,
+            EncoderOptionsRepository::URL_PREFIX => 'http://www.example.tld/api/v1'
         ],
         self::VARIANT => [
             EncoderOptionsRepository::OPTIONS => JSON_PRETTY_PRINT,
-            EncoderOptionsRepository::VERSION_META => [
-                'encoder' => self::VARIANT,
-            ],
+            EncoderOptionsRepository::DEPTH => 250
         ],
     ];
 
@@ -62,10 +58,8 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $defaults = $this->config[EncoderOptionsRepository::DEFAULTS];
         $expected = new EncoderOptions(
-            0,
-            null,
-            $defaults[EncoderOptionsRepository::IS_SHOW_VERSION_INFO],
-            $defaults[EncoderOptionsRepository::VERSION_META]
+            $defaults[EncoderOptionsRepository::OPTIONS],
+            $defaults[EncoderOptionsRepository::URL_PREFIX]
         );
 
         $this->assertEquals($expected, $this->repository->getEncoderOptions());
@@ -76,12 +70,11 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariant()
     {
-        $settings = array_merge_recursive($this->config[EncoderOptionsRepository::DEFAULTS], $this->config[static::VARIANT]);
+        $settings = array_merge($this->config[EncoderOptionsRepository::DEFAULTS], $this->config[static::VARIANT]);
         $expected = new EncoderOptions(
             $settings[EncoderOptionsRepository::OPTIONS],
-            null,
-            $settings[EncoderOptionsRepository::IS_SHOW_VERSION_INFO],
-            $settings[EncoderOptionsRepository::VERSION_META]
+            $settings[EncoderOptionsRepository::URL_PREFIX],
+            $settings[EncoderOptionsRepository::DEPTH]
         );
 
         $actual = $this->repository->getEncoderOptions(static::VARIANT);
@@ -118,8 +111,6 @@ class EncoderOptionsRepositoryTest extends \PHPUnit_Framework_TestCase
         $expected = new EncoderOptions(
             $options->getOptions(),
             $url,
-            $options->isShowVersionInfo(),
-            $options->getVersionMeta(),
             $options->getDepth()
         );
 

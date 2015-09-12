@@ -35,14 +35,6 @@ interface EncoderOptionsRepositoryInterface extends MutableRepositoryInterface
     const URL_PREFIX = 'url-prefix';
     const URL_PREFIX_DEFAULT = null;
 
-    /** Is Show Version Info config key and its default setting. */
-    const IS_SHOW_VERSION_INFO = 'version';
-    const IS_SHOW_VERSION_INFO_DEFAULT = false;
-
-    /** Version Meta config key and its default setting. */
-    const VERSION_META = 'version-meta';
-    const VERSION_META_DEFAULT = null;
-
     /** Depth config key and its default setting */
     const DEPTH = 'depth';
     const DEPTH_DEFAULT = 512;

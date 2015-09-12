@@ -18,8 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
-use CloudCreativity\JsonApi\Error\ErrorException;
-use CloudCreativity\JsonApi\Error\ErrorObject;
+use CloudCreativity\JsonApi\Error\ThrowableError;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 
 /**
@@ -43,14 +42,10 @@ abstract class AbstractDecoder implements DecoderInterface
         $parsed = json_decode($content, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            $error = new ErrorObject([
-                ErrorObject::TITLE => 'Invalid JSON',
-                ErrorObject::DETAIL => 'Request body content could not be parsed as JSON: ' . json_last_error_msg(),
-                ErrorObject::CODE => static::ERROR_INVALID_JSON,
-                ErrorObject::STATUS => 400,
-            ]);
-
-            throw new ErrorException($error);
+            throw new ThrowableError([
+                ThrowableError::TITLE => 'Invalid JSON',
+                ThrowableError::DETAIL => 'Request body content could not be parsed as JSON: ' . json_last_error_msg(),
+            ], 400, static::ERROR_INVALID_JSON);
         }
 
         return $parsed;

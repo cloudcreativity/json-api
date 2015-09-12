@@ -20,36 +20,31 @@ namespace CloudCreativity\JsonApi\Error;
 
 use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use RuntimeException;
 
 /**
  * Class ErrorException
  * @package CloudCreativity\JsonApi
  */
-class ErrorException extends \RuntimeException implements ErrorsAwareInterface
+class ErrorException extends RuntimeException implements ErrorsAwareInterface
 {
 
     /**
      * @var ErrorInterface
      */
-    protected $_error;
+    private $error;
 
     /**
      * @param ErrorInterface|array $error
      * @param \Exception|null $previous
      */
-    public function __construct($error, \Exception $previous = null)
+    public function __construct(ErrorInterface $error, \Exception $previous = null)
     {
-        if (is_array($error)) {
-            $error = ErrorObject::create($error);
-        } elseif (!$error instanceof ErrorInterface) {
-            throw new \RuntimeException('Expecting an ErrorInterface instance or an array.');
-        }
-
         $code = is_numeric($error->getCode()) ? (int) $error->getCode() : null;
 
         parent::__construct($error->getTitle(), $code, $previous);
 
-        $this->_error = $error;
+        $this->error = $error;
     }
 
     /**
@@ -57,7 +52,7 @@ class ErrorException extends \RuntimeException implements ErrorsAwareInterface
      */
     public function getError()
     {
-        return $this->_error;
+        return $this->error;
     }
 
     /**

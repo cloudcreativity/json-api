@@ -16,42 +16,25 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Codec;
+namespace CloudCreativity\JsonApi\Contracts\Encoder;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 
 /**
- * Class CodecMatcherAwareTrait
+ * Interface EncoderAwareInterface
  * @package CloudCreativity\JsonApi
  */
-trait CodecMatcherAwareTrait
+interface EncoderAwareInterface
 {
 
     /**
-     * @var CodecMatcherInterface|null
-     */
-    private $codecMatcher;
-
-    /**
-     * @param CodecMatcherInterface $matcher
+     * @param EncoderInterface $encoder
      * @return $this
      */
-    public function setCodecMatcher(CodecMatcherInterface $matcher)
-    {
-        $this->codecMatcher = $matcher;
-
-        return $this;
-    }
+    public function setEncoder(EncoderInterface $encoder);
 
     /**
-     * @return CodecMatcherInterface
+     * @return EncoderInterface
      */
-    public function getCodecMatcher()
-    {
-        if (!$this->codecMatcher instanceof CodecMatcherInterface) {
-            $this->codecMatcher = new CodecMatcher();
-        }
-
-        return $this->codecMatcher;
-    }
+    public function getEncoder();
 }

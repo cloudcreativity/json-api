@@ -31,7 +31,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
     /**
      * @var array
      */
-    protected $_stack = [];
+    private $stack = [];
 
     /**
      * @param array $errors
@@ -53,7 +53,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
             $stack[] = clone $error;
         }
 
-        $this->_stack = $stack;
+        $this->stack = $stack;
     }
 
     /**
@@ -62,7 +62,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
      */
     public function add(ErrorInterface $error)
     {
-        $this->_stack[] = $error;
+        $this->stack[] = $error;
 
         return $this;
     }
@@ -122,7 +122,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
      */
     public function clear()
     {
-        $this->_stack = [];
+        $this->stack = [];
 
         return $this;
     }
@@ -132,7 +132,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
      */
     public function getAll()
     {
-        return $this->_stack;
+        return $this->stack;
     }
 
     /**
@@ -191,7 +191,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
      */
     public function count()
     {
-        return count($this->_stack);
+        return count($this->stack);
     }
 
     /**
@@ -199,7 +199,7 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
      */
     public function isEmpty()
     {
-        return empty($this->_stack);
+        return empty($this->stack);
     }
 
 }

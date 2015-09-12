@@ -30,10 +30,8 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
  * ````
  * [
  *      'defaults' => [
- *           'version' => true,
- *           'version-meta' => [
- *              'version' => '1.0',
- *          ],
+ *           'options' => JSON_HEX_AMP,
+ *           'depth' => 350
  *      ],
  *      'humanized' => [
  *          'options' => JSON_PRETTY_PRINT,
@@ -82,13 +80,11 @@ class EncoderOptionsRepository implements EncoderOptionsRepositoryInterface
         }
 
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
-        $config = $this->modify($this->merge($merge, true), $name);
+        $config = $this->modify($this->merge($merge, false), $name);
 
         return new EncoderOptions(
             $config->get(static::OPTIONS, static::OPTIONS_DEFAULT),
             $config->get(static::URL_PREFIX, static::URL_PREFIX_DEFAULT),
-            $config->get(static::IS_SHOW_VERSION_INFO, static::IS_SHOW_VERSION_INFO_DEFAULT),
-            $config->get(static::VERSION_META, static::VERSION_META_DEFAULT),
             $config->get(static::DEPTH, static::DEPTH_DEFAULT)
         );
     }

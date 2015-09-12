@@ -31,7 +31,7 @@ class MultiErrorException extends \RuntimeException implements ErrorsAwareInterf
     /**
      * @var ErrorCollectionInterface
      */
-    protected $_errors;
+    private $errors;
 
     /**
      * @param ErrorCollectionInterface $errors
@@ -42,7 +42,7 @@ class MultiErrorException extends \RuntimeException implements ErrorsAwareInterf
     {
         parent::__construct($message, null, $previous);
 
-        $this->_errors = $errors;
+        $this->errors = $errors;
     }
 
     /**
@@ -50,6 +50,6 @@ class MultiErrorException extends \RuntimeException implements ErrorsAwareInterf
      */
     public function getErrors()
     {
-        return $this->_errors;
+        return $this->errors;
     }
 }

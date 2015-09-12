@@ -155,7 +155,6 @@ class ArticleController
     public function updateAction($id)
     {
       $model = ... // get the article model.
-      $content = ... // get HTTP request body content.
       $validator = $this->getValidator($id);
 
       $resourceObject = $this

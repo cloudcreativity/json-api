@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Exceptions;
+
+use CloudCreativity\JsonApi\Error\ThrowableError;
+use Exception;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 class ExceptionThrowerTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,65 +35,40 @@ class ExceptionThrowerTest extends \PHPUnit_Framework_TestCase
         $this->thrower = new ExceptionThrower();
     }
 
-    protected function checkException($method, ErrorObject $expected)
+    protected function checkException($method, $status)
     {
         try {
             call_user_func([$this->thrower, $method]);
             $this->fail('No exception thrown.');
-        } catch (ErrorException $actual) {
-            $this->assertEquals($expected, $actual->getError());
-        } catch (\Exception $e) {
+        } catch (ThrowableError $actual) {
+            $this->assertEquals($status, $actual->getStatus());
+        } catch (Exception $e) {
             $this->fail('Invalid exception thrown.');
         }
     }
 
     public function testBadRequest()
     {
-        $expected = new ErrorObject([
-            ErrorObject::STATUS => 400,
-            ErrorObject::TITLE => 'Bad Request',
-        ]);
-
-        $this->checkException('throwBadRequest', $expected);
+        $this->checkException('throwBadRequest', 400);
     }
 
     public function testForbidden()
     {
-        $expected = new ErrorObject([
-            ErrorObject::STATUS => 403,
-            ErrorObject::TITLE => 'Forbidden',
-        ]);
-
-        $this->checkException('throwForbidden', $expected);
+        $this->checkException('throwForbidden', 403);
     }
 
     public function testNotAcceptable()
     {
-        $expected = new ErrorObject([
-            ErrorObject::STATUS => 406,
-            ErrorObject::TITLE => 'Not Acceptable',
-        ]);
-
-        $this->checkException('throwNotAcceptable', $expected);
+        $this->checkException('throwNotAcceptable', 406);
     }
 
     public function testConfict()
     {
-        $expected = new ErrorObject([
-            ErrorObject::STATUS => 409,
-            ErrorObject::TITLE => 'Conflict',
-        ]);
-
-        $this->checkException('throwConflict', $expected);
+        $this->checkException('throwConflict', 409);
     }
 
     public function testUnsupportedMediaType()
     {
-        $expected = new ErrorObject([
-            ErrorObject::STATUS => 415,
-            ErrorObject::TITLE => 'Unsupported Media Type',
-        ]);
-
-        $this->checkException('throwUnsupportedMediaType', $expected);
+        $this->checkException('throwUnsupportedMediaType', 415);
     }
 }

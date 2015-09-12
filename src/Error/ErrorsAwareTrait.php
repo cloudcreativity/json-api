@@ -30,7 +30,7 @@ trait ErrorsAwareTrait
     /**
      * @var ErrorCollectionInterface|null
      */
-    protected $_errors;
+    private $errors;
 
     /**
      * @param ErrorCollectionInterface $errors
@@ -38,7 +38,7 @@ trait ErrorsAwareTrait
      */
     public function setErrors(ErrorCollectionInterface $errors)
     {
-        $this->_errors = $errors;
+        $this->errors = $errors;
 
         return $this;
     }
@@ -48,10 +48,10 @@ trait ErrorsAwareTrait
      */
     public function getErrors()
     {
-        if (!$this->_errors instanceof ErrorCollectionInterface) {
-            $this->_errors = new ErrorCollection();
+        if (!$this->errors instanceof ErrorCollectionInterface) {
+            $this->errors = new ErrorCollection();
         }
 
-        return $this->_errors;
+        return $this->errors;
     }
 }

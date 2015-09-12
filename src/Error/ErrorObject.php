@@ -29,14 +29,14 @@ use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 class ErrorObject implements ErrorObjectInterface
 {
 
-    protected $_id;
-    protected $_links;
-    protected $_status;
-    protected $_code;
-    protected $_title;
-    protected $_detail;
-    protected $_source;
-    protected $_meta;
+    private $id;
+    private $links;
+    private $status;
+    private $code;
+    private $title;
+    private $detail;
+    private $source;
+    private $meta;
 
     /**
      * @param array $input
@@ -51,8 +51,8 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function __clone()
     {
-        if (is_object($this->_source)) {
-            $this->_source = clone $this->_source;
+        if (is_object($this->source)) {
+            $this->source = clone $this->source;
         }
     }
 
@@ -62,7 +62,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setId($id)
     {
-        $this->_id = $id;
+        $this->id = $id;
 
         return $this;
     }
@@ -74,11 +74,11 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getId()
     {
-        if (is_int($this->_id)) {
-            return $this->_id;
+        if (is_int($this->id)) {
+            return $this->id;
         }
 
-        return !is_null($this->_id) ? (string) $this->_id : null;
+        return !is_null($this->id) ? (string) $this->id : null;
     }
 
     /**
@@ -87,7 +87,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setLinks($links)
     {
-        $this->_links = $links;
+        $this->links = $links;
 
         return $this;
     }
@@ -99,8 +99,8 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getLinks()
     {
-        if (is_string($this->_links) || is_array($this->_links) || $this->_links instanceof LinkInterface) {
-            return $this->_links;
+        if (is_string($this->links) || is_array($this->links) || $this->links instanceof LinkInterface) {
+            return $this->links;
         }
 
         return null;
@@ -112,7 +112,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setStatus($status)
     {
-        $this->_status = $status;
+        $this->status = $status;
 
         return $this;
     }
@@ -124,7 +124,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getStatus()
     {
-        return !empty($this->_status) ? (string) $this->_status : null;
+        return !empty($this->status) ? (string) $this->status : null;
     }
 
     /**
@@ -133,7 +133,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setCode($code)
     {
-        $this->_code = $code;
+        $this->code = $code;
 
         return $this;
     }
@@ -145,7 +145,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getCode()
     {
-        return !is_null($this->_code) ? (string) $this->_code : null;
+        return !is_null($this->code) ? (string) $this->code : null;
     }
 
     /**
@@ -154,7 +154,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setTitle($title)
     {
-        $this->_title = $title;
+        $this->title = $title;
 
         return $this;
     }
@@ -168,7 +168,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getTitle()
     {
-        return !empty($this->_title) ? (string) $this->_title : null;
+        return !empty($this->title) ? (string) $this->title : null;
     }
 
     /**
@@ -177,7 +177,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function setDetail($detail)
     {
-        $this->_detail = $detail;
+        $this->detail = $detail;
 
         return $this;
     }
@@ -189,7 +189,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getDetail()
     {
-        return !empty($this->_detail) ? (string) $this->_detail : null;
+        return !empty($this->detail) ? (string) $this->detail : null;
     }
 
     /**
@@ -198,11 +198,11 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function source()
     {
-        if (!$this->_source instanceof SourceObject) {
-            $this->_source = new SourceObject();
+        if (!$this->source instanceof SourceObject) {
+            $this->source = new SourceObject();
         }
 
-        return $this->_source;
+        return $this->source;
     }
 
     /**
@@ -217,7 +217,7 @@ class ErrorObject implements ErrorObjectInterface
             throw new \InvalidArgumentException('Expecting a SourceObject, array or null');
         }
 
-        $this->_source = $source;
+        $this->source = $source;
 
         return $this;
     }
@@ -227,7 +227,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getSource()
     {
-        return $this->_source;
+        return $this->source;
     }
 
     /**
@@ -235,11 +235,11 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getSourceObject()
     {
-        if (!$this->_source instanceof SourceObjectInterface) {
-            $this->_source = new SourceObject();
+        if (!$this->source instanceof SourceObjectInterface) {
+            $this->source = new SourceObject();
         }
 
-        return $this->_source;
+        return $this->source;
     }
 
     /**
@@ -247,7 +247,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function hasSource()
     {
-        return $this->_source instanceof SourceObject;
+        return $this->source instanceof SourceObject;
     }
 
     /**
@@ -260,7 +260,7 @@ class ErrorObject implements ErrorObjectInterface
             throw new \InvalidArgumentException('Expecting meta to be an array or null.');
         }
 
-        $this->_meta = $meta;
+        $this->meta = $meta;
 
         return $this;
     }
@@ -272,7 +272,7 @@ class ErrorObject implements ErrorObjectInterface
      */
     public function getMeta()
     {
-        return is_array($this->_meta) ? $this->_meta : null;
+        return is_array($this->meta) ? $this->meta : null;
     }
 
     /**

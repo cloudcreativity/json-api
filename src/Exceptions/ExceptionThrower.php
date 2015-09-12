@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Error;
+namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Contracts\Error\ErrorObjectInterface;
+use CloudCreativity\JsonApi\Error\ThrowableError;
 use Neomerx\JsonApi\Contracts\Integration\ExceptionThrowerInterface;
 
 /**
@@ -35,10 +35,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwBadRequest()
     {
-        throw new ErrorException([
-            ErrorObjectInterface::STATUS => 400,
-            ErrorObjectInterface::TITLE => 'Bad Request'
-        ]);
+        throw new ThrowableError('Bad Request', 400);
     }
 
     /**
@@ -48,10 +45,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwForbidden()
     {
-        throw new ErrorException([
-            ErrorObjectInterface::STATUS => 403,
-            ErrorObjectInterface::TITLE => 'Forbidden',
-        ]);
+        throw new ThrowableError('Forbidden', 403);
     }
 
     /**
@@ -61,10 +55,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwNotAcceptable()
     {
-        throw new ErrorException([
-            ErrorObjectInterface::STATUS => 406,
-            ErrorObjectInterface::TITLE => 'Not Acceptable',
-        ]);
+        throw new ThrowableError('Not Acceptable', 406);
     }
 
     /**
@@ -74,10 +65,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwConflict()
     {
-        throw new ErrorException([
-            ErrorObjectInterface::STATUS => 409,
-            ErrorObjectInterface::TITLE => 'Conflict',
-        ]);
+        throw new ThrowableError('Conflict', 409);
     }
 
     /**
@@ -87,10 +75,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwUnsupportedMediaType()
     {
-        throw new ErrorException([
-            ErrorObjectInterface::STATUS => 415,
-            ErrorObjectInterface::TITLE => 'Unsupported Media Type',
-        ]);
+        throw new ThrowableError('Unsupported Media Type', 415);
     }
 
 }
