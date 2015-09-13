@@ -30,12 +30,13 @@ interface CodecMatcherRepositoryInterface extends MutableRepositoryInterface
 
     /** Config key for a codec matcher's encoders */
     const ENCODERS = 'encoders';
-    /** Config key for named schemas to use for an encoder. */
-    const ENCODER_SCHEMAS = 'schemas';
-    /** Config key for named encoder options to use for an encoder. */
-    const ENCODER_OPTIONS = 'options';
     /** Config key for a codec matcher's decoders */
     const DECODERS = 'decoders';
+
+    /** Config key for the media type list */
+    const MEDIA_TYPES = 'media-types';
+    /** Config key for the name of which schema set to use */
+    const SCHEMAS = 'schemas';
 
     /**
      * @param string|null $name

@@ -30,6 +30,7 @@ use Neomerx\JsonApi\Parameters\Headers\AcceptHeader;
 use Neomerx\JsonApi\Parameters\Headers\AcceptMediaType;
 use Neomerx\JsonApi\Parameters\Headers\Header;
 use Neomerx\JsonApi\Parameters\Headers\MediaType;
+use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface as Codec;
 
 /**
  * Class CodecMatcherRepositoryTest
@@ -39,44 +40,51 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 
     const TEXT_MEDIA_TYPE = 'text/plain';
-    const PARAM_MEDIA_TYPE = 'application/vnd.api+json;charset=utf-8';
-
-    const VARIANT = 'foo';
-    const TEXT_OPTIONS = 'text-options';
-    const PARAM_SCHEMAS = 'param-schemas';
+    const TEXT_OPTIONS = 'humanized';
     const TEXT_DECODER = 'text-decoder';
 
+    const VARIANT = 'foo';
+    const VARIANT_SCHEMAS = 'foo-schemas';
+    const VARIANT_EXTRA_MEDIA_TYPE = 'application/json';
+
     private $config = [
-		CodecMatcherRepository::DEFAULTS => [
-			CodecMatcherRepository::ENCODERS => [
-				MediaTypeInterface::JSON_API_MEDIA_TYPE,
-                self::PARAM_MEDIA_TYPE => [
-                    CodecMatcherRepository::ENCODER_SCHEMAS => self::PARAM_SCHEMAS,
+		Codec::DEFAULTS => [
+			Codec::ENCODERS => [
+                Codec::MEDIA_TYPES => [
+                    MediaTypeInterface::JSON_API_MEDIA_TYPE => null,
+                    self::TEXT_MEDIA_TYPE => self::TEXT_OPTIONS,
                 ],
-			],
-			CodecMatcherRepository::DECODERS => [
-                MediaTypeInterface::JSON_API_MEDIA_TYPE,
-			],
-		],
-		self::VARIANT => [
-			CodecMatcherRepository::ENCODERS => [
-				self::TEXT_MEDIA_TYPE => [
-					CodecMatcherRepository::ENCODER_OPTIONS => self::TEXT_OPTIONS,
-				],
-			],
-            CodecMatcherRepository::DECODERS => [
-                self::TEXT_MEDIA_TYPE => self::TEXT_DECODER,
+                Codec::SCHEMAS => null,
             ],
-		],
+            Codec::DECODERS => [
+                Codec::MEDIA_TYPES => [
+                    MediaTypeInterface::JSON_API_MEDIA_TYPE => null,
+                ],
+            ],
+        ],
+        self::VARIANT => [
+            Codec::ENCODERS => [
+                Codec::MEDIA_TYPES => [
+                    self::VARIANT_EXTRA_MEDIA_TYPE => null,
+                ],
+                Codec::SCHEMAS => self::VARIANT_SCHEMAS,
+            ],
+            Codec::DECODERS => [
+                Codec::MEDIA_TYPES => [
+                    self::TEXT_MEDIA_TYPE => self::TEXT_DECODER,
+                ],
+            ],
+        ],
 	];
 
     private $defaultEncoder;
-    private $paramEncoder;
+    private $defaultDecoder;
     private $textEncoder;
 
-    private $defaultDecoder;
-    private $paramDecoder;
-    private $textDecoder;
+    private $variantEncoder;
+    private $variantTextEncoder;
+    private $variantExtraEncoder;
+    private $variantTextDecoder;
 
     /**
      * @var CodecMatcherRepository
@@ -89,26 +97,29 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $defaultSchemas = ['foo' => 'bar'];
-        $paramSchemas = ['baz' => 'bar'];
+        $variantSchemas = ['baz' => 'bar'];
 
         $defaultOptions = new EncoderOptions(JSON_BIGINT_AS_STRING, 'http://www.example.tld');
         $textOptions = new EncoderOptions(JSON_PRETTY_PRINT, 'http://www.foobar.tld');
 
         $this->defaultEncoder = Encoder::instance($defaultSchemas, $defaultOptions);
-        $this->paramEncoder = Encoder::instance($paramSchemas, $defaultOptions);
         $this->textEncoder = Encoder::instance($defaultSchemas, $textOptions);
+        $this->variantEncoder = Encoder::instance($variantSchemas, $defaultOptions);
+        $this->variantTextEncoder = Encoder::instance($variantSchemas, $defaultOptions);
+        $this->variantExtraEncoder = $this->variantEncoder;
 
         $this->defaultDecoder = new ObjectDecoder();
-        $this->paramEncoder = $this->defaultDecoder;
-        $this->textDecoder = new ArrayDecoder();
+        $this->variantTextDecoder = new ArrayDecoder();
 
         /** @var EncodersRepositoryInterface $encoders */
         $encoders = $this->getMock(EncodersRepositoryInterface::class);
         $encoders->method('getEncoder')
             ->will($this->returnValueMap([
                 [null, null, $this->defaultEncoder],
-                [self::PARAM_SCHEMAS, null, $this->paramEncoder],
-                [null, self::TEXT_OPTIONS, $this->textEncoder],
+                [null, static::TEXT_OPTIONS, $this->textEncoder],
+                [static::VARIANT_SCHEMAS, null, $this->variantEncoder],
+                [static::VARIANT_SCHEMAS, static::TEXT_OPTIONS, $this->variantTextEncoder],
+                [static::VARIANT_SCHEMAS, null, $this->variantExtraEncoder],
             ]));
 
         /** @var DecodersRepositoryInterface $decoders */
@@ -116,7 +127,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $decoders->method('getDecoder')
             ->will($this->returnValueMap([
                 [null, $this->defaultDecoder],
-                [static::TEXT_DECODER, $this->textDecoder],
+                [static::TEXT_DECODER, $this->variantTextDecoder],
             ]));
 
         $this->repository = new CodecMatcherRepository($encoders, $decoders, $this->config);
@@ -135,10 +146,9 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->defaultEncoder, $codecMatcher->getEncoder());
         $this->assertEquals($this->defaultDecoder, $codecMatcher->getDecoder());
 
-        $codecMatcher->matchEncoder($this->acceptHeader(static::TEXT_MEDIA_TYPE));
-        $codecMatcher->findDecoder($this->contentTypeHeader(static::TEXT_MEDIA_TYPE));
+        $this->match($codecMatcher, self::TEXT_MEDIA_TYPE);
 
-        $this->assertNull($codecMatcher->getEncoder());
+        $this->assertEquals($this->textEncoder, $codecMatcher->getEncoder());
         $this->assertNull($codecMatcher->getDecoder());
     }
 
@@ -149,23 +159,20 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $codecMatcher = $this->repository->getCodecMatcher(static::VARIANT);
 
-        $this->match($codecMatcher, static::TEXT_MEDIA_TYPE);
+        $this->match($codecMatcher, MediaTypeInterface::JSON_API_MEDIA_TYPE);
 
-        $this->assertEquals($this->textEncoder, $codecMatcher->getEncoder());
-        $this->assertEquals($this->textDecoder, $codecMatcher->getDecoder());
-    }
+        $this->assertEquals($this->variantEncoder, $codecMatcher->getEncoder());
+        $this->assertEquals($this->defaultDecoder, $codecMatcher->getDecoder());
 
-    /**
-     * @depends testDefault
-     */
-    public function testWithParam()
-    {
-        $codecMatcher = $this->repository->getCodecMatcher();
+        $this->match($codecMatcher, self::TEXT_MEDIA_TYPE);
 
-        $this->match($codecMatcher, static::PARAM_MEDIA_TYPE);
+        $this->assertEquals($this->variantTextEncoder, $codecMatcher->getEncoder());
+        $this->assertEquals($this->variantTextDecoder, $codecMatcher->getDecoder());
 
-        $this->assertEquals($this->paramEncoder, $codecMatcher->getEncoder());
-        $this->assertEquals($this->paramDecoder, $codecMatcher->getDecoder());
+        $this->match($codecMatcher, self::VARIANT_EXTRA_MEDIA_TYPE);
+
+        $this->assertEquals($this->variantExtraEncoder, $codecMatcher->getEncoder());
+        $this->assertNull($codecMatcher->getDecoder());
     }
 
     /**

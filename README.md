@@ -196,15 +196,20 @@ return [
   // CodecMatchersRepository configuration.
   'codecMatcher' => [
     'encoders' => [
-        'application/vnd.api+json',
-        'application/vnd.api+json;charset=utf-8',
-        'text/plain' => [
-          'options' => 'humanized',
-        ],
+      // mapping of media types to encoder options...
+      'media-types' => [
+        'application/vnd.api+json' => null // means the default options
+        'application/vnd.api+json;charset=utf-8' => null,
+        'text/plain' => 'humanized',
+      ],
+      'schemas' => null, // use the default set of schemas for these encoders.
     ],
     'decoders' => [
-        'application/vnd.api+json',
-        'application/vnd.api+json;charset=utf-8',
+      // mapping of media types to decoders...
+      'media-types' => [
+        'application/vnd.api+json' => null, // use the default decoder
+        'application/vnd.api+json;charset=utf-8' => null,
+      ],
     ],
   ],
 
@@ -246,36 +251,30 @@ return [
   'codecMatcher' => [
     'defaults' => [
       'encoders' => [
+        'media-types' => [
+          'application/vnd.api+json' => null,
+          'text/plain' => 'humanized',
+        ],
+        'schemas' => null,
       ],
       'decoders' => [
-        'application/vnd.api+json',
-        'application/vnd.api+json;charset=utf-8',
+        'media-types' => [
+          'application/vnd.api+json' => null,
+        ],
       ],
     ],
-    // Extends the defaults, adding in specific encoders
+    // Extends the defaults, adding in specific encoders and changing the schema set...
     'tenant-api' => [
       'encoders' => [
-        'application/vnd.api+json' => [
-          // No encoding options specified, so will use the default encoder options.
-          'schemas' => 'tenant-schemas',
+        'media-types' => [
+          'application/json' => null,
         ],
-        'application/vnd.api+json;charset=utf-8' => [
-          'schemas' => 'tenant-schemas',
-        ],
+        'schemas' => 'tenant-api',
       ],
     ],
     'user-api' => [
       'encoders' => [
-        'application/vnd.api+json' => [
-          'schemas' => 'user-schemas',
-        ],
-        'application/vnd.api+json' => [
-          'schemas' => 'user-schemas',
-        ],
-        'text/plain' => [
-          'schemas' => 'user-schemas',
-          'options' => 'humanized',
-        ],
+        'schemas' => 'user-api',
       ],
     ],
   ],
