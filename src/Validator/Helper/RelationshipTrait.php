@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validator\Helper;
 
 use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
-use CloudCreativity\JsonApi\Validator\Relationships\BelongsToValidator;
+use CloudCreativity\JsonApi\Validator\Relationships\HasOneValidator;
 use CloudCreativity\JsonApi\Validator\Relationships\HasManyValidator;
 
 /**
@@ -46,7 +46,7 @@ trait RelationshipTrait
     {
         $relationships = $this->getKeyedRelationships();
 
-        $validator = new BelongsToValidator($typeOrTypes);
+        $validator = new HasOneValidator($typeOrTypes);
         $validator->configure($options);
 
         $relationships->setValidator($key, $validator);

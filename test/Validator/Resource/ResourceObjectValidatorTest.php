@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validator\Resource;
 
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
-use CloudCreativity\JsonApi\Validator\Relationships\BelongsToValidator;
+use CloudCreativity\JsonApi\Validator\Relationships\HasOneValidator;
 use CloudCreativity\JsonApi\Validator\Relationships\HasManyValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
@@ -90,14 +90,14 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $key = 'foo';
         $type = 'bar';
 
-        $expected = new BelongsToValidator();
+        $expected = new HasOneValidator();
         $expected->setTypes($type);
         $expected->setAllowEmpty(false);
 
         $validator = new ResourceObjectValidator();
 
         $this->assertSame($validator, $validator->belongsTo($key, $type, [
-            BelongsToValidator::ALLOW_EMPTY => false,
+            HasOneValidator::ALLOW_EMPTY => false,
         ]));
 
         $this->assertEquals($expected, $validator->getKeyedRelationships()->getValidator($key));

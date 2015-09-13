@@ -37,7 +37,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
     protected $valid;
 
     /**
-     * @var BelongsToValidator
+     * @var HasOneValidator
      */
     protected $validator;
 
@@ -48,7 +48,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->valid->{Relationship::DATA}->{ResourceIdentifier::TYPE} = static::TYPE;
         $this->valid->{Relationship::DATA}->{ResourceIdentifier::ID} = static::ID;
 
-        $this->validator = new BelongsToValidator();
+        $this->validator = new HasOneValidator();
         $this->validator->setTypes(static::TYPE);
     }
 
@@ -61,7 +61,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
     public function testMultiTypeValid()
     {
         $stack = ['foo-bar', 'baz-bat'];
-        $validator = new BelongsToValidator();
+        $validator = new HasOneValidator();
 
         $validator->setTypes($stack);
 
@@ -79,7 +79,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertFalse($this->validator->isValid($this->valid));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_INVALID_TYPE, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_INVALID_TYPE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/type', $error->source()->getPointer());
     }
@@ -90,7 +90,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
 
         $this->assertFalse($this->validator->isValid($this->valid));
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
     }
@@ -101,7 +101,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertFalse($this->validator->isValid($this->valid));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_INVALID_ID, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_INVALID_ID, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data/id', $error->source()->getPointer());
     }
@@ -112,7 +112,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
 
         $this->assertFalse($this->validator->isValid($this->valid));
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_INCOMPLETE_IDENTIFIER, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
     }
@@ -123,7 +123,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertFalse($this->validator->isValid($this->valid));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_INVALID_VALUE, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_INVALID_VALUE, $error->getCode());
         $this->assertEquals(400, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
     }
@@ -141,7 +141,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertFalse($this->validator->isValid($this->valid));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_NULL_DISALLOWED, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_NULL_DISALLOWED, $error->getCode());
         $this->assertEquals(422, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
     }
@@ -173,7 +173,7 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertFalse($this->validator->isValid($this->valid));
 
         $error = $this->getError($this->validator);
-        $this->assertEquals(BelongsToValidator::ERROR_NOT_FOUND, $error->getCode());
+        $this->assertEquals(HasOneValidator::ERROR_NOT_FOUND, $error->getCode());
         $this->assertEquals(404, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
     }

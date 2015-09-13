@@ -29,7 +29,7 @@ use CloudCreativity\JsonApi\Validator\Helper\RequiredTrait;
  * Class BelongsToValidator
  * @package CloudCreativity\JsonApi
  */
-class BelongsToValidator extends AbstractValidator implements ConfigurableInterface
+class HasOneValidator extends AbstractValidator implements ConfigurableInterface
 {
 
     use RequiredTrait;

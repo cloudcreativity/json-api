@@ -43,13 +43,13 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
     const CALLBACK = 'callback';
 
     // Error constants
-    const ERROR_INVALID_VALUE = BelongsToValidator::ERROR_INVALID_VALUE;
-    const ERROR_INVALID_TYPE = BelongsToValidator::ERROR_INVALID_TYPE;
-    const ERROR_INVALID_ID = BelongsToValidator::ERROR_INVALID_ID;
-    const ERROR_INCOMPLETE_IDENTIFIER = BelongsToValidator::ERROR_INCOMPLETE_IDENTIFIER;
-    const ERROR_EMPTY_DISALLOWED = BelongsToValidator::ERROR_NULL_DISALLOWED;
+    const ERROR_INVALID_VALUE = HasOneValidator::ERROR_INVALID_VALUE;
+    const ERROR_INVALID_TYPE = HasOneValidator::ERROR_INVALID_TYPE;
+    const ERROR_INVALID_ID = HasOneValidator::ERROR_INVALID_ID;
+    const ERROR_INCOMPLETE_IDENTIFIER = HasOneValidator::ERROR_INCOMPLETE_IDENTIFIER;
+    const ERROR_EMPTY_DISALLOWED = HasOneValidator::ERROR_NULL_DISALLOWED;
     const ERROR_INVALID_COLLECTION = 'invalid-resources';
-    const ERROR_NOT_FOUND = BelongsToValidator::ERROR_NOT_FOUND;
+    const ERROR_NOT_FOUND = HasOneValidator::ERROR_NOT_FOUND;
 
     protected $templates = [
         self::ERROR_INVALID_VALUE => [
