@@ -128,8 +128,8 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
         $config = $this->merge($merge, true);
         $matcher = new CodecMatcher();
 
-        $this->registerEncoders($matcher, $config->get(static::ENCODERS))
-            ->registerDecoders($matcher, $config->get(static::DECODERS));
+        $this->registerEncoders($matcher, (array) $config->get(static::ENCODERS))
+            ->registerDecoders($matcher, (array) $config->get(static::DECODERS));
 
         return $matcher;
     }
