@@ -80,7 +80,7 @@ class DecodersRepository implements DecodersRepositoryInterface
         $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
         $config = $this->modify($this->merge($merge), $name);
 
-        return $this->make($config);
+        return $this->make($config, $name);
     }
 
     /**
@@ -125,9 +125,10 @@ class DecodersRepository implements DecodersRepositoryInterface
 
     /**
      * @param ConfigInterface $config
+     * @param string $name
      * @return DecoderInterface
      */
-    private function make(ConfigInterface $config)
+    private function make(ConfigInterface $config, $name)
     {
         $class = $config->get(static::TYPE);
 
