@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Stdlib\MutableConfigInterface;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepositoryTest
@@ -27,7 +27,8 @@ use CloudCreativity\JsonApi\Contracts\Stdlib\MutableConfigInterface;
 class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 
-    const VARIANT = 'foo';
+    const A = 'foo';
+    const B = 'bar';
 
     /**
      * @var array
@@ -35,11 +36,19 @@ class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
     private $config = [
         SchemasRepository::DEFAULTS => [
             'Author' => 'AuthorSchema',
+            'Comment' => 'CommentSchema',
         ],
-        self::VARIANT => [
+        self::A => [
             'Post' => 'PostSchema',
         ],
+        self::B => [
+            'Like' => 'LikeSchema',
+        ],
     ];
+
+    private $defaults;
+    private $a;
+    private $b;
 
     /**
      * @var SchemasRepository
@@ -48,54 +57,44 @@ class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->repository = new SchemasRepository($this->config);
-    }
+        $factory = new Factory();
 
-    public function testGetDefaults()
-    {
+        $this->repository = new SchemasRepository($factory);
+        $this->repository->configure($this->config);
+
         $defaults = $this->config[SchemasRepository::DEFAULTS];
-        $this->assertEquals($defaults,  $this->repository->getSchemas());
-        $this->assertEquals($defaults, $this->repository->getSchemas(SchemasRepository::DEFAULTS));
+        $this->defaults = $factory->createContainer($defaults);
+        $this->a = $factory->createContainer(array_merge($defaults, $this->config[static::A]));
+        $this->b = $factory->createContainer(array_merge($defaults, $this->config[static::B]));
     }
 
-    public function testGetVariant()
+    public function testDefaults()
     {
-        $expected = array_merge($this->config[SchemasRepository::DEFAULTS], $this->config[static::VARIANT]);
-        $this->assertEquals($expected, $this->repository->getSchemas(static::VARIANT));
+        $this->assertEquals($this->defaults,  $this->repository->getSchemas());
+        $this->assertEquals($this->defaults, $this->repository->getSchemas(SchemasRepository::DEFAULTS));
+    }
 
-        return $expected;
+    public function testVariantA()
+    {
+        $this->assertEquals($this->a, $this->repository->getSchemas(static::A));
+    }
+
+    public function testVariantB()
+    {
+        $this->assertEquals($this->b, $this->repository->getSchemas(static::B));
     }
 
     /**
-     * @depends testGetVariant
-     */
-    public function testModifier($variant)
-    {
-        $add = [
-            'Comment' => 'CommentSchema',
-        ];
-
-        $expected = array_merge($variant, $add);
-
-        $callback = function (MutableConfigInterface $config, $name) use ($variant, $add) {
-            $this->assertEquals($variant, $config->toArray());
-            $this->assertEquals(static::VARIANT, $name);
-            $config->merge($add);
-        };
-
-        $this->assertSame($this->repository, $this->repository->addModifier($callback));
-        $this->assertEquals($expected, $this->repository->getSchemas(static::VARIANT));
-    }
-
-    /**
-     * @depends testGetDefaults
+     * @depends testDefaults
      */
     public function testRootConfig()
     {
         $defaults = $this->config[SchemasRepository::DEFAULTS];
 
-        $repository = new SchemasRepository($defaults);
-        $this->assertEquals($defaults, $repository->getSchemas());
+        $repository = new SchemasRepository(new Factory());
+        $repository->configure($defaults);
+
+        $this->assertEquals($this->defaults, $repository->getSchemas());
 
         $this->setExpectedException(\RuntimeException::class);
         $repository->getSchemas('foo');

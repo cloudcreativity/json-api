@@ -18,13 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 
 /**
  * Interface CodecMatcherRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface CodecMatcherRepositoryInterface extends MutableRepositoryInterface
+interface CodecMatcherRepositoryInterface extends ConfigurableInterface
 {
 
 
@@ -33,15 +34,13 @@ interface CodecMatcherRepositoryInterface extends MutableRepositoryInterface
     /** Config key for a codec matcher's decoders */
     const DECODERS = 'decoders';
 
-    /** Config key for the media type list */
-    const MEDIA_TYPES = 'media-types';
-    /** Config key for the name of which schema set to use */
-    const SCHEMAS = 'schemas';
+    /** Config key for encoder options. */
+    const OPTIONS = 'options';
+    /** Config key for encoder depth. */
+    const DEPTH = 'depth';
 
     /**
-     * @param string|null $name
-     *      the name of the codec matcher or empty to get the default codec matcher.
      * @return CodecMatcherInterface
      */
-    public function getCodecMatcher($name = null);
+    public function getCodecMatcher();
 }

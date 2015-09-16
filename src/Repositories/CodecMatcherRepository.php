@@ -18,12 +18,18 @@
 
 namespace CloudCreativity\JsonApi\Repositories;
 
+use CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\DecodersRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\EncodersRepositoryInterface;
+use Generator;
 use Neomerx\JsonApi\Codec\CodecMatcher;
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Parameters\Headers\MediaType;
+use RuntimeException;
 
 /**
  * Class CodecMatcherRepository
@@ -33,105 +39,73 @@ use Neomerx\JsonApi\Parameters\Headers\MediaType;
  *
  * ````
  * [
- *       // The default codec matcher
- *       'defaults' => [
- *           'encoders' => [
- *               // the media types mapped to the named encoder options to use, or null to use the default
- *               'media-types' => [
- *                  'application/vnd.api+json' => null,
- *                  'text/plain' => 'humanized',
- *               ],
- *               // the schema set that should be used for these encoders, or null to use the default set.
- *               'schemas' => null,
- *           ],
- *          'decoders' => [
- *               // the media types mapped to the named decoder
- *               'media-types' => [
- *                  'application/vnd.api+json' => null,
- *           ],
- *       ],
- *       // The codec matcher named 'extended'. Will have default settings plus these below.
- *       'extended' => [
- *            'encoders' => [
- *               // add an extra media type that uses the default encoder options...
- *               'media-types' => [
- *                  'application/json' => null,
- *               ],
- *              // all encoders to use a different set of schemas...
- *              'schemas' => 'extra-schemas',
- *           ],
- *           'decoders' => [
- *               // add an extra media type that uses a specific decoder...
- *               'media-types' => [
- *                  'application/json' => 'json',
- *               ],
- *           ],
- *       ],
+ *      'encoders' => [
+ *          // Media type without any settings.
+ *          'application/vnd.api+json'
+ *          // Media type with encoder options.
+ *          'application/json' => JSON_BIGINT_AS_STRING,
+ *          // Media type with options and depth.
+ *          'text/plain' => [
+ *              'options' => JSON_PRETTY_PRINT,
+ *              'depth' => 125,
+ *          ],
+ *      ],
+ *      'decoders' => [
+ *          'application/vnd.api+json' => ObjectDecoder::class,
+ *      ],
  * ]
  * ```
- *
- * This repository also accepts non-namespaced config: i.e. the provided config array will be loaded as the default if
- * it does not contain the `defaults` key.
  *
  */
 class CodecMatcherRepository implements CodecMatcherRepositoryInterface
 {
 
-    use RepositoryTrait {
-        configure as traitConfigure;
-    }
+    /**
+     * @var FactoryInterface
+     */
+    private $factory;
+
+    /**
+     * @var EnvironmentInterface
+     */
+    private $environment;
 
     /**
      * @var EncodersRepositoryInterface
      */
-    private $encoders;
+    private $encoders = [];
 
     /**
      * @var DecodersRepositoryInterface
      */
-    private $decoders;
+    private $decoders = [];
 
     /**
-     * @var bool
+     * @param FactoryInterface $factory
+     * @param EnvironmentInterface $environment
      */
-    private $namespaced = false;
-
-    /**
-     * @param EncodersRepositoryInterface $encoders
-     * @param DecodersRepositoryInterface $decoders
-     * @param array $config
-     */
-    public function __construct(
-        EncodersRepositoryInterface $encoders,
-        DecodersRepositoryInterface $decoders,
-        array $config = []
-    ) {
-        $this->encoders = $encoders;
-        $this->decoders = $decoders;
-        $this->configure($config);
+    public function __construct(FactoryInterface $factory, EnvironmentInterface $environment)
+    {
+        $this->factory = $factory;
+        $this->environment = $environment;
     }
 
     /**
-     * @param string|null $name
-     *      the codec matcher name or empty to get the default codec matcher
      * @return CodecMatcher
      */
-    public function getCodecMatcher($name = null)
+    public function getCodecMatcher()
     {
-        $name = ($name) ?: static::DEFAULTS;
+        $codecMatcher = new CodecMatcher();
 
-        if (static::DEFAULTS !== $name && !$this->namespaced) {
-            throw new \RuntimeException(sprintf('Codec Matcher configuration is not namespaced, so cannot get "%s".', $name));
+        foreach ($this->getEncoders() as $mediaType => $encoder) {
+            $codecMatcher->registerEncoder($this->normalizeMediaType($mediaType), $encoder);
         }
 
-        $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
-        $config = $this->merge($merge, true);
-        $matcher = new CodecMatcher();
+        foreach ($this->getDecoders() as $mediaType => $decoder) {
+            $codecMatcher->registerDecoder($this->normalizeMediaType($mediaType), $decoder);
+        }
 
-        $this->registerEncoders($matcher, (array) $config->get(static::ENCODERS))
-            ->registerDecoders($matcher, (array) $config->get(static::DECODERS));
-
-        return $matcher;
+        return $codecMatcher;
     }
 
     /**
@@ -140,81 +114,122 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
      */
     public function configure(array $config)
     {
-        if (!isset($config[static::DEFAULTS])) {
-            $config = [static::DEFAULTS => $config];
-            $this->namespaced = false;
-        } else {
-            $this->namespaced = true;
-        }
+        $encoders = isset($config[static::ENCODERS]) ? (array) $config[static::ENCODERS] : [];
+        $decoders = isset($config[static::DECODERS]) ? (array) $config[static::DECODERS] : [];
 
-        $this->traitConfigure($config);
+        $this->configureEncoders($encoders)
+            ->configureDecoders($decoders);
 
         return $this;
     }
 
     /**
-     * @param CodecMatcherInterface $codecMatcher
-     * @param array $config
+     * @param array $encoders
      * @return $this
      */
-    private function registerEncoders(CodecMatcherInterface $codecMatcher, array $config)
+    private function configureEncoders(array $encoders)
     {
-        $schemasName = isset($config[static::SCHEMAS]) ? $config[static::SCHEMAS] : null;
+        $this->encoders = [];
 
-        // because of recursive merging...
-        if (is_array($schemasName)) {
-            $schemasName = array_pop($schemasName);
-        }
+        foreach ($encoders as $mediaType => $options) {
 
-        $mediaTypes = isset($config[static::MEDIA_TYPES]) ? (array) $config[static::MEDIA_TYPES] : [];
-
-        foreach ($mediaTypes as $key => $optionsName) {
-            $mediaType = $this->toMediaType($key);
-
-            // because of recursive merging...
-            if (is_array($optionsName)) {
-                $optionsName = array_pop($optionsName);
+            if (is_numeric($mediaType)) {
+                $mediaType = $options;
+                $options = [];
             }
 
-            $codecMatcher->registerEncoder($mediaType, function () use ($schemasName, $optionsName) {
-                return $this->encoders->getEncoder($schemasName, $optionsName);
-            });
+            $this->encoders[$mediaType] = $this->normalizeEncoder($options);
         }
 
         return $this;
     }
 
     /**
-     * @param CodecMatcherInterface $codecMatcher
-     * @param array $config
+     * @param $options
+     * @return array
+     */
+    private function normalizeEncoder($options)
+    {
+        $defaults = [
+            static::OPTIONS => 0,
+            static::DEPTH => 512,
+        ];
+
+        if (!is_array($options)) {
+            $options = [
+                static::OPTIONS => $options,
+            ];
+        }
+
+        return array_merge($defaults, $options);
+    }
+
+    /**
+     * @return Generator
+     */
+    private function getEncoders()
+    {
+        $environment = $this->environment;
+        $factory = $this->factory;
+
+        /** @var array $encoder */
+        foreach ($this->encoders as $mediaType => $encoder) {
+
+            $closure = function () use ($factory, $environment, $encoder) {
+                $options = $encoder[static::OPTIONS];
+                $depth = $encoder[static::DEPTH];
+                $encOptions = new EncoderOptions($options, $environment->getUrlPrefix(), $depth);
+
+                return $this->factory->createEncoder($environment->getSchemas(), $encOptions);
+            };
+
+            yield $mediaType => $closure;
+        }
+    }
+
+    /**
+     * @param array $decoders
      * @return $this
      */
-    private function registerDecoders(CodecMatcherInterface $codecMatcher, array $config)
+    private function configureDecoders(array $decoders)
     {
-        $mediaTypes = isset($config[static::MEDIA_TYPES]) ? (array) $config[static::MEDIA_TYPES] : [];
-
-        foreach ($mediaTypes as $key => $decoderName) {
-            $mediaType = $this->toMediaType($key);
-
-            // because of recursive merging...
-            if (is_array($decoderName)) {
-                $decoderName = array_pop($decoderName);
-            }
-
-            $codecMatcher->registerDecoder($mediaType, function () use ($decoderName) {
-                return $this->decoders->getDecoder($decoderName);
-            });
-        }
+        $this->decoders = $decoders;
 
         return $this;
     }
 
     /**
-     * @param $string
-     * @return MediaType
+     * @return Generator
      */
-    private function toMediaType($string)
+    private function getDecoders()
     {
-        return MediaType::parse(0, $string);
+        foreach ($this->decoders as $mediaType => $decoderClass) {
+
+            $closure = function () use ($decoderClass) {
+
+                if (!class_exists($decoderClass)) {
+                    throw new RuntimeException(sprintf('Invalid decoder class: %s', $decoderClass));
+                }
+
+                $decoder = new $decoderClass();
+
+                if (!$decoder instanceof DecoderInterface) {
+                    throw new RuntimeException(sprintf('Class %s is not a decoder class.', $decoderClass));
+                }
+
+                return $decoder;
+            };
+
+            yield $mediaType => $closure;
+        }
+    }
+
+    /**
+     * @param string $mediaType
+     * @return MediaTypeInterface
+     */
+    private function normalizeMediaType($mediaType)
+    {
+        return MediaType::parse(0, $mediaType);
     }
 }

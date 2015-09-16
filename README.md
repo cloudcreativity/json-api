@@ -3,13 +3,80 @@
 A framework agnostic implementation of the [jsonapi.org](http://jsonapi.org) spec. This repository extends
 [neomerx/json-api](https://github.com/neomerx/json-api), adding in several additional features:
 
-1. HTML request body content validation.
-2. Parsing request body content into standard objects, with a fluent interface for analysing content.
-3. Creating codec matchers (that contain encoders and decoders) from arrays.
-4. Namespacing codec matchers, for when applications require different codec matchers for different parts of the
-application. (E.g. running multiple separated APIs within the same web application.)
+1. JSON API environment to obtain JSON API configuration for the current request.
+2. Multiple schema sets loaded from a configuration array. Default schemas are merged with the schema set being loaded.
+3. Build codec matchers from a configuration array.
+4. HTML request body content validation.
+5. Decoding request body content into standard objects, with a fluent interface for analysing content.
 
-## 1. HTML Request Body Content Validation
+## 1. Environment Integration
+
+Each JSON API request that is handled by an application has dependencies that (once resolved) remain constant for the
+duration of the request. As different parts of your application - e.g. middleware, controllers, exception handlers -
+all need to access these resolved dependencies, a standard interface is provided to obtain these dependencies.
+This is similar to application frameworks providing access to singleton HTTP Request and Response objects.
+
+The `CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface` provides a standard interface to access
+the current state of the JSON API request. The standard dependencies are:
+
+* The url prefix for JSON API links.
+* A single set of schemas.
+* A single encoder instance.
+* A decoder instance, if the request provided HTTP body content.
+* JSON API request parameters.
+
+## 2. Schema Sets
+
+Schemas can be loaded from configuration arrays, for example:
+
+``` php
+[
+  'defaults' => [
+    'Article' => 'ArticleSchema',
+    'Post' => 'PostSchema',
+    'Comment' => 'CommentSchema',
+  ],
+  'users' => [
+    'User' => 'UserSchema',
+  ],
+  'tenant' => [
+    'ArticleDashboard' => 'ArticleDashboardSchema',
+  ],
+]
+```
+
+If loaded into a `CloudCreativity\JsonApi\Repositories\SchemasRepository` instance, then your application will be
+able to access either a default schema set, a `users` schema set or a `tenant` schema set. Both the `users` and `tenant`
+schema sets will contain the default schemas as well as their own.
+
+## 3. Codec Matcher Configuration
+
+Codec matchers can be built from configuration arrays, for example:
+
+``` php
+[
+  'encoders' => [
+    // Encoder with no extra configuration.
+    'application/vnd.api+json',
+    // Encoder with the encoder options set to the supplied value.
+    'application/json' => JSON_BIGINT_AS_STRING,
+    // Encoder with both encoder options and depth set.
+    'text/plain' => [
+      'options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+      'depth' => 123,
+    ],
+  ],
+  'decoders' => [
+    'application/vnd.api+json' => ObjectDecoder::class,
+  ],
+]
+```
+
+The above configuration will build a codec matcher if loaded into a
+`CloudCreativity\JsonApi\Repositories\CodecMatcherRepository` instance. When building codec matchers, the encoder url
+prefix and schema set will be taken from the injected `EnvironmentInterface` instance.
+
+## 4. HTML Request Body Content Validation
 
 ### Why?
 
@@ -106,7 +173,7 @@ Most frameworks implement their own validators. These framework validators can e
 been decoder, or integrated into the decoding processing. To integrate, just wrap them in an object that implements
 `CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface`.
 
-## 2. Parsing to Standard Objects
+## 5. Parsing to Standard Objects
 
 The standard decoder, `DocumentDecoder` returns a `Document` instance. This provides methods to walk through the
 JSON API content that was received by a server. All objects returned through the interface implement a
@@ -179,142 +246,6 @@ class ArticleController
     }
 }
 ```
-
-## 3. Arrays to Codec Matchers
-
-Configuration loading is a standard feature of PHP frameworks. This package provides a number of classes to enable the
-loading of `Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface` objects from array configuration. This includes the
-encoders and decoders that are contained within the `CodecMatcherInterface` object.
-
-This is implemented using classes in the `CloudCreativity\JsonApi\Repositories` namespace. A `CodecMatchersRepository`
-instance is injected with an `EncodersRepository` instance and a `DecodersRepository` instance.
-
-In a basic example, the configuration would be:
-
-``` php
-return [
-  // CodecMatchersRepository configuration.
-  'codecMatcher' => [
-    'encoders' => [
-      // mapping of media types to encoder options...
-      'media-types' => [
-        'application/vnd.api+json' => null // means the default options
-        'application/vnd.api+json;charset=utf-8' => null,
-        'text/plain' => 'humanized',
-      ],
-      'schemas' => null, // use the default set of schemas for these encoders.
-    ],
-    'decoders' => [
-      // mapping of media types to decoders...
-      'media-types' => [
-        'application/vnd.api+json' => null, // use the default decoder
-        'application/vnd.api+json;charset=utf-8' => null,
-      ],
-    ],
-  ],
-
-  // EncodersRepository configuration
-  'encoders' => [
-    'options' => [
-      'defaults' => [
-        'options' => JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOTE,
-        'depth' => 300,
-      ],
-      'humanized' => [
-        'options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-      ],
-    ],
-    'schemas' => [
-      Article::class => ArticleSchema::class,
-      Post::class => PostSchema::class,
-    ],
-  ],
-
-  // DecodersRepository configuration
-  'decoders' => [
-     CloudCreativity\JsonApi\Decoders\DocumentDecoder::class,
-  ]
-];
-```
-
-## 4. Namespaced Codec Matchers
-
-The basic configuration shown above can be extended to produce multiple namespaced codec matchers that assemble
-different combinations of encoding options, schemas and decoders. We're using this for a complex application that has
-multiple JSON APIs, each with different combinations of schemas but with common encoding/decoding options.
-
-For example, the config above can become:
-
-``` php
-return [
-  // CodecMatchersRepository configuration.
-  'codecMatcher' => [
-    'defaults' => [
-      'encoders' => [
-        'media-types' => [
-          'application/vnd.api+json' => null,
-          'text/plain' => 'humanized',
-        ],
-        'schemas' => null,
-      ],
-      'decoders' => [
-        'media-types' => [
-          'application/vnd.api+json' => null,
-        ],
-      ],
-    ],
-    // Extends the defaults, adding in specific encoders and changing the schema set...
-    'tenant-api' => [
-      'encoders' => [
-        'media-types' => [
-          'application/json' => null,
-        ],
-        'schemas' => 'tenant-api',
-      ],
-    ],
-    'user-api' => [
-      'encoders' => [
-        'schemas' => 'user-api',
-      ],
-    ],
-  ],
-
-  // EncodersRepository configuration
-  'encoders' => [
-    'options' => [
-      'defaults' => [
-        'options' => JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOTE,
-        'depth' => 300,
-      ],
-      'humanized' => [
-        'options' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-      ],
-    ],
-    'schemas' => [
-      'defaults' => [
-        Article::class => ArticleSchema::class,
-        Post::class => PostSchema::class,
-      ],
-      // Schemas for the tenant api - add to the defaults
-      'tenant-api' => [
-        SalesReport::class => SalesReportSchema::class,
-      ],
-      // Schemas for the user api - add to the defaults
-      'user-api' => [
-        AccountSettings::class => AccountSettingsSchema::class,
-      ],
-    ],
-  ],
-
-  // DecodersRepository configuration
-  'decoders' => [
-     CloudCreativity\JsonApi\Decoders\DocumentDecoder::class,
-  ],
-];
-```
-
-The relevant codec matcher can be built for the relevant API routing group by calling `getCodecMatcher($name)` on the
-`CodecMatchersRepository` instance (that we access via our service container).
 
 ## Status
 

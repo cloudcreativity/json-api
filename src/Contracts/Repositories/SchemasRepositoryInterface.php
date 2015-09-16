@@ -18,17 +18,22 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
+use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+
 /**
  * Interface SchemaRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface SchemasRepositoryInterface extends MutableRepositoryInterface
+interface SchemasRepositoryInterface extends ConfigurableInterface
 {
+
+    const DEFAULTS = 'defaults';
 
     /**
      * @param string|null $schemas
      *      The name of the schema set, or empty to get the default schemas.
-     * @return array
+     * @return ContainerInterface
      */
     public function getSchemas($schemas = null);
 }

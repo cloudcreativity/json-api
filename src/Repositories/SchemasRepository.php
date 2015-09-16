@@ -19,6 +19,8 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
  * Class SchemasRepository
@@ -46,9 +48,10 @@ use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
 class SchemasRepository implements SchemasRepositoryInterface
 {
 
-    use RepositoryTrait {
-        configure as traitConfigure;
-    }
+    /**
+     * @var SchemaFactoryInterface
+     */
+    private $factory;
 
     /**
      * @var bool
@@ -56,16 +59,21 @@ class SchemasRepository implements SchemasRepositoryInterface
     private $namespaced = false;
 
     /**
-     * @param array $config
+     * @var array
      */
-    public function __construct(array $config = [])
+    private $schemas = [];
+
+    /**
+     * @param SchemaFactoryInterface $factory
+     */
+    public function __construct(SchemaFactoryInterface $factory)
     {
-        $this->configure($config);
+        $this->factory = $factory;
     }
 
     /**
      * @param string $name
-     * @return array
+     * @return ContainerInterface
      */
     public function getSchemas($name = null)
     {
@@ -75,12 +83,10 @@ class SchemasRepository implements SchemasRepositoryInterface
             throw new \RuntimeException(sprintf('Schemas configuration is not namespaced, so cannot get "%s".', $name));
         }
 
-        $merge = (static::DEFAULTS === $name) ? [$name] : [static::DEFAULTS, $name];
-        $config = $this->merge($merge);
+        $defaults = $this->get(static::DEFAULTS);
+        $schemas = (static::DEFAULTS === $name) ? $defaults : array_merge($defaults, $this->get($name));
 
-        return $this
-            ->modify($config, $name)
-            ->toArray();
+        return $this->factory->createContainer($schemas);
     }
 
     /**
@@ -96,9 +102,18 @@ class SchemasRepository implements SchemasRepositoryInterface
             $this->namespaced = true;
         }
 
-        $this->traitConfigure($config);
+        $this->schemas = $config;
 
         return $this;
+    }
+
+    /**
+     * @param $key
+     * @return array
+     */
+    private function get($key)
+    {
+        return array_key_exists($key, $this->schemas) ? (array) $this->schemas[$key] : [];
     }
 
 }
