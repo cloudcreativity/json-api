@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
  * Interface CodecMatcherRepositoryInterface
@@ -43,4 +44,18 @@ interface CodecMatcherRepositoryInterface extends ConfigurableInterface
      * @return CodecMatcherInterface
      */
     public function getCodecMatcher();
+
+    /**
+     * Get the schemas that were used to build encoders within the returned codec matcher.
+     *
+     * @return ContainerInterface
+     */
+    public function getSchemas();
+
+    /**
+     * Get the url prefix that was used to build encoders within the returned codec matcher.
+     *
+     * @return mixed
+     */
+    public function getUrlPrefix();
 }

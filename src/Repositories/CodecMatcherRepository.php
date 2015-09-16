@@ -18,15 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Repositories\DecodersRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Repositories\EncodersRepositoryInterface;
 use Generator;
 use Neomerx\JsonApi\Codec\CodecMatcher;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Parameters\Headers\MediaType;
 use RuntimeException;
@@ -66,28 +64,73 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     private $factory;
 
     /**
-     * @var EnvironmentInterface
+     * @var string|null
      */
-    private $environment;
+    private $urlPrefix;
 
     /**
-     * @var EncodersRepositoryInterface
+     * @var ContainerInterface|null
+     */
+    private $schemas;
+
+    /**
+     * @var array
      */
     private $encoders = [];
 
     /**
-     * @var DecodersRepositoryInterface
+     * @var array
      */
     private $decoders = [];
 
     /**
      * @param FactoryInterface $factory
-     * @param EnvironmentInterface $environment
      */
-    public function __construct(FactoryInterface $factory, EnvironmentInterface $environment)
+    public function __construct(FactoryInterface $factory)
     {
         $this->factory = $factory;
-        $this->environment = $environment;
+    }
+
+    /**
+     * @param $urlPrefix
+     * @return $this
+     */
+    public function setUrlPrefix($urlPrefix)
+    {
+        $this->urlPrefix = (string) $urlPrefix;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getUrlPrefix()
+    {
+        return $this->urlPrefix;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @return $this
+     */
+    public function setSchemas(ContainerInterface $container)
+    {
+        $this->schemas = $container;
+
+        return $this;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getSchemas()
+    {
+        if (!$this->schemas instanceof ContainerInterface) {
+            throw new RuntimeException('No schemas set.');
+        }
+
+        return $this->schemas;
     }
 
     /**
@@ -169,18 +212,15 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
      */
     private function getEncoders()
     {
-        $environment = $this->environment;
-        $factory = $this->factory;
-
         /** @var array $encoder */
         foreach ($this->encoders as $mediaType => $encoder) {
 
-            $closure = function () use ($factory, $environment, $encoder) {
+            $closure = function () use ($encoder) {
                 $options = $encoder[static::OPTIONS];
                 $depth = $encoder[static::DEPTH];
-                $encOptions = new EncoderOptions($options, $environment->getUrlPrefix(), $depth);
+                $encOptions = new EncoderOptions($options, $this->getUrlPrefix(), $depth);
 
-                return $this->factory->createEncoder($environment->getSchemas(), $encOptions);
+                return $this->factory->createEncoder($this->getSchemas(), $encOptions);
             };
 
             yield $mediaType => $closure;

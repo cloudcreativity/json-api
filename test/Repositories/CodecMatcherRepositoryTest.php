@@ -69,12 +69,8 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $factory = new Factory();
-        $environment = $this->getMock(EnvironmentInterface::class);
         $urlPrefix = 'https://www.example.tld/api/v1';
         $schemas = $factory->createContainer(['Author' => 'AuthorSchema']);
-
-        $environment->method('getUrlPrefix')->willReturn($urlPrefix);
-        $environment->method('getSchemas')->willReturn($schemas);
 
         $this->encoderA = $factory->createEncoder($schemas, new EncoderOptions(0, $urlPrefix));
         $this->encoderB = $factory->createEncoder($schemas, new EncoderOptions(JSON_BIGINT_AS_STRING, $urlPrefix));
@@ -83,8 +79,9 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->decoderA = new ObjectDecoder();
         $this->decoderB = new ArrayDecoder();
 
-        /** @var EnvironmentInterface $environment */
-        $this->repository = new CodecMatcherRepository($factory, $environment);
+        $this->repository = new CodecMatcherRepository($factory);
+        $this->repository->setSchemas($schemas)->setUrlPrefix($urlPrefix);
+
         $this->repository->configure($this->config);
     }
 
