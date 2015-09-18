@@ -17,13 +17,25 @@ all need to access these resolved dependencies, a standard interface is provided
 This is similar to application frameworks providing access to singleton HTTP Request and Response objects.
 
 The `CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface` provides a standard interface to access
-the current state of the JSON API request. The standard dependencies are:
+the current *state* of the JSON API request. The *state* comprises of:
 
 * The url prefix for JSON API links.
 * A single set of schemas.
 * A single encoder instance.
-* A decoder instance, if the request provided HTTP body content.
+* A decoder instance, if the request included a HTTP `Content-Type` header.
 * JSON API request parameters.
+
+> A concrete class (`CloudCreativity\JsonApi\Integration\EnvironmentService`) is provided to use if desired. This
+expects to be initialised when JSON API support is required within an application.
+
+> In middleware based applications (e.g. Laravel 5) we're using middleware on JSON API routes to initialise this
+service.
+
+> In event based applications (e.g. Zend 2), we're using an event listener to initialise the service once a JSON API
+route has been matched.
+
+> In either scenario, global middleware or a global event listener can be used to initialise the service if every route
+in the application is a JSON API endpoint.
 
 ## 2. Schema Sets
 

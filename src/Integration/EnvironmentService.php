@@ -109,10 +109,9 @@ class EnvironmentService implements EnvironmentInterface
      * content-type header, that a decoder matches this as well.
      *
      * @param CodecMatcherRepositoryInterface $repository
-     * @param $inclusionResourceType
      * @return $this
      */
-    public function init(CodecMatcherRepositoryInterface $repository, $inclusionResourceType)
+    public function init(CodecMatcherRepositoryInterface $repository)
     {
         $codecMatcher = $repository->getCodecMatcher();
         $this->urlPrefix = $repository->getUrlPrefix();
@@ -120,7 +119,7 @@ class EnvironmentService implements EnvironmentInterface
 
         $this->parameters = $this->factory
             ->createParametersParser()
-            ->parse($inclusionResourceType, $this->currentRequest, $this->exceptionThrower);
+            ->parse($this->currentRequest, $this->exceptionThrower);
 
         $this->factory
             ->createHeadersChecker($this->exceptionThrower, $codecMatcher)

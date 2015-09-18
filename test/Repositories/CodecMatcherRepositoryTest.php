@@ -79,8 +79,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->decoderA = new ObjectDecoder();
         $this->decoderB = new ArrayDecoder();
 
-        $this->repository = new CodecMatcherRepository($factory);
-        $this->repository->setSchemas($schemas)->setUrlPrefix($urlPrefix);
+        $this->repository = new CodecMatcherRepository($factory, $schemas, $urlPrefix);
 
         $this->repository->configure($this->config);
     }
