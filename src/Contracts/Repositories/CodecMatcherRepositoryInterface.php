@@ -46,11 +46,27 @@ interface CodecMatcherRepositoryInterface extends ConfigurableInterface
     public function getCodecMatcher();
 
     /**
+     * Register the schemas to use when creating a codec matcher.
+     *
+     * @param ContainerInterface $schemas
+     * @return $this
+     */
+    public function registerSchemas(ContainerInterface $schemas);
+
+    /**
      * Get the schemas that were used to build encoders within the returned codec matcher.
      *
      * @return ContainerInterface
      */
     public function getSchemas();
+
+    /**
+     * Register the URL prefix to use when creating a codec matcher.
+     *
+     * @param $urlPrefix
+     * @return $this
+     */
+    public function registerUrlPrefix($urlPrefix);
 
     /**
      * Get the url prefix that was used to build encoders within the returned codec matcher.

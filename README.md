@@ -85,8 +85,8 @@ Codec matchers can be built from configuration arrays, for example:
 ```
 
 The above configuration will build a codec matcher if loaded into a
-`CloudCreativity\JsonApi\Repositories\CodecMatcherRepository` instance. When building codec matchers, the encoder url
-prefix and schema set will be taken from the injected `EnvironmentInterface` instance.
+`CloudCreativity\JsonApi\Repositories\CodecMatcherRepository` instance. The URL prefix and schemas to use when creating
+encoders are registered on the `CodecMatcherRepository` before creating a codec matcher.
 
 ## 4. HTML Request Body Content Validation
 

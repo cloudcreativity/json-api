@@ -86,11 +86,20 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     /**
      * @param FactoryInterface $factory
      */
-    public function __construct(FactoryInterface $factory, ContainerInterface $schemas, $urlPrefix = null)
+    public function __construct(FactoryInterface $factory)
     {
         $this->factory = $factory;
-        $this->schemas = $schemas;
-        $this->urlPrefix = $urlPrefix;
+    }
+
+    /**
+     * @param $urlPrefix
+     * @return $this
+     */
+    public function registerUrlPrefix($urlPrefix)
+    {
+        $this->urlPrefix = ($urlPrefix) ?: null;
+
+        return $this;
     }
 
     /**
@@ -99,6 +108,17 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     public function getUrlPrefix()
     {
         return $this->urlPrefix;
+    }
+
+    /**
+     * @param ContainerInterface $schemas
+     * @return $this
+     */
+    public function registerSchemas(ContainerInterface $schemas)
+    {
+        $this->schemas = $schemas;
+
+        return $this;
     }
 
     /**

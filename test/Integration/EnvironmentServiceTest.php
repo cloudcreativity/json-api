@@ -42,7 +42,8 @@ class EnvironmentServiceTest extends \PHPUnit_Framework_TestCase
         $this->factory = new Factory();
         $this->schemas = $this->factory->createContainer(['Author' => 'AuthorSchema']);
         $this->urlPrefix = 'http://www.example.tld/api';
-        $this->repository = new CodecMatcherRepository($this->factory, $this->schemas, $this->urlPrefix);
+        $this->repository = new CodecMatcherRepository($this->factory);
+        $this->repository->registerSchemas($this->schemas)->registerUrlPrefix($this->urlPrefix);
 
         $this->repository
             ->configure([

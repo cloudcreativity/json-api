@@ -18,7 +18,6 @@
 
 namespace CloudCreativity\JsonApi\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;
@@ -79,7 +78,8 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->decoderA = new ObjectDecoder();
         $this->decoderB = new ArrayDecoder();
 
-        $this->repository = new CodecMatcherRepository($factory, $schemas, $urlPrefix);
+        $this->repository = new CodecMatcherRepository($factory);
+        $this->repository->registerSchemas($schemas)->registerUrlPrefix($urlPrefix);
 
         $this->repository->configure($this->config);
     }
