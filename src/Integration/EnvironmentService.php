@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Integration;
 
 use CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface;
-use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
+use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Integration\CurrentRequestInterface;
@@ -27,6 +27,7 @@ use Neomerx\JsonApi\Contracts\Integration\ExceptionThrowerInterface;
 use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Parameters\ParametersFactoryInterface;
 use Neomerx\JsonApi\Contracts\Parameters\ParametersInterface;
+use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use RuntimeException;
 
@@ -84,6 +85,11 @@ class EnvironmentService implements EnvironmentInterface
     private $parameters;
 
     /**
+     * @var SupportedExtensionsInterface|null
+     */
+    private $supportedExtensions;
+
+    /**
      * @param ParametersFactoryInterface $factory
      * @param CurrentRequestInterface $currentRequest
      * @param ExceptionThrowerInterface $exceptionThrower
@@ -99,24 +105,65 @@ class EnvironmentService implements EnvironmentInterface
     }
 
     /**
-     * Initialise JSON API support for the current request.
-     *
-     * An application should initialise support on the routes that are JSON API endpoints. Alternatively, if the whole
-     * application is a JSON API, then this can be initialised on every request.
-     *
-     * The initialisation process configures the JSON API environment based on the supplied codec matcher repository.
-     * It will check request headers and ensure that an encoder is matched to the accept header, and if there is a
-     * content-type header, that a decoder matches this as well.
-     *
-     * @param CodecMatcherRepositoryInterface $repository
+     * @param $urlPrefix
      * @return $this
      */
-    public function init(CodecMatcherRepositoryInterface $repository)
+    public function registerUrlPrefix($urlPrefix)
     {
-        $codecMatcher = $repository->getCodecMatcher();
-        $this->urlPrefix = $repository->getUrlPrefix();
-        $this->schemas = $repository->getSchemas();
+        $this->urlPrefix = $urlPrefix ?: null;
 
+        return $this;
+    }
+
+    /**
+     * Get the url prefix for links.
+     *
+     * @return string|null
+     */
+    public function getUrlPrefix()
+    {
+        return $this->urlPrefix;
+    }
+
+    /**
+     * @param ContainerInterface $schemas
+     * @return $this
+     */
+    public function registerSchemas(ContainerInterface $schemas)
+    {
+        $this->schemas = $schemas;
+
+        return $this;
+    }
+
+    /**
+     * Get the schemas for the current request.
+     *
+     * @return ContainerInterface
+     */
+    public function getSchemas()
+    {
+        if (!$this->schemas instanceof ContainerInterface) {
+            throw new RuntimeException('No schemas registered.');
+        }
+
+        return $this->schemas;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSchemas()
+    {
+        return $this->schemas instanceof ContainerInterface;
+    }
+
+    /**
+     * @param CodecMatcherInterface $codecMatcher
+     * @return $this
+     */
+    public function registerCodecMatcher(CodecMatcherInterface $codecMatcher)
+    {
         $this->parameters = $this->factory
             ->createParametersParser()
             ->parse($this->currentRequest, $this->exceptionThrower);
@@ -143,44 +190,12 @@ class EnvironmentService implements EnvironmentInterface
     }
 
     /**
-     * Get the url prefix for links.
-     *
-     * @return string|null
-     */
-    public function getUrlPrefix()
-    {
-        return $this->urlPrefix;
-    }
-
-    /**
-     * Get the schemas for the current request.
-     *
-     * @return ContainerInterface
-     */
-    public function getSchemas()
-    {
-        if (!$this->schemas instanceof ContainerInterface) {
-            throw new RuntimeException('No schemas registered. Has JSON API support been initialised for the current request?');
-        }
-
-        return $this->schemas;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasSchemas()
-    {
-        return $this->schemas instanceof ContainerInterface;
-    }
-
-    /**
      * @return EncoderInterface
      */
     public function getEncoder()
     {
         if (!$this->encoder instanceof EncoderInterface) {
-            throw new RuntimeException('No encoder registered. Has JSON API support been initialised for the current request?');
+            throw new RuntimeException('No encoder registered. Has a codec matcher been registered?');
         }
 
         return $this->encoder;
@@ -200,7 +215,7 @@ class EnvironmentService implements EnvironmentInterface
     public function getEncoderMediaType()
     {
         if (!$this->hasEncoder()) {
-            throw new RuntimeException('No encoder registered. Has JSON API support been initialised for the current request?');
+            throw new RuntimeException('No encoder registered. Has a codec matcher been registered?');
         }
 
         return $this->encoderMediaType;
@@ -212,7 +227,7 @@ class EnvironmentService implements EnvironmentInterface
     public function getDecoder()
     {
         if (!$this->decoder instanceof DecoderInterface) {
-            throw new RuntimeException('No decoder registered. Has JSON API support been initialised for the current request, and has the current request supplied content?');
+            throw new RuntimeException('No decoder registered. Has a codec matcher been registered?');
         }
 
         return $this->decoder;
@@ -232,7 +247,7 @@ class EnvironmentService implements EnvironmentInterface
     public function getDecoderMediaType()
     {
         if (!$this->hasDecoder()) {
-            throw new RuntimeException('No decoder registered. Has JSON API support been initialised for the current request, and has the current request supplied content?');
+            throw new RuntimeException('No decoder registered. Has a codec matcher been registered?');
         }
 
         return $this->decoderMediaType;
@@ -256,6 +271,25 @@ class EnvironmentService implements EnvironmentInterface
     public function hasParameters()
     {
         return $this->parameters instanceof ParametersInterface;
+    }
+
+    /**
+     * @param SupportedExtensionsInterface $extensions
+     * @return $this
+     */
+    public function registerSupportedExtensions(SupportedExtensionsInterface $extensions)
+    {
+        $this->supportedExtensions = $extensions;
+
+        return $this;
+    }
+
+    /**
+     * @return SupportedExtensionsInterface|null
+     */
+    public function getSupportedExtensions()
+    {
+        return $this->supportedExtensions;
     }
 
 }

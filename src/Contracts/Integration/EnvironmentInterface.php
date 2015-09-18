@@ -22,6 +22,7 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Parameters\ParametersInterface;
+use Neomerx\JsonApi\Contracts\Parameters\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
@@ -89,4 +90,9 @@ interface EnvironmentInterface
      * @return bool
      */
     public function hasParameters();
+
+    /**
+     * @return SupportedExtensionsInterface|null
+     */
+    public function getSupportedExtensions();
 }
