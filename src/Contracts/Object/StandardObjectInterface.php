@@ -40,6 +40,14 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function getProperties(array $keys, $default = null);
 
     /**
+     * Get properties if they exist.
+     *
+     * @param array $keys
+     * @return array
+     */
+    public function getMany(array $keys);
+
+    /**
      * @param $key
      * @param $value
      * @return $this

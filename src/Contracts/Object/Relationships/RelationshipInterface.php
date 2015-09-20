@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Object\Relationships;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use RuntimeException;
 
 /**
@@ -43,8 +44,14 @@ interface RelationshipInterface
 
     /**
      * @return bool
+     * @deprecated use `isHasOne` instead
      */
     public function isBelongsTo();
+
+    /**
+     * @return bool
+     */
+    public function isHasOne();
 
     /**
      * @return bool

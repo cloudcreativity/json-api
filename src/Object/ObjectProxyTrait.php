@@ -84,6 +84,26 @@ trait ObjectProxyTrait
     }
 
     /**
+     * Get properties if they exist.
+     *
+     * @param array $keys
+     * @return array
+     */
+    public function getMany(array $keys)
+    {
+        $ret = [];
+
+        foreach ($keys as $key) {
+
+            if ($this->has($key)) {
+                $ret[$key] = $this->get($key);
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
      * @param $key
      * @param $value
      * @return $this

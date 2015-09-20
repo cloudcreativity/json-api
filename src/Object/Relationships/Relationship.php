@@ -52,9 +52,17 @@ class Relationship extends StandardObject implements RelationshipInterface
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function isBelongsTo()
+    {
+        return $this->isHasOne();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHasOne()
     {
         if (!$this->has(static::DATA)) {
             return false;
