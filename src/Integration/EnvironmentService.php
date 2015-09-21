@@ -173,11 +173,7 @@ class EnvironmentService implements EnvironmentInterface
             ->checkHeaders($this->parameters);
 
         $this->encoder = $codecMatcher->getEncoder();
-        $this->encoderMediaType = $codecMatcher->getEncoderHeaderMatchedType();
-
-        if (!$this->encoderMediaType) {
-            $this->encoderMediaType = $codecMatcher->getEncoderRegisteredMatchedType();
-        }
+        $this->encoderMediaType = $codecMatcher->getEncoderRegisteredMatchedType();
 
         $this->decoder = $codecMatcher->getDecoder();
         $this->decoderMediaType = $codecMatcher->getDecoderHeaderMatchedType();
