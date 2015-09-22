@@ -35,6 +35,18 @@ trait RelationshipTrait
     abstract public function getKeyedRelationships();
 
     /**
+     * @param $key
+     * @param $typeOrTypes
+     * @param array $options
+     * @return $this
+     * @deprecated use `hasOne` instead
+     */
+    public function belongsTo($key, $typeOrTypes, array $options = [])
+    {
+        return $this->hasOne($key, $typeOrTypes, $options);
+    }
+
+    /**
      * Helper method to add a belongs to validator for the specified key.
      *
      * @param $key
@@ -42,7 +54,7 @@ trait RelationshipTrait
      * @param array $options
      * @return $this
      */
-    public function belongsTo($key, $typeOrTypes, array $options = [])
+    public function hasOne($key, $typeOrTypes, array $options = [])
     {
         $relationships = $this->getKeyedRelationships();
 
