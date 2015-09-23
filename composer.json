@@ -22,7 +22,7 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "neomerx/json-api": "dev-develop"
+        "neomerx/json-api": "^0.6.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.7"

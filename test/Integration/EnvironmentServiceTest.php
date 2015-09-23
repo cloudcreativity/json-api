@@ -110,7 +110,7 @@ class EnvironmentServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->service->hasEncoder());
         $this->service->registerCodecMatcher($this->repository->getCodecMatcher());
         $this->assertEquals($matcher->getEncoder(), $this->service->getEncoder());
-        $this->assertEquals($matcher->getEncoderHeaderMatchedType(), $this->service->getEncoderMediaType());
+        $this->assertEquals($matcher->getEncoderRegisteredMatchedType(), $this->service->getEncoderMediaType());
         $this->assertTrue($this->service->hasEncoder());
     }
 
