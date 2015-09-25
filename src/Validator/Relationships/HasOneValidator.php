@@ -265,7 +265,7 @@ class HasOneValidator extends AbstractValidator implements ConfigurableInterface
         }
 
         // check the callback, if one exists.
-        if ($this->hasCallback() && false == call_user_func($this->getCallback(), $data)) {
+        if ($this->getErrors()->isEmpty() && $this->hasCallback() && false == call_user_func($this->getCallback(), $data)) {
             $this->error(static::ERROR_NOT_FOUND, '/' . Relationship::DATA);
         }
     }

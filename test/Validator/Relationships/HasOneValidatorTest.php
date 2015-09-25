@@ -22,7 +22,7 @@ use CloudCreativity\JsonApi\Object\Relationships\Relationship;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
 
-class BelongsToValidatorTest extends ValidatorTestCase
+class HasOneValidatorTest extends ValidatorTestCase
 {
 
     const TYPE = 'foo';
@@ -176,5 +176,20 @@ class BelongsToValidatorTest extends ValidatorTestCase
         $this->assertEquals(HasOneValidator::ERROR_NOT_FOUND, $error->getCode());
         $this->assertEquals(404, $error->getStatus());
         $this->assertEquals('/data', $error->source()->getPointer());
+    }
+
+    /**
+     * @depends testCallback
+     */
+    public function testCallbackNotInvokedForInvalidIdentifier()
+    {
+        $callback = function () {
+            $this->fail('Not expecting callback to be invoked.');
+        };
+
+        $this->valid->{Relationship::DATA}->{ResourceIdentifier::TYPE} = static::INVALID_TYPE;
+
+        $this->validator->setCallback($callback);
+        $this->assertFalse($this->validator->isValid($this->valid));
     }
 }

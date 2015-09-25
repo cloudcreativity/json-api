@@ -257,7 +257,7 @@ class HasManyValidator extends AbstractValidator implements ConfigurableInterfac
             $this->validateIdentifier($identifier, $key);
         }
 
-        if ($this->hasCallback()) {
+        if ($this->getErrors()->isEmpty() && $this->hasCallback()) {
             $this->validateCallback($data);
         }
     }

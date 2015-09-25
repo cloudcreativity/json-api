@@ -195,4 +195,18 @@ class HasManyValidatorTest extends ValidatorTestCase
         $this->assertEquals('/data/1', $error->source()->getPointer());
     }
 
+    /**
+     * @depends testCallback
+     */
+    public function testCallbackNotInvokedIfCollectionIsInvalid()
+    {
+        $this->validator->setTypes(static::TYPE_A);
+
+        $this->validator->setCallback(function () {
+            $this->fail('Not expecting callback to be invoked.');
+        });
+
+        $this->assertFalse($this->validator->isValid($this->input));
+    }
+
 }
