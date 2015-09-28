@@ -149,13 +149,15 @@ class ErrorCollection implements \IteratorAggregate, ErrorCollectionInterface
             $status = $error->getStatus();
 
             if (400 <= $status && 499 >= $status) {
-                $request = is_null($request) ? $status : 400;
+                $request = is_null($request) ? $status : ($request == $status) ? $status : 400;
             } elseif (500 <= $status && 599 >= $status) {
-                $internal = is_null($internal) ? $status : 500;
+                $internal = is_null($internal) ? $status : ($internal == $status) ? $status : 500;
             }
         }
 
-        if (!is_null($internal)) {
+        if (!is_null($internal) && !is_null($request)) {
+            return '500';
+        } elseif (!is_null($internal)) {
             return (string) $internal;
         }
 

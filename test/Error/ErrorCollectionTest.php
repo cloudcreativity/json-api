@@ -146,6 +146,7 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
     public function testGetStatus5xx()
     {
         $this->a->setStatus(503);
+        $this->b->setStatus(503);
         $collection = new ErrorCollection([$this->a, $this->b]);
         $this->assertEquals(503, $collection->getStatus());
     }
@@ -161,6 +162,7 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
     public function testGetStatus4xx()
     {
         $this->a->setStatus(422);
+        $this->b->setStatus(422);
         $collection = new ErrorCollection([$this->a, $this->b]);
         $this->assertEquals(422, $collection->getStatus());
     }
@@ -171,6 +173,14 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
         $this->b->setStatus(402);
         $collection = new ErrorCollection([$this->a, $this->b]);
         $this->assertEquals(400, $collection->getStatus());
+    }
+
+    public function testGetStatusMixed5xxAnd4xx()
+    {
+        $this->a->setStatus(405);
+        $this->b->setStatus(501);
+        $collection = new ErrorCollection([$this->a, $this->b]);
+        $this->assertEquals(500, $collection->getStatus());
     }
 
     public function testGetStatusUnknown()
