@@ -45,7 +45,7 @@ class RelationshipsValidator extends AbstractKeyedValidator
             ErrorObject::CODE => self::ERROR_REQUIRED,
             ErrorObject::STATUS => 400,
             ErrorObject::TITLE => 'Required Relationship',
-            ErrorObject::DETAIL => 'Missing required relationship "%s".',
+            ErrorObject::DETAIL => 'Relationship is required so must be provided.',
         ],
         self::ERROR_UNRECOGNISED_RELATIONSHIP => [
             ErrorObject::CODE => self::ERROR_UNRECOGNISED_RELATIONSHIP,
