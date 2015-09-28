@@ -69,6 +69,7 @@ class ThrowableError extends RuntimeException implements ErrorInterface
 
     /**
      * @param string $titleOrArray
+     * @param int|null $status
      * @param null $code
      * @param Exception|null $previous
      */

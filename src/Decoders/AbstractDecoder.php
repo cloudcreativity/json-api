@@ -28,8 +28,6 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 abstract class AbstractDecoder implements DecoderInterface
 {
 
-    const ERROR_INVALID_JSON = 'invalid-json';
-
     /**
      * @param $content
      * @param bool|false $assoc
@@ -45,7 +43,7 @@ abstract class AbstractDecoder implements DecoderInterface
             throw new ThrowableError([
                 ThrowableError::TITLE => 'Invalid JSON',
                 ThrowableError::DETAIL => 'Request body content could not be parsed as JSON: ' . json_last_error_msg(),
-            ], 400, static::ERROR_INVALID_JSON);
+            ], 400);
         }
 
         return $parsed;
