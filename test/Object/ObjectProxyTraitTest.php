@@ -18,6 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use stdClass;
+
 class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -154,5 +156,29 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->trait, $this->trait->exchangeArray($arr));
         $this->assertEquals($arr, $this->trait->toArray());
         $this->assertEquals($this->proxy, $this->trait->getProxy());
+    }
+
+    public function testToArrayRecursive()
+    {
+        $object = new stdClass();
+        $object->foo = 'bar';
+        $object->baz = new stdClass();
+        $object->baz->bat = 'bazbat';
+        $object->baz->foobar = new stdClass();
+        $object->baz->foobar->bazbat = 'foobarbazbat';
+
+        $expected = [
+            'foo' => 'bar',
+            'baz' => [
+                'bat' => 'bazbat',
+                'foobar' => [
+                    'bazbat' => 'foobarbazbat',
+                ],
+            ],
+        ];
+
+        $this->trait->setProxy($object);
+
+        $this->assertSame($expected, $this->trait->toArray());
     }
 }

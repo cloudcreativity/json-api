@@ -237,6 +237,6 @@ trait ObjectProxyTrait
      */
     public function toArray()
     {
-        return (array) $this->getProxy();
+        return ObjectUtils::toArray($this->getProxy());
     }
 }
