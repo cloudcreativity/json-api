@@ -18,7 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
+use CloudCreativity\JsonApi\Contracts\Error\ErrorObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Error\ErrorsAwareInterface;
+use Exception;
+use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use RuntimeException;
 
@@ -29,17 +32,34 @@ use RuntimeException;
 class ErrorException extends RuntimeException implements ErrorsAwareInterface
 {
 
+    const ID = ErrorObjectInterface::ID;
+    const LINKS = ErrorObjectInterface::LINKS;
+    const STATUS = ErrorObjectInterface::STATUS;
+    const CODE = ErrorObjectInterface::CODE;
+    const TITLE = ErrorObjectInterface::TITLE;
+    const DETAIL = ErrorObjectInterface::DETAIL;
+    const SOURCE = ErrorObjectInterface::SOURCE;
+    const META = ErrorObjectInterface::META;
+
     /**
      * @var ErrorInterface
      */
     private $error;
 
     /**
-     * @param ErrorInterface|array $error
-     * @param \Exception|null $previous
+     * @param ErrorInterface|array $errorOrArray
+     * @param Exception|null $previous
      */
-    public function __construct(ErrorInterface $error, \Exception $previous = null)
+    public function __construct($errorOrArray, Exception $previous = null)
     {
+        if (is_array($errorOrArray)) {
+            $error = new ErrorObject($errorOrArray);
+        } elseif ($errorOrArray instanceof ErrorInterface) {
+            $error = $errorOrArray;
+        } else {
+            throw new InvalidArgumentException(sprintf('Expecting an %s object or an array to cast to an error object.', ErrorInterface::class));
+        }
+
         $code = is_numeric($error->getCode()) ? (int) $error->getCode() : null;
 
         parent::__construct($error->getTitle(), $code, $previous);

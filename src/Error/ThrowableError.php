@@ -26,6 +26,8 @@ use RuntimeException;
 /**
  * Class ThrowableError
  * @package CloudCreativity\JsonApi
+ * @deprecated
+ *      use `ErrorException` providing an array as the first argument.
  */
 class ThrowableError extends RuntimeException implements ErrorInterface
 {
