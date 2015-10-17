@@ -3,7 +3,6 @@
 namespace CloudCreativity\JsonApi\Integration;
 
 use CloudCreativity\JsonApi\Error\ErrorException;
-use CloudCreativity\JsonApi\Error\ThrowableError;
 use CloudCreativity\JsonApi\Exceptions\ExceptionThrower;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use Neomerx\JsonApi\Contracts\Integration\CurrentRequestInterface;

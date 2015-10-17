@@ -2,7 +2,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
-use CloudCreativity\JsonApi\Error\ThrowableError;
+use CloudCreativity\JsonApi\Error\ErrorException;
 
 class DocumentDecoderTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ EOL;
 
         $decoder = new DocumentDecoder();
 
-        $this->setExpectedException(ThrowableError::class);
+        $this->setExpectedException(ErrorException::class);
         $decoder->decode($content);
     }
 }
