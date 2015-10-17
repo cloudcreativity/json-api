@@ -2,6 +2,7 @@
 
 namespace CloudCreativity\JsonApi\Integration;
 
+use CloudCreativity\JsonApi\Error\ErrorException;
 use CloudCreativity\JsonApi\Error\ThrowableError;
 use CloudCreativity\JsonApi\Exceptions\ExceptionThrower;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
@@ -155,8 +156,8 @@ class EnvironmentServiceTest extends \PHPUnit_Framework_TestCase
         try {
             $service->registerCodecMatcher($this->repository->getCodecMatcher());
             $this->fail('No exception thrown.');
-        } catch (ThrowableError $e) {
-            $this->assertEquals(406, $e->getStatus());
+        } catch (ErrorException $e) {
+            $this->assertEquals(406, $e->getError()->getStatus());
         }
     }
 
@@ -177,8 +178,8 @@ class EnvironmentServiceTest extends \PHPUnit_Framework_TestCase
         try {
             $service->registerCodecMatcher($this->repository->getCodecMatcher());
             $this->fail('No exception thrown.');
-        } catch (ThrowableError $e) {
-            $this->assertEquals(415, $e->getStatus());
+        } catch (ErrorException $e) {
+            $this->assertEquals(415, $e->getError()->getStatus());
         }
     }
 

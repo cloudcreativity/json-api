@@ -82,4 +82,20 @@ class ErrorException extends RuntimeException implements ErrorsAwareInterface
     {
         return new ErrorCollection([$this->getError()]);
     }
+
+    /**
+     * Create an ErrorException with only a title and status code.
+     *
+     * @param $title
+     * @param $statusCode
+     * @param Exception|null $previous
+     * @return static
+     */
+    public static function create($title, $statusCode, Exception $previous = null)
+    {
+        return new static([
+            static::TITLE => $title,
+            static::STATUS => $statusCode,
+        ], $previous);
+    }
 }
