@@ -89,9 +89,9 @@ class RelationshipsValidator extends AbstractKeyedValidator
      */
     protected function checkKey($key)
     {
-        if (!$this->hasValidator($key)) {
+        if (!$this->isAllowedKey($key)) {
             $this->error(static::ERROR_UNRECOGNISED_RELATIONSHIP)
-                ->source()
+                ->getSourceObject()
                 ->setPointer(sprintf('/%s', $key));
         }
 

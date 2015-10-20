@@ -113,6 +113,11 @@ class RelationshipsValidatorTest extends ValidatorTestCase
 
         $this->a->method('isValid')->willReturn(true);
 
+        /** Expect relationships that do not have validators to be ignored. */
+        $this->assertTrue($this->validator->isValid($this->input));
+
+        /** If only key a is allowed, then this should now reject because the input includes a key b. */
+        $this->validator->setAllowedKeys(static::KEY_A);
         $this->assertFalse($this->validator->isValid($this->input));
 
         $error = $this->getError($this->validator);
