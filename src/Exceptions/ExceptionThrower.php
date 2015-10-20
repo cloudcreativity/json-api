@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Error\ThrowableError;
+use CloudCreativity\JsonApi\Error\ErrorException;
 use Neomerx\JsonApi\Contracts\Integration\ExceptionThrowerInterface;
 
 /**
@@ -35,7 +35,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwBadRequest()
     {
-        throw new ThrowableError('Bad Request', 400);
+        throw ErrorException::create('Bad Request', 400);
     }
 
     /**
@@ -45,7 +45,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwForbidden()
     {
-        throw new ThrowableError('Forbidden', 403);
+        throw ErrorException::create('Forbidden', 403);
     }
 
     /**
@@ -55,7 +55,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwNotAcceptable()
     {
-        throw new ThrowableError('Not Acceptable', 406);
+        throw ErrorException::create('Not Acceptable', 406);
     }
 
     /**
@@ -65,7 +65,7 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwConflict()
     {
-        throw new ThrowableError('Conflict', 409);
+        throw ErrorException::create('Conflict', 409);
     }
 
     /**
@@ -75,7 +75,6 @@ class ExceptionThrower implements ExceptionThrowerInterface
      */
     public function throwUnsupportedMediaType()
     {
-        throw new ThrowableError('Unsupported Media Type', 415);
+        throw ErrorException::create('Unsupported Media Type', 415);
     }
-
 }

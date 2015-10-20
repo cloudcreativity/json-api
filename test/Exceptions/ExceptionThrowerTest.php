@@ -18,9 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Error\ThrowableError;
+use CloudCreativity\JsonApi\Error\ErrorException;
 use Exception;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 class ExceptionThrowerTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,13 +34,14 @@ class ExceptionThrowerTest extends \PHPUnit_Framework_TestCase
         $this->thrower = new ExceptionThrower();
     }
 
-    protected function checkException($method, $status)
+    private function checkException($method, $status)
     {
         try {
             call_user_func([$this->thrower, $method]);
             $this->fail('No exception thrown.');
-        } catch (ThrowableError $actual) {
-            $this->assertEquals($status, $actual->getStatus());
+        } catch (ErrorException $actual) {
+            $error = $actual->getError();
+            $this->assertEquals($status, $error->getStatus());
         } catch (Exception $e) {
             $this->fail('Invalid exception thrown.');
         }
