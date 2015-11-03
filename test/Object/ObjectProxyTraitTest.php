@@ -158,27 +158,15 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->proxy, $this->trait->getProxy());
     }
 
-    public function testToArrayRecursive()
+    public function testToArray()
     {
         $object = new stdClass();
         $object->foo = 'bar';
         $object->baz = new stdClass();
         $object->baz->bat = 'bazbat';
-        $object->baz->foobar = new stdClass();
-        $object->baz->foobar->bazbat = 'foobarbazbat';
 
-        $expected = [
-            'foo' => 'bar',
-            'baz' => [
-                'bat' => 'bazbat',
-                'foobar' => [
-                    'bazbat' => 'foobarbazbat',
-                ],
-            ],
-        ];
-
+        $expected = ObjectUtils::toArray($object);
         $this->trait->setProxy($object);
-
         $this->assertSame($expected, $this->trait->toArray());
     }
 }
