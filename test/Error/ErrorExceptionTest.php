@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Error;
 
 use Exception;
+use InvalidArgumentException;
 
 class ErrorExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,6 +53,13 @@ class ErrorExceptionTest extends \PHPUnit_Framework_TestCase
         $expected = new ErrorObject($arr);
 
         $this->assertEquals($expected, $exception->getError());
+    }
+
+    public function testWithInvalid()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+
+        new ErrorException('foo');
     }
 
     public function testPreviousException()

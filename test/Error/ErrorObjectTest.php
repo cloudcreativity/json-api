@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Error;
 
+use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 
 class ErrorObjectTest extends \PHPUnit_Framework_TestCase
@@ -62,6 +63,16 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
         }
 
         return $object;
+    }
+
+    public function testIntegerId()
+    {
+        $id = 500;
+
+        $object = new ErrorObject();
+        $object->setId($id);
+
+        $this->assertSame($id, $object->getId());
     }
 
     public function testLinksObject()
@@ -121,6 +132,13 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
         return $object;
     }
 
+    public function testSetInvalidSource()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+
+        (new ErrorObject())->setSource('foo');
+    }
+
     /**
      * @depends testSetSourceArray
      */
@@ -130,6 +148,13 @@ class ErrorObjectTest extends \PHPUnit_Framework_TestCase
         $object->setSource(null);
         $this->assertNull($object->getSource());
         $this->assertFalse($object->hasSource());
+    }
+
+    public function testInvalidMeta()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+
+        (new ErrorObject())->setMeta('invalid');
     }
 
     /**

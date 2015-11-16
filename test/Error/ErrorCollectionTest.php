@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Error;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use InvalidArgumentException;
 
 class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -101,6 +102,13 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
         return $collection;
     }
 
+    public function testAddManyInvalidArgument()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+
+        (new ErrorCollection())->addMany([$this->a, 'foo', $this->b]);
+    }
+
     /**
      * @depends testAddMany
      */
@@ -130,6 +138,13 @@ class ErrorCollectionTest extends \PHPUnit_Framework_TestCase
             ->error($this->interface);
 
         $this->assertEquals($expected, $collection->getAll());
+    }
+
+    public function testInvalidError()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+
+        (new ErrorCollection())->error('boom!');
     }
 
     public function testMerge()
