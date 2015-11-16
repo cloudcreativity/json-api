@@ -27,6 +27,7 @@ use Neomerx\JsonApi\Exceptions\BaseRenderer;
 /**
  * Class ErrorRenderer
  * @package CloudCreativity\JsonApi
+ * @deprecated ThrowableError is deprecated and is the only exception error that implements ErrorInterface.
  */
 class ErrorRenderer extends BaseRenderer implements EncoderAwareInterface
 {

@@ -56,6 +56,8 @@ class ErrorsAwareRenderer extends BaseRenderer implements EncoderAwareInterface
     {
         if ($e instanceof ErrorsAwareInterface && !$this->getStatusCode()) {
             $this->withStatusCode($e->getErrors()->getStatus());
+        } elseif (!$this->getStatusCode()) {
+            $this->withStatusCode(500);
         }
 
         return parent::render($e);
