@@ -40,7 +40,7 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->proxy = new \stdClass();
+        $this->proxy = new stdClass();
         $this->proxy->{static::KEY_A} = static::VALUE_A;
         $this->proxy->{static::KEY_B} = static::VALUE_B;
 
@@ -144,6 +144,41 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->trait->keys());
         $this->trait->setProxy($this->proxy);
         $this->assertEquals([static::KEY_A, static::KEY_B], $this->trait->keys());
+    }
+
+    public function testMapKey()
+    {
+        $alt = static::KEY_A . static::KEY_B;
+
+        $expected = clone $this->proxy;
+        $expected->{$alt} = $expected->{static::KEY_A};
+        unset($expected->{static::KEY_A});
+
+        $this->trait->setProxy($this->proxy);
+        $this->assertSame($this->trait, $this->trait->mapKey(static::KEY_A, $alt));
+
+        $this->assertEquals($expected, $this->trait->getProxy());
+        $this->assertFalse($this->trait->has(static::KEY_A));
+    }
+
+    public function testMapKeys()
+    {
+        $altA = static::KEY_A . static::KEY_B;
+        $altB = static::KEY_B . static::KEY_A;
+
+        $expected = new stdClass();
+        $expected->{$altA} = $this->proxy->{static::KEY_A};
+        $expected->{$altB} = $this->proxy->{static::KEY_B};
+
+        $this->trait->setProxy($this->proxy);
+
+        $this->assertSame($this->trait, $this->trait->mapKeys([
+            static::KEY_A => $altA,
+            static::KEY_B => $altB,
+            static::KEY_C => 'ignored',
+        ]));
+
+        $this->assertEquals($expected, $this->trait->getProxy());
     }
 
     public function testArrayExchangeable()

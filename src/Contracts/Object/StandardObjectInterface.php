@@ -110,6 +110,23 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function keys();
 
     /**
+     * If the object has the current key, convert it to the new key.
+     *
+     * @param $currentKey
+     * @param $newKey
+     * @return $this
+     */
+    public function mapKey($currentKey, $newKey);
+
+    /**
+     * Map multiple keys to new key names.
+     *
+     * @param array $map
+     * @return $this
+     */
+    public function mapKeys(array $map);
+
+    /**
      * Get the object's property values as an array.
      *
      * @return array

@@ -18,6 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use InvalidArgumentException;
+use stdClass;
+
 /**
  * Class ObjectProxyTrait
  * @package CloudCreativity\JsonApi
@@ -37,7 +40,7 @@ trait ObjectProxyTrait
     public function setProxy($proxy)
     {
         if (!is_object($proxy)) {
-            throw new \InvalidArgumentException('Expecting an object.');
+            throw new InvalidArgumentException('Expecting an object.');
         }
 
         $this->proxy = $proxy;
@@ -51,7 +54,7 @@ trait ObjectProxyTrait
     public function getProxy()
     {
         if (!is_object($this->proxy)) {
-            $this->proxy = new \stdClass();
+            $this->proxy = new stdClass();
         }
 
         return $this->proxy;
@@ -219,6 +222,37 @@ trait ObjectProxyTrait
     public function keys()
     {
         return array_keys($this->toArray());
+    }
+
+    /**
+     * If the object has the current key, convert it to the new key name.
+     *
+     * @param $currentKey
+     * @param $newKey
+     * @return $this
+     */
+    public function mapKey($currentKey, $newKey)
+    {
+        if ($this->has($currentKey)) {
+            $this->set($newKey, $this->get($currentKey))->remove($currentKey);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Map many current keys to new keys.
+     *
+     * @param array $map
+     * @return $this
+     */
+    public function mapKeys(array $map)
+    {
+        foreach ($map as $currentKey => $newKey) {
+            $this->mapKey($currentKey, $newKey);
+        }
+
+        return $this;
     }
 
     /**
