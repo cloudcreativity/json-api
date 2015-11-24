@@ -127,12 +127,30 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function mapKeys(array $map);
 
     /**
-     * Recursively iterate through the object's keys and apply the transform to the key.
+     * Recursively iterate through the object's keys and apply the transform to each key.
      *
      * @param callable $transform
      * @return $this
      */
     public function transformKeys(callable $transform);
+
+    /**
+     * Apply the converter to the value for the supplied key, if it exists.
+     *
+     * @param $key
+     * @param callable $converter
+     * @return $this
+     */
+    public function convertValue($key, callable $converter);
+
+    /**
+     * Apply the converter to multiple keys that exist.
+     *
+     * @param array $keys
+     * @param callable $converter
+     * @return $this
+     */
+    public function convertValues(array $keys, callable $converter);
 
     /**
      * Get the object's property values as an array.
