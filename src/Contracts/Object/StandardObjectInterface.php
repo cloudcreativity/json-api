@@ -127,6 +127,14 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function mapKeys(array $map);
 
     /**
+     * Recursively iterate through the object's keys and apply the transform to the key.
+     *
+     * @param callable $transform
+     * @return $this
+     */
+    public function transformKeys(callable $transform);
+
+    /**
      * Get the object's property values as an array.
      *
      * @return array

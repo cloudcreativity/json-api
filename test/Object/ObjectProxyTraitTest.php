@@ -181,6 +181,21 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->trait->getProxy());
     }
 
+    public function testTransformKeys()
+    {
+        $this->trait->setProxy($this->proxy);
+
+        $expected = new stdClass();
+        $expected->a = $this->proxy->{static::KEY_A};
+        $expected->b = $this->proxy->{static::KEY_B};
+
+        $this->assertSame($this->trait, $this->trait->transformKeys(function ($key) {
+            return (static::KEY_A) === $key ? 'a' : 'b';
+        }));
+
+        $this->assertEquals($expected, $this->trait->getProxy());
+    }
+
     public function testArrayExchangeable()
     {
         $arr = [

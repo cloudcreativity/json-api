@@ -256,6 +256,17 @@ trait ObjectProxyTrait
     }
 
     /**
+     * @param callable $transform
+     * @return $this
+     */
+    public function transformKeys(callable $transform)
+    {
+        ObjectUtils::transformKeys($this->getProxy(), $transform);
+
+        return $this;
+    }
+
+    /**
      * @param array $input
      * @return $this
      */
