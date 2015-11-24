@@ -20,23 +20,27 @@ namespace CloudCreativity\JsonApi\Object;
 
 use InvalidArgumentException;
 
+/**
+ * Class ObjectUtils
+ * @package CloudCreativity\JsonApi
+ */
 class ObjectUtils
 {
 
     /**
-     * @param $object
+     * @param object|array $data
      * @return array
      */
-    public static function toArray($object)
+    public static function toArray($data)
     {
-        if (!is_object($object)) {
-            throw new InvalidArgumentException('Expecting an object to convert to an array.');
+        if  (!is_object($data) && !is_array($data)) {
+            throw new InvalidArgumentException('Expecting an object or array to convert to an array.');
         }
 
         $arr = [];
 
-        foreach (get_object_vars($object) as $key => $value) {
-            $arr[$key] = is_object($value) ? static::toArray($value) : $value;
+        foreach ($data as $key => $value) {
+            $arr[$key] = (is_object($value) || is_array($value)) ? static::toArray($value) : $value;
         }
 
         return $arr;
