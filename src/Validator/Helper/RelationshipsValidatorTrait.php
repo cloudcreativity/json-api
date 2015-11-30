@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Validator\Helper;
 use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Validator\Relationships\RelationshipsValidator;
+use RuntimeException;
 
 /**
  * Class RelationshipsValidatorTrait
@@ -32,7 +33,7 @@ trait RelationshipsValidatorTrait
     /**
      * @var ValidatorInterface|null
      */
-    protected $relationshipsValidator;
+    private $relationshipsValidator;
 
     /**
      * @param ValidatorInterface $validator
@@ -65,9 +66,17 @@ trait RelationshipsValidatorTrait
         $relationships = $this->getRelationshipsValidator();
 
         if (!$relationships instanceof KeyedValidatorInterface) {
-            throw new \RuntimeException('%s expects relationships validator to be a %s instance.', static::class, KeyedValidatorInterface::class);
+            throw new RuntimeException(sprintf('%s expects relationships validator to be a %s instance.', static::class, KeyedValidatorInterface::class));
         }
 
         return $relationships;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasKeyedRelationships()
+    {
+        return $this->getRelationshipsValidator() instanceof KeyedValidatorInterface;
     }
 }

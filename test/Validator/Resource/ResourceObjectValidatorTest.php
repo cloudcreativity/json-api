@@ -25,6 +25,7 @@ use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
 use CloudCreativity\JsonApi\Validator\Type\StringValidator;
 use CloudCreativity\JsonApi\Validator\ValidatorTestCase;
+use OutOfBoundsException;
 
 class ResourceObjectValidatorTest extends ValidatorTestCase
 {
@@ -62,7 +63,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
             StringValidator::ACCEPT_NULL => true,
         ]));
 
-        $this->assertEquals($expected, $validator->getKeyedAttributes()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyValidator($key));
     }
 
     public function testAttrWithClass()
@@ -72,7 +73,7 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator = new ResourceObjectValidator();
 
         $validator->attr($key, get_class($expected));
-        $this->assertEquals($expected, $validator->getKeyedAttributes()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyValidator($key));
     }
 
     public function testAttrWithValidator()
@@ -82,10 +83,10 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
         $validator = new ResourceObjectValidator();
 
         $validator->attr($key, $mock);
-        $this->assertSame($mock, $validator->getKeyedAttributes()->getValidator($key));
+        $this->assertSame($mock, $validator->getKeyValidator($key));
     }
 
-    public function testBelongsTo()
+    public function testHasOne()
     {
         $key = 'foo';
         $type = 'bar';
@@ -96,11 +97,11 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
 
         $validator = new ResourceObjectValidator();
 
-        $this->assertSame($validator, $validator->belongsTo($key, $type, [
+        $this->assertSame($validator, $validator->hasOne($key, $type, [
             HasOneValidator::ALLOW_EMPTY => false,
         ]));
 
-        $this->assertEquals($expected, $validator->getKeyedRelationships()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyValidator($key));
     }
 
     public function testHasMany()
@@ -118,7 +119,37 @@ class ResourceObjectValidatorTest extends ValidatorTestCase
             HasManyValidator::ALLOW_EMPTY => false,
         ]));
 
-        $this->assertEquals($expected, $validator->getKeyedRelationships()->getValidator($key));
+        $this->assertEquals($expected, $validator->getKeyValidator($key));
+    }
+
+    /**
+     * Test for issue #19
+     */
+    public function testKeyValidatorAttributesNotKeyed()
+    {
+        /** @var ValidatorInterface $attributes */
+        $attributes = $this->getMock(ValidatorInterface::class);
+
+        $validator = new ResourceObjectValidator();
+        $validator->setAttributesValidator($attributes)
+            ->hasOne('foo', 'bar');
+
+        $this->assertInstanceOf(ValidatorInterface::class, $validator->getKeyValidator('foo'));
+    }
+
+    /**
+     * Test for issue #19
+     */
+    public function testKeyValidatorRelationshipsNotKeyed()
+    {
+        /** @var ValidatorInterface $relationships */
+        $relationships = $this->getMock(ValidatorInterface::class);
+
+        $validator = new ResourceObjectValidator();
+        $validator->setRelationshipsValidator($relationships);
+
+        $this->setExpectedException(OutOfBoundsException::class);
+        $validator->getKeyValidator('foo');
     }
 
     public function testGetRelated()
