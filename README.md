@@ -9,6 +9,16 @@ A framework agnostic implementation of the [jsonapi.org](http://jsonapi.org) spe
 4. HTML request body content validation.
 5. Decoding request body content into standard objects, with a fluent interface for analysing content.
 
+### Contributions
+
+Contributions are absolutely welcome. Ideally submit a pull request, even more ideally with unit tests. Please note
+the following:
+
+* **Bug Fixes** - submit a pull request against the `master` branch.
+* **Enhancements / New Features** - submit a pull request against the `develop` branch.
+
+We'd recommend submitting an issue before taking the time to put together a pull request!
+
 ## 1. Environment Integration
 
 Each JSON API request that is handled by an application has dependencies that (once resolved) remain constant for the
