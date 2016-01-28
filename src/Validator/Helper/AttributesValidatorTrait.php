@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Validator\Helper;
 use CloudCreativity\JsonApi\Contracts\Validator\KeyedValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
 use CloudCreativity\JsonApi\Validator\Attributes\AttributesValidator;
+use RuntimeException;
 
 /**
  * Class AttributesValidatorTrait
@@ -65,9 +66,17 @@ trait AttributesValidatorTrait
         $attributes = $this->getAttributesValidator();
 
         if (!$attributes instanceof KeyedValidatorInterface) {
-            throw new \RuntimeException(sprintf('%s expects attributes validator to be a %s instance.', static::class, KeyedValidatorInterface::class));
+            throw new RuntimeException(sprintf('%s expects attributes validator to be a %s instance.', static::class, KeyedValidatorInterface::class));
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasKeyedAttributes()
+    {
+        return $this->getAttributesValidator() instanceof KeyedValidatorInterface;
     }
 }

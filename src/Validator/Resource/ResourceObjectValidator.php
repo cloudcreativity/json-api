@@ -25,6 +25,7 @@ use CloudCreativity\JsonApi\Validator\Helper\RelationshipsValidatorTrait;
 use CloudCreativity\JsonApi\Validator\Helper\RelationshipTrait;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedIdValidator;
 use CloudCreativity\JsonApi\Validator\ResourceIdentifier\ExpectedTypeValidator;
+use OutOfBoundsException;
 
 /**
  * Class ResourceObjectValidator
@@ -93,14 +94,14 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
     {
         $keys = is_array($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
 
-        $attributes = $this->getKeyedAttributes();
-        $relationships = $this->getKeyedRelationships();
+        $attributes = $this->hasKeyedAttributes() ? $this->getKeyedAttributes() : null;
+        $relationships = $this->hasKeyedRelationships() ? $this->getKeyedRelationships() : null;
 
         foreach ($keys as $key) {
 
-            if ($relationships->hasValidator($key)) {
+            if ($relationships && $relationships->hasValidator($key)) {
                 $relationships->addAllowedKeys($key);
-            } else {
+            } elseif ($attributes && $attributes->hasValidator($key)) {
                 $attributes->addAllowedKeys($key);
             }
         }
@@ -160,19 +161,19 @@ class ResourceObjectValidator extends AbstractResourceObjectValidator
      */
     public function getKeyValidator($key)
     {
-        $attributes = $this->getKeyedAttributes();
+        $attributes = $this->hasKeyedAttributes() ? $this->getKeyedAttributes() : null;
 
-        if ($attributes->hasValidator($key)) {
+        if ($attributes && $attributes->hasValidator($key)) {
             return $attributes->getValidator($key);
         }
 
-        $relationships = $this->getKeyedRelationships();
+        $relationships = $this->hasKeyedRelationships() ? $this->getKeyedRelationships() : null;
 
-        if ($relationships->hasValidator($key)) {
+        if ($relationships && $relationships->hasValidator($key)) {
             return $relationships->getValidator($key);
         }
 
-        throw new \OutOfBoundsException(sprintf('Key "%s" does not exist as a validator on attributes or relationships.', $key));
+        throw new OutOfBoundsException(sprintf('Key "%s" does not exist as a validator on attributes or relationships.', $key));
     }
 
     /**
