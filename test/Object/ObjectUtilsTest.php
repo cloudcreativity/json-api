@@ -1,7 +1,5 @@
 <?php
 
-namespace CloudCreativity\JsonApi\Object;
-
 /**
  * Copyright 2015 Cloud Creativity Limited
  *
@@ -17,6 +15,10 @@ namespace CloudCreativity\JsonApi\Object;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+namespace CloudCreativity\JsonApi\Object;
+
+use stdClass;
 
 class ObjectUtilsTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +53,6 @@ class ObjectUtilsTest extends \PHPUnit_Framework_TestCase
             }
         }
 OBJ;
-        $object = json_decode($object);
 
         $expected = [
             "multiple" => [
@@ -80,8 +81,77 @@ OBJ;
             ],
         ];
 
-        $actual = ObjectUtils::toArray($object);
+        $actual = ObjectUtils::toArray($this->toObject($object));
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testTransformKeys()
+    {
+        $object = <<<OBJ
+        {
+            "first-name": "Frankie",
+            "surname": "Manning",
+            "meta": {
+                "created-at": "2015-01-01",
+                "updated-at": "2015-02-01"
+            },
+            "associates": [
+                {
+                    "first-name": "Ella",
+                    "surname": "Fitzgerald"
+                },
+                {
+                    "first-name": "Chick",
+                    "surname": "Webb"
+                }
+            ]
+        }
+OBJ;
+
+        $expected = <<<OBJ
+        {
+            "first_name": "Frankie",
+            "surname": "Manning",
+            "meta": {
+                "created_at": "2015-01-01",
+                "updated_at": "2015-02-01"
+            },
+            "associates": [
+                {
+                    "first_name": "Ella",
+                    "surname": "Fitzgerald"
+                },
+                {
+                    "first_name": "Chick",
+                    "surname": "Webb"
+                }
+            ]
+        }
+OBJ;
+
+        $object = $this->toObject($object);
+        $actual = ObjectUtils::transformKeys($object, function ($key) {
+            return is_int($key) ? $key : str_replace('-', '_', $key);
+        });
+
+        $this->assertEquals($this->toObject($expected), $actual);
+        $this->assertSame($object, $actual);
+        $this->assertSame($object->meta, $actual->meta);
+    }
+
+    /**
+     * @param $string
+     * @return stdClass
+     */
+    private function toObject($string)
+    {
+        $object = json_decode($string);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            $this->fail("Error in JSON: \n" . $string);
+        }
+
+        return $object;
     }
 }
