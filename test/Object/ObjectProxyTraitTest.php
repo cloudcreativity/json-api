@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use DateTime;
 use stdClass;
 
 class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
@@ -177,6 +178,44 @@ class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
             static::KEY_B => $altB,
             static::KEY_C => 'ignored',
         ]));
+
+        $this->assertEquals($expected, $this->trait->getProxy());
+    }
+
+    public function testTransformKeys()
+    {
+        $this->trait->setProxy($this->proxy);
+
+        $expected = new stdClass();
+        $expected->a = $this->proxy->{static::KEY_A};
+        $expected->b = $this->proxy->{static::KEY_B};
+
+        $this->assertSame($this->trait, $this->trait->transformKeys(function ($key) {
+            return (static::KEY_A) === $key ? 'a' : 'b';
+        }));
+
+        $this->assertEquals($expected, $this->trait->getProxy());
+    }
+
+    public function testConvertValues()
+    {
+        $proxy = new stdClass();
+        $proxy->start = '2015-01-01 12:00:00';
+        $proxy->finish = '2016-01-01 23:59:59';
+
+        $expected = new stdClass();
+        $expected->start = new DateTime($proxy->start);
+        $expected->finish = new DateTime($proxy->finish);
+
+        $this->trait->setProxy($proxy);
+
+        $this->assertSame($this->trait, $this->trait->convertValues([
+            'start',
+            'finish',
+            'foo'
+        ], function ($value) {
+            return new DateTime($value);
+        }));
 
         $this->assertEquals($expected, $this->trait->getProxy());
     }

@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use InvalidArgumentException;
+use stdClass;
 
 /**
  * Class ObjectUtils
@@ -44,5 +45,35 @@ class ObjectUtils
         }
 
         return $arr;
+    }
+
+    /**
+     * @param $data
+     * @param callable $transform
+     * @return array|stdClass
+     */
+    public static function transformKeys($data, callable $transform)
+    {
+        if (!is_object($data) && !is_array($data)) {
+            throw new InvalidArgumentException('Expecting an object or array to transform keys.');
+        }
+
+        $copy = is_object($data) ? clone $data : $data;
+
+        foreach ($copy as $key => $value) {
+
+            $transformed = call_user_func($transform, $key);
+            $value = (is_object($value) || is_array($value)) ? self::transformKeys($value, $transform) : $value;
+
+            if (is_object($data)) {
+                unset($data->{$key});
+                $data->{$transformed} = $value;
+            } else {
+                unset($data[$key]);
+                $data[$transformed] = $value;
+            }
+        }
+
+        return $data;
     }
 }
