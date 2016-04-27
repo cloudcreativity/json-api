@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+Updated package `neomerx/json-api` to `^0.7.1`, which is a breaking change. See the [Upgrade Notes](UPGRADE.md)
+for help.
+
+### Removed
+- Abstracted framework integration removed in favour of framework packages writing their own integrations that
+suit the needs of the particular framework. Classes from the following namespaces were removed:
+  - `CloudCreativity\JsonApi\Contracts\Integration`
+  - `CloudCreativity\JsonApi\Integration`
+- `CloudCreativity\JsonApi\Error\ThrowableError` was deprecated in `v0.4.0` and has now been removed.
+- Error handling changes in the `neomerx/json-api` package means the following classes have been removed:
+  - `CloudCreativity\JsonApi\Exceptions\ErrorRenderer`
+  - `CloudCreativity\JsonApi\Exception\ExceptionThrower`
+  - `CloudCreativity\JsonApi\Exceptions\ExceptionThrower`
+  - `CloudCreativity\JsonApi\Exceptions\StandardRenderer`
+
 ## [0.4.1] - 2016-04-27
 
 ### Added

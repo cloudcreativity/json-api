@@ -3,11 +3,10 @@
 A framework agnostic implementation of the [jsonapi.org](http://jsonapi.org) spec. This repository extends
 [neomerx/json-api](https://github.com/neomerx/json-api), adding in several additional features:
 
-1. JSON API environment to obtain JSON API configuration for the current request.
-2. Multiple schema sets loaded from a configuration array. Default schemas are merged with the schema set being loaded.
-3. Build codec matchers from a configuration array.
-4. HTML request body content validation.
-5. Decoding request body content into standard objects, with a fluent interface for analysing content.
+1. Multiple schema sets loaded from a configuration array. Default schemas are merged with the schema set being loaded.
+2. Build codec matchers from a configuration array.
+3. HTML request body content validation.
+4. Decoding request body content into standard objects, with a fluent interface for analysing content.
 
 ### Contributions
 
@@ -19,35 +18,7 @@ the following:
 
 We'd recommend submitting an issue before taking the time to put together a pull request!
 
-## 1. Environment Integration
-
-Each JSON API request that is handled by an application has dependencies that (once resolved) remain constant for the
-duration of the request. As different parts of your application - e.g. middleware, controllers, exception handlers -
-all need to access these resolved dependencies, a standard interface is provided to obtain these dependencies.
-This is similar to application frameworks providing access to singleton HTTP Request and Response objects.
-
-The `CloudCreativity\JsonApi\Contracts\Integration\EnvironmentInterface` provides a standard interface to access
-the current *state* of the JSON API request. The *state* comprises of:
-
-* The url prefix for JSON API links.
-* A single set of schemas.
-* A single encoder instance.
-* A decoder instance, if the request included a HTTP `Content-Type` header.
-* JSON API request parameters.
-
-> A concrete class (`CloudCreativity\JsonApi\Integration\EnvironmentService`) is provided to use if desired. This
-expects to be initialised when JSON API support is required within an application.
-
-> In middleware based applications (e.g. Laravel 5) we're using middleware on JSON API routes to initialise this
-service.
-
-> In event based applications (e.g. Zend 2), we're using an event listener to initialise the service once a JSON API
-route has been matched.
-
-> In either scenario, global middleware or a global event listener can be used to initialise the service if every route
-in the application is a JSON API endpoint.
-
-## 2. Schema Sets
+## 1. Schema Sets
 
 Schemas can be loaded from configuration arrays, for example:
 
@@ -71,7 +42,7 @@ If loaded into a `CloudCreativity\JsonApi\Repositories\SchemasRepository` instan
 able to access either a default schema set, a `users` schema set or a `tenant` schema set. Both the `users` and `tenant`
 schema sets will contain the default schemas as well as their own.
 
-## 3. Codec Matcher Configuration
+## 2. Codec Matcher Configuration
 
 Codec matchers can be built from configuration arrays, for example:
 
@@ -98,7 +69,7 @@ The above configuration will build a codec matcher if loaded into a
 `CloudCreativity\JsonApi\Repositories\CodecMatcherRepository` instance. The URL prefix and schemas to use when creating
 encoders are registered on the `CodecMatcherRepository` before creating a codec matcher.
 
-## 4. HTML Request Body Content Validation
+## 3. HTML Request Body Content Validation
 
 ### Why?
 
@@ -195,7 +166,7 @@ Most frameworks implement their own validators. These framework validators can e
 been decoder, or integrated into the decoding processing. To integrate, just wrap them in an object that implements
 `CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface`.
 
-## 5. Parsing to Standard Objects
+## 4. Parsing to Standard Objects
 
 The standard decoder, `DocumentDecoder` returns a `Document` instance. This provides methods to walk through the
 JSON API content that was received by a server. All objects returned through the interface implement a
@@ -271,7 +242,7 @@ class ArticleController
 
 ## Status
 
-This repository is under active development, but is anticipated to stabilise soon.
+This repository is under active development, but is in use in production applications.
 
 ## License
 

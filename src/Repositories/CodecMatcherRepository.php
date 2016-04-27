@@ -23,10 +23,10 @@ use Generator;
 use Neomerx\JsonApi\Codec\CodecMatcher;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
-use Neomerx\JsonApi\Parameters\Headers\MediaType;
+use Neomerx\JsonApi\Http\Headers\MediaType;
 use RuntimeException;
 
 /**
