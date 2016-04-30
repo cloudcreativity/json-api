@@ -4,8 +4,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Unreleased]
 
-Updated package `neomerx/json-api` to `^0.7.1`, which is a breaking change. See the [Upgrade Notes](UPGRADE.md)
-for help.
+Updated package `neomerx/json-api` to from `v0.6.6` to `^0.8.0`, which is a breaking change.
+See the [Upgrade Notes](UPGRADE.md) for help.
 
 ### Removed
 - Abstracted framework integration removed in favour of framework packages writing their own integrations that

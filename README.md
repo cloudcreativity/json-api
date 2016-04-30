@@ -1,7 +1,7 @@
 # cloudcreativity/json-api
 
-A framework agnostic implementation of the [jsonapi.org](http://jsonapi.org) spec. This repository extends
-[neomerx/json-api](https://github.com/neomerx/json-api), adding in several additional features:
+This repository extends [neomerx/json-api](https://github.com/neomerx/json-api), adding in several additional
+framework-agnostic features:
 
 1. Multiple schema sets loaded from a configuration array. Default schemas are merged with the schema set being loaded.
 2. Build codec matchers from a configuration array.

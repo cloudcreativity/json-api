@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Error;
 
 use InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 class ErrorObjectTest extends \PHPUnit_Framework_TestCase
 {

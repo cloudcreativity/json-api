@@ -4,8 +4,8 @@ This file provides notes on how to upgrade between breaking versions.
 
 ## v0.4 to v0.5
 
-The underlying `neomerx/json-api` package was upgraded from `v0.6.6` to `v0.7.0`.
-[Please refer to these notes.](https://github.com/neomerx/json-api/wiki/Upgrade-Notes#to-070-from-066)
+The underlying `neomerx/json-api` package was upgraded from `v0.6.6` to `v0.8.0`.
+[Please refer to these notes.](https://github.com/neomerx/json-api/wiki/Upgrade-Notes)
 
 ### Framework Integration
 

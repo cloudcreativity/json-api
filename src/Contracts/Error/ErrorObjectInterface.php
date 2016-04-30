@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Error;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 /**
  * Interface ErrorObjectInterface
