@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,15 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Error;
+namespace CloudCreativity\JsonApi\Exceptions;
+
+use RuntimeException;
 
 /**
- * Interface ErrorsAwareInterface
+ * Class RepositoryException
  * @package CloudCreativity\JsonApi
  */
-interface ErrorsAwareInterface
+class RepositoryException extends RuntimeException
 {
 
-    /**
-     * @return ErrorCollectionInterface
-     */
-    public function getErrors();
 }

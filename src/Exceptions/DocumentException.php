@@ -25,8 +25,8 @@ use RuntimeException;
  *
  * An exception to use when a part of a processes JSON API document is not as expected.
  * E.g. when part of the document is expected to be an object, but it is not.
- * 
- * @package CloudCreativity\JsonApi\Exceptions
+ *
+ * @package CloudCreativity\JsonApi
  */
 class DocumentException extends RuntimeException
 {
