@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use InvalidArgumentException;
+use RuntimeException;
 use stdClass;
 
 /**
@@ -311,5 +312,20 @@ trait ObjectProxyTrait
     public function toArray()
     {
         return ObjectUtils::toArray($this->getProxy());
+    }
+
+    /**
+     * @param $key
+     * @return StandardObject
+     */
+    public function asObject($key)
+    {
+        $value = $this->get($key);
+
+        if (!is_object($value) && !is_null($value)) {
+            throw new RuntimeException("Key '$key' is not an object or null.'");
+        }
+
+        return new StandardObject($value);
     }
 }

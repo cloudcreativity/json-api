@@ -19,6 +19,10 @@
 namespace CloudCreativity\JsonApi\Object\Relationships;
 
 use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierCollectionInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Object\Meta\MetaMemberTrait;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\Object\StandardObject;
@@ -30,29 +34,20 @@ use CloudCreativity\JsonApi\Object\StandardObject;
 class Relationship extends StandardObject implements RelationshipInterface
 {
 
-    const DATA = 'data';
-    const META = 'meta';
+    use MetaMemberTrait;
 
     /**
-     * @return ResourceIdentifier|ResourceIdentifierCollection|null
+     * @return ResourceIdentifierCollectionInterface|ResourceIdentifierInterface|null
+     * @deprecated use `data()`
      */
     public function getData()
     {
-        $data = $this->get(static::DATA);
-
-        if (is_null($data)) {
-            return null;
-        } elseif (is_object($data)) {
-            return new ResourceIdentifier($data);
-        } elseif (is_array($data)) {
-            return ResourceIdentifierCollection::create($data);
-        }
-
-        throw new \RuntimeException('Invalid data value on Relationship.');
+        return $this->data();
     }
 
     /**
-     * @inheritdoc
+     * @return bool
+     * @deprecated use `isHasOne()`
      */
     public function isBelongsTo()
     {
@@ -64,11 +59,11 @@ class Relationship extends StandardObject implements RelationshipInterface
      */
     public function isHasOne()
     {
-        if (!$this->has(static::DATA)) {
+        if (!$this->has(self::DATA)) {
             return false;
         }
 
-        $data = $this->get(static::DATA);
+        $data = $this->get(self::DATA);
 
         return is_null($data) || is_object($data);
     }
@@ -78,22 +73,62 @@ class Relationship extends StandardObject implements RelationshipInterface
      */
     public function isHasMany()
     {
-        return is_array($this->get(static::DATA));
+        return is_array($this->get(self::DATA));
     }
 
     /**
-     * @return StandardObject
+     * Get the data member as a correctly casted object.
+     *
+     * If this is a has-one relationship, a ResourceIdentifierInterface object or null will be returned. If it is
+     * a has-many relationship, a ResourceIdentifierCollectionInterface will be returned.
+     *
+     * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
+     * @throws DocumentException
+     *      if the value for the data member is not a valid relationship value.
      */
-    public function getMeta()
+    public function data()
     {
-        return new StandardObject($this->get(static::META));
+        if ($this->isHasOne()) {
+            return $this->hasOne();
+        } elseif ($this->isHasMany()) {
+            return $this->hasMany();
+        }
+
+        throw new DocumentException('No data member or data member is not a valid relationship.');
     }
 
     /**
-     * @return bool
+     * Get the data member as a has-one relationship.
+     *
+     * @return ResourceIdentifierInterface|null
+     * @throws DocumentException
+     *      if the data member is not a resource identifier or null.
      */
-    public function hasMeta()
+    public function hasOne()
     {
-        return $this->has(static::META);
+        if (!$this->isHasOne()) {
+            throw new DocumentException('No data member or data member is not a valid has-one relationship.');
+        }
+
+        $data = $this->get(self::DATA);
+
+        return ($data) ? new ResourceIdentifier($data) : null;
     }
+
+    /**
+     * Get the data member as a has-many relationship.
+     *
+     * @return ResourceIdentifierCollectionInterface
+     * @throws DocumentException
+     *      if the data member is not an array.
+     */
+    public function hasMany()
+    {
+        if (!$this->isHasMany()) {
+            throw new DocumentException('No data member of data member is not a valid has-many relationship.');
+        }
+
+        return ResourceIdentifierCollection::create($this->get(self::DATA));
+    }
+
 }

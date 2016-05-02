@@ -19,8 +19,13 @@
 namespace CloudCreativity\JsonApi\Object\Document;
 
 use CloudCreativity\JsonApi\Contracts\Object\Document\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Resource\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Object\Meta\MetaMemberTrait;
 use CloudCreativity\JsonApi\Object\Relationships\Relationship;
-use CloudCreativity\JsonApi\Object\Resource\ResourceObject;
+use CloudCreativity\JsonApi\Object\Resource\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
@@ -30,39 +35,87 @@ use CloudCreativity\JsonApi\Object\StandardObject;
 class Document extends StandardObject implements DocumentInterface
 {
 
+    use MetaMemberTrait;
+
     /**
-     * @return StandardObject
+     * @return StandardObjectInterface
+     * @deprecated use `data()`
      */
     public function getData()
     {
-        return new StandardObject($this->get(static::DATA));
+        return $this->data();
     }
 
     /**
-     * Get the primary data as a resource object.
-     *
-     * @return ResourceObject
+     * @return ResourceInterface
+     * @deprecated use `resource()`
      */
     public function getResourceObject()
     {
-        return new ResourceObject($this->get(static::DATA));
+        return $this->resource();
     }
 
     /**
-     * Get the document as a relationship object.
-     *
      * @return Relationship
+     * @deprecated use `relationship()`
      */
     public function getRelationship()
     {
-        return new Relationship($this->getProxy());
+        return $this->relationship();
     }
 
     /**
-     * @return StandardObject
+     * @return StandardObjectInterface
      */
-    public function getMeta()
+    public function data()
     {
-        return new StandardObject($this->get(static::META));
+        if (!$this->has(self::DATA)) {
+            throw new DocumentException('Data member is not present.');
+        }
+
+        $data = $this->get(self::DATA);
+
+        if (!is_object($data)) {
+            throw new DocumentException('Data member is not an object or null.');
+        }
+
+        return new StandardObject($data);
+    }
+
+    /**
+     * Get the data member as a resource object.
+     *
+     * @return ResourceInterface
+     * @throws DocumentException
+     *      if the data member is not an object or is not present.
+     */
+    public function resource()
+    {
+        /** @var StandardObject $data */
+        $data = $this->data();
+
+        return new Resource($data->getProxy());
+    }
+
+    /**
+     * Get the data member as a relationship.
+     *
+     * @return RelationshipInterface
+     * @throws DocumentException
+     *      if the data member is not an object or null, or is not present.
+     */
+    public function relationship()
+    {
+        if (!$this->has(self::DATA)) {
+            throw new DocumentException('Data member is not present.');
+        }
+
+        $data = $this->get(self::DATA);
+
+        if (!is_object($data) && !is_null($data)) {
+            throw new DocumentException('Data member is not an object or null.');
+        }
+
+        return new Relationship($data);
     }
 }

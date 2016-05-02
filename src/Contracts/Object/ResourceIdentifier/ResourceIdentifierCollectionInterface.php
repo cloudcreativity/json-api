@@ -36,8 +36,16 @@ interface ResourceIdentifierCollectionInterface extends IteratorAggregate, Count
 
     /**
      * @return ResourceIdentifierInterface[]
+     * @deprecated use `all()`
      */
     public function getAll();
+
+    /**
+     * Get the collection as an array.
+     *
+     * @return ResourceIdentifierInterface[]
+     */
+    public function all();
 
     /**
      * @return bool
@@ -60,11 +68,17 @@ interface ResourceIdentifierCollectionInterface extends IteratorAggregate, Count
     public function isOnly($typeOrTypes);
 
     /**
+     * @return array
+     * @deprecated use `ids()`
+     */
+    public function getIds();
+
+    /**
      * Get an array of the ids of each identifier in the collection.
      *
      * @return array
      */
-    public function getIds();
+    public function ids();
 
     /**
      * Map the collection to an array of type keys and id values.

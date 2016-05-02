@@ -18,7 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-class StandardObjectTest extends \PHPUnit_Framework_TestCase
+use CloudCreativity\JsonApi\TestCase;
+use stdClass;
+
+class StandardObjectTest extends TestCase
 {
 
     const KEY_A = 'foo';
@@ -31,7 +34,7 @@ class StandardObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $proxy = new \stdClass();
+        $proxy = new stdClass();
         $proxy->{static::KEY_A} = static::VALUE_A;
 
         $object = new StandardObject($proxy);

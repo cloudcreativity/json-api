@@ -20,7 +20,9 @@ namespace CloudCreativity\JsonApi\Object\Relationships;
 
 use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use CloudCreativity\JsonApi\Object\StandardObject;
+use Generator;
 
 /**
  * Class Relationships
@@ -30,18 +32,10 @@ class Relationships extends StandardObject implements RelationshipsInterface
 {
 
     /**
-     * @param $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return parent::get($key);
-    }
-
-    /**
      * @param $method
      * @param array $args
      * @return Relationship
+     * @deprecated use `rel()` or `relationship()`
      */
     public function __call($method, array $args)
     {
@@ -60,6 +54,9 @@ class Relationships extends StandardObject implements RelationshipsInterface
      * @param $key
      * @param $default
      * @return RelationshipInterface
+     * @deprecated
+     *      this will be reverted to the definition as per the StandardObjectInterface. Use `rel()` or
+     *      `relationship()` instead.
      */
     public function get($key, $default = null)
     {
@@ -67,12 +64,46 @@ class Relationships extends StandardObject implements RelationshipsInterface
     }
 
     /**
-     * @return \Generator
+     * @return Generator
      */
-    public function getIterator()
+    public function all()
     {
         foreach ($this->keys() as $key) {
-            yield $key => $this->get($key);
+            yield $key => $this->rel($key);
         }
     }
+
+    /**
+     * Shorthand for `relationship()`
+     *
+     * @param $key
+     * @return RelationshipInterface
+     * @throws DocumentException
+     */
+    public function rel($key)
+    {
+        return $this->relationship($key);
+    }
+
+    /**
+     * @param $key
+     * @return RelationshipInterface
+     * @throws DocumentException
+     *      if the key is not present, or is not an object.
+     */
+    public function relationship($key)
+    {
+        if (!$this->has($key)) {
+            throw new DocumentException("Relationship member '$key' is not present.");
+        }
+
+        $value = parent::get($key);
+
+        if (!is_object($value)) {
+            throw new DocumentException("Relationship member '$key' is not an object.'");
+        }
+
+        return new Relationship($value);
+    }
+
 }

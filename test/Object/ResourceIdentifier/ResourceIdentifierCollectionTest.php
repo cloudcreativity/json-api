@@ -18,7 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
-class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
+use CloudCreativity\JsonApi\TestCase;
+
+class ResourceIdentifierCollectionTest extends TestCase
 {
 
     /**
@@ -33,17 +35,14 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->a = new ResourceIdentifier();
-        $this->a->setType('foo')->setId(123);
-
-        $this->b = new ResourceIdentifier();
-        $this->b->setType('bar')->setId(456);
+        $this->a = ResourceIdentifier::create('foo', 123);
+        $this->b = ResourceIdentifier::create('bar', 456);
     }
 
     public function testConstruct()
     {
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
-        $this->assertSame([$this->a, $this->b], $collection->getAll());
+        $this->assertSame([$this->a, $this->b], $collection->all());
 
         return $collection;
     }
@@ -53,7 +52,7 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testIterator(ResourceIdentifierCollection $collection)
     {
-        $expected = $collection->getAll();
+        $expected = $collection->all();
         $this->assertEquals($expected, iterator_to_array($collection));
     }
 
@@ -71,7 +70,7 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     public function testClear(ResourceIdentifierCollection $collection)
     {
         $this->assertSame($collection, $collection->clear());
-        $this->assertEmpty($collection->getAll());
+        $this->assertEmpty($collection->all());
     }
 
     public function testIsEmpty()
@@ -88,7 +87,7 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($collection, $collection->add($this->a));
         $collection->add($this->b);
-        $this->assertSame([$this->a, $this->b], $collection->getAll());
+        $this->assertSame([$this->a, $this->b], $collection->all());
 
         return $collection;
     }
@@ -98,11 +97,11 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddIgnoresDuplicates(ResourceIdentifierCollection $collection)
     {
-        $expected = $collection->getAll();
+        $expected = $collection->all();
 
         $collection->add($this->a)->add($this->b);
 
-        $this->assertEquals($expected, $collection->getAll());
+        $this->assertEquals($expected, $collection->all());
     }
 
     public function testHas()
@@ -128,26 +127,26 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new ResourceIdentifierCollection();
 
-        $this->assertTrue($collection->isOnly($this->a->getType()));
+        $this->assertTrue($collection->isOnly($this->a->type()));
         $collection->add($this->a);
-        $this->assertTrue($collection->isOnly($this->a->getType()));
+        $this->assertTrue($collection->isOnly($this->a->type()));
 
         $collection->add($this->b);
-        $this->assertFalse($collection->isOnly($this->a->getType()));
-        $this->assertFalse($collection->isOnly($this->b->getType()));
+        $this->assertFalse($collection->isOnly($this->a->type()));
+        $this->assertFalse($collection->isOnly($this->b->type()));
 
         $this->assertTrue($collection->isOnly([
-            $this->a->getType(),
-            $this->b->getType(),
+            $this->a->type(),
+            $this->b->type(),
         ]));
     }
 
     public function testGetIds()
     {
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
-        $expected = [$this->a->getId(), $this->b->getId()];
+        $expected = [$this->a->id(), $this->b->id()];
 
-        $this->assertEquals($expected, $collection->getIds());
+        $this->assertEquals($expected, $collection->ids());
     }
 
     public function testMap()
@@ -155,11 +154,11 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
 
         $expected = [
-            $this->a->getType() => [
-                $this->a->getId(),
+            $this->a->type() => [
+                $this->a->id(),
             ],
-            $this->b->getType() => [
-                $this->b->getId(),
+            $this->b->type() => [
+                $this->b->id(),
             ],
         ];
 
@@ -177,13 +176,13 @@ class ResourceIdentifierCollectionTest extends \PHPUnit_Framework_TestCase
         $b = 'Alias-B';
 
         $map = [
-            $this->a->getType() => $a,
-            $this->b->getType() => $b,
+            $this->a->type() => $a,
+            $this->b->type() => $b,
         ];
 
         $expected = [
-            $a => [$this->a->getId()],
-            $b => [$this->b->getId()],
+            $a => [$this->a->id()],
+            $b => [$this->b->id()],
         ];
 
         $this->assertEquals($expected, $collection->map($map));

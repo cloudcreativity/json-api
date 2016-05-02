@@ -18,13 +18,16 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use IteratorAggregate;
+use Traversable;
 
 /**
  * Class StandardObject
  * @package CloudCreativity\JsonApi
  */
-class StandardObject implements \IteratorAggregate, StandardObjectInterface
+class StandardObject implements IteratorAggregate, StandardObjectInterface
 {
 
     use ObjectProxyTrait;
@@ -79,15 +82,15 @@ class StandardObject implements \IteratorAggregate, StandardObjectInterface
     }
 
     /**
-     * @return \Traversable
+     * @return Traversable
      */
     public function getIterator()
     {
-        if ($this->getProxy() instanceof \Traversable) {
+        if ($this->getProxy() instanceof Traversable) {
             return $this->getProxy();
         }
 
-        return new \ArrayIterator($this->toArray());
+        return new ArrayIterator($this->toArray());
     }
 
     /**

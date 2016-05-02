@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
+use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
 
@@ -94,10 +95,11 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
 
     /**
      * @return array
+     * @deprecated use `all()`
      */
     public function getAll()
     {
-        return $this->stack;
+        return $this->all();
     }
 
     /**
@@ -111,11 +113,11 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
     }
 
     /**
-     * @return \ArrayIterator
+     * @return ArrayIterator
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->getAll());
+        return new ArrayIterator($this->all());
     }
 
     /**
@@ -169,17 +171,11 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
 
     /**
      * @return array
+     * @deprecated use `ids()`
      */
     public function getIds()
     {
-        $ret = [];
-
-        /** @var ResourceIdentifier $identifier */
-        foreach ($this as $identifier) {
-            $ret[] = $identifier->getId();
-        }
-
-        return $ret;
+        return $this->ids();
     }
 
     /**
@@ -204,6 +200,34 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
 
         return $ret;
     }
+
+    /**
+     * Get the collection as an array.
+     *
+     * @return ResourceIdentifierInterface[]
+     */
+    public function all()
+    {
+        return $this->stack;
+    }
+
+    /**
+     * Get an array of the ids of each identifier in the collection.
+     *
+     * @return array
+     */
+    public function ids()
+    {
+        $ids = [];
+
+        /** @var ResourceIdentifierInterface $identifier */
+        foreach ($this as $identifier) {
+            $ids[] = $identifier->id();
+        }
+
+        return $ids;
+    }
+
 
     /**
      * @param array $input

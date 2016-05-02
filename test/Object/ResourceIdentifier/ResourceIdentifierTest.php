@@ -19,27 +19,34 @@
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
 use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\TestCase;
+use stdClass;
 
-class ResourceIdentifierTest extends \PHPUnit_Framework_TestCase
+class ResourceIdentifierTest extends TestCase
 {
 
     const TYPE = 'foo';
     const ID = 123;
 
-    public function testType()
+    public function testTypeAndId()
     {
         $identifier = new ResourceIdentifier();
-
         $this->assertFalse($identifier->hasType());
-        $this->assertSame($identifier, $identifier->setType(static::TYPE));
-        $this->assertSame(static::TYPE, $identifier->getType());
+        $this->assertFalse($identifier->hasId());
+
+        $identifier = ResourceIdentifier::create(self::TYPE, self::ID);
+
+        $this->assertSame(self::TYPE, $identifier->type());
         $this->assertTrue($identifier->hasType());
+
+        $this->assertSame(self::ID, $identifier->id());
+        $this->assertTrue($identifier->hasId());
 
         return $identifier;
     }
 
     /**
-     * @depends testType
+     * @depends testTypeAndId
      */
     public function testIsType(ResourceIdentifier $identifier)
     {
@@ -48,34 +55,18 @@ class ResourceIdentifierTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($identifier->isType(['not-a-match', static::TYPE]));
     }
 
-    /**
-     * @depends testType
-     */
-    public function testId(ResourceIdentifier $identifier)
-    {
-        $this->assertFalse($identifier->hasId());
-        $this->assertSame($identifier, $identifier->setId(static::ID));
-        $this->assertSame(static::ID, $identifier->getId());
-        $this->assertTrue($identifier->hasId());
-
-        return $identifier;
-    }
-
     public function testIsComplete()
     {
         $this->assertFalse((new ResourceIdentifier())->isComplete());
-        $this->assertFalse((new ResourceIdentifier())->setType(static::TYPE)->isComplete());
-        $this->assertFalse((new ResourceIdentifier())->setId(static::ID)->isComplete());
 
-        $complete = new ResourceIdentifier();
-        $complete->setType(static::TYPE)->setId(static::ID);
+        $complete = ResourceIdentifier::create(self::TYPE, self::ID);
 
         $this->assertTrue($complete->isComplete());
     }
 
     public function testMapType()
     {
-        $identifier = (new ResourceIdentifier())->setType(static::TYPE);
+        $identifier = ResourceIdentifier::create(self::TYPE, self::ID);
         $expected = 'My\Class';
 
         $map = [
@@ -95,14 +86,14 @@ class ResourceIdentifierTest extends \PHPUnit_Framework_TestCase
     {
         $identifier = new ResourceIdentifier();
 
-        $this->assertEquals(new StandardObject(), $identifier->getMeta());
+        $this->assertEquals(new StandardObject(), $identifier->meta());
 
-        $meta = new \stdClass();
+        $meta = new stdClass();
         $meta->foo = 'bar';
         $expected = new StandardObject($meta);
 
         $identifier->set(ResourceIdentifier::META, $meta);
 
-        $this->assertEquals($expected, $identifier->getMeta());
+        $this->assertEquals($expected, $identifier->meta());
     }
 }

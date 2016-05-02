@@ -19,8 +19,10 @@
 namespace CloudCreativity\JsonApi\Contracts\Object\Document;
 
 use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\Resource\ResourceObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Object\Resource\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
  * Interface DocumentInterface
@@ -29,30 +31,66 @@ use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 interface DocumentInterface extends StandardObjectInterface
 {
 
-    const DATA = 'data';
-    const META = 'meta';
+    const DATA = NeomerxDocumentInterface::KEYWORD_DATA;
+    const META = NeomerxDocumentInterface::KEYWORD_META;
 
     /**
      * @return StandardObjectInterface
+     * @deprecated use `data()`
      */
     public function getData();
 
     /**
-     * Get the data member as a resource object.
+     * Get the data member of the document as a standard object.
      *
-     * @return ResourceObjectInterface
+     * @return StandardObjectInterface
+     * @throws DocumentException
+     *      if the data member is not an object, or is not present.
+     */
+    public function data();
+
+    /**
+     * @return ResourceInterface
+     * @deprecated use `resource()`
      */
     public function getResourceObject();
+
+    /**
+     * Get the data member as a resource object.
+     *
+     * @return ResourceInterface
+     * @throws DocumentException
+     *      if the data member is not an object or is not present.
+     */
+    public function resource();
+
+    /**
+     * @return RelationshipInterface
+     * @deprecated use `relationship()`
+     */
+    public function getRelationship();
 
     /**
      * Get the data member as a relationship.
      *
      * @return RelationshipInterface
+     * @throws DocumentException
+     *      if the data member is not an object or null, or is not present.
      */
-    public function getRelationship();
+    public function relationship();
 
     /**
      * @return StandardObjectInterface
+     * @deprecated use `meta()`
      */
     public function getMeta();
+
+    /**
+     * Get the meta member of the document.
+     *
+     * @return StandardObjectInterface
+     * @throws DocumentException
+     *      if the meta member is present and is not an object.
+     */
+    public function meta();
 }

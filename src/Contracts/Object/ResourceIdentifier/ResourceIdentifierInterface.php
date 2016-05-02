@@ -19,6 +19,8 @@
 namespace CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier;
 
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use RuntimeException;
 
 /**
@@ -28,12 +30,22 @@ use RuntimeException;
 interface ResourceIdentifierInterface extends StandardObjectInterface
 {
 
+    const TYPE = DocumentInterface::KEYWORD_TYPE;
+    const ID = DocumentInterface::KEYWORD_ID;
+    const META = DocumentInterface::KEYWORD_META;
+
     /**
      * @return string|int
-     * @throws RuntimeException
-     *      if no type is set.
+     * @deprecated use `type()`
      */
     public function getType();
+
+    /**
+     * @return string
+     * @throws DocumentException
+     *      if the type member is not present, or is not a string, or is an empty string.
+     */
+    public function type();
 
     /**
      * @return bool
@@ -53,17 +65,23 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
      *
      * @param array $types
      * @return mixed
-     * @throws RuntimeException
+     * @throws DocumentException
      *      if the current type is not one of those in the supplied $types
      */
     public function mapType(array $types);
 
     /**
      * @return string|int
-     * @throws RuntimeException
-     *      if no id is set.
+     * @deprecated use `id()`
      */
     public function getId();
+
+    /**
+     * @return string|int
+     * @throws DocumentException
+     *      if the id member is not present, or is not a string/int, or is an empty string.
+     */
+    public function id();
 
     /**
      * @return bool
@@ -71,7 +89,7 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
     public function hasId();
 
     /**
-     * Whether both a type and an id are set.
+     * Whether both a type and an id are present.
      *
      * @return bool
      */
@@ -79,6 +97,14 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
 
     /**
      * @return StandardObjectInterface
+     * @deprecated use `meta()`
      */
     public function getMeta();
+
+    /**
+     * @return StandardObjectInterface
+     * @throws DocumentException
+     *      if the meta member is present and is not an object.
+     */
+    public function meta();
 }

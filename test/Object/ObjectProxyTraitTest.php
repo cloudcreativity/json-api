@@ -18,10 +18,11 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\TestCase;
 use DateTime;
 use stdClass;
 
-class ObjectProxyTraitTest extends \PHPUnit_Framework_TestCase
+class ObjectProxyTraitTest extends TestCase
 {
 
     const KEY_A = 'foo';

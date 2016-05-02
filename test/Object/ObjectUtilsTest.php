@@ -18,9 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
-class ObjectUtilsTest extends \PHPUnit_Framework_TestCase
+class ObjectUtilsTest extends TestCase
 {
 
     public function testToArray()

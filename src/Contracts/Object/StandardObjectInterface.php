@@ -18,11 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
+use Countable;
+use Traversable;
+
 /**
  * Interface StandardObjectInterface
  * @package CloudCreativity\JsonApi
  */
-interface StandardObjectInterface extends \Traversable, \Countable
+interface StandardObjectInterface extends Traversable, Countable
 {
 
     /**
@@ -158,4 +161,12 @@ interface StandardObjectInterface extends \Traversable, \Countable
      * @return array
      */
     public function toArray();
+
+    /**
+     * Get the supplied key's value as a standard object.
+     *
+     * @param $key
+     * @return StandardObjectInterface
+     */
+    public function asObject($key);
 }

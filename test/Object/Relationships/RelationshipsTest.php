@@ -19,8 +19,10 @@
 namespace CloudCreativity\JsonApi\Object\Relationships;
 
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
+use CloudCreativity\JsonApi\TestCase;
+use stdClass;
 
-class RelationshipsTest extends \PHPUnit_Framework_TestCase
+class RelationshipsTest extends TestCase
 {
 
     const KEY_A = 'foo';
@@ -30,17 +32,17 @@ class RelationshipsTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $belongsTo = new \stdClass();
+        $belongsTo = new stdClass();
         $belongsTo->{ResourceIdentifier::TYPE} = 'foo';
         $belongsTo->{ResourceIdentifier::ID} = 123;
 
-        $a = new \stdClass();
+        $a = new stdClass();
         $a->{Relationship::DATA} = $belongsTo;
 
-        $b = new \stdClass();
+        $b = new stdClass();
         $b->{Relationship::DATA} = null;
 
-        $this->data = new \stdClass();
+        $this->data = new stdClass();
         $this->data->{static::KEY_A} = $a;
         $this->data->{static::KEY_B} = $b;
     }
@@ -51,8 +53,8 @@ class RelationshipsTest extends \PHPUnit_Framework_TestCase
         $a = new Relationship($this->data->{static::KEY_A});
         $b = new Relationship($this->data->{static::KEY_B});
 
-        $this->assertEquals($a, $object->get(static::KEY_A));
-        $this->assertEquals($b, $object->get(static::KEY_B));
+        $this->assertEquals($a, $object->relationship(static::KEY_A));
+        $this->assertEquals($b, $object->relationship(static::KEY_B));
 
         return $object;
     }
@@ -60,20 +62,14 @@ class RelationshipsTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testGet
      */
-    public function testIterator(Relationships $object)
+    public function testAll(Relationships $object)
     {
         $expected = [
-            static::KEY_A => $object->get(static::KEY_A),
-            static::KEY_B => $object->get(static::KEY_B),
+            static::KEY_A => $object->relationship(static::KEY_A),
+            static::KEY_B => $object->relationship(static::KEY_B),
         ];
 
-        $this->assertEquals($expected, iterator_to_array($object));
+        $this->assertEquals($expected, iterator_to_array($object->all()));
     }
 
-    public function testMagicGet()
-    {
-        $object = new Relationships($this->data);
-
-        $this->assertEquals($this->data->{static::KEY_A}, $object->{static::KEY_A});
-    }
 }

@@ -21,8 +21,10 @@ namespace CloudCreativity\JsonApi\Object\Relationships;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\TestCase;
+use stdClass;
 
-class RelationshipTest extends \PHPUnit_Framework_TestCase
+class RelationshipTest extends TestCase
 {
 
     protected $belongsTo;
@@ -30,15 +32,15 @@ class RelationshipTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->belongsTo = new \stdClass();
+        $this->belongsTo = new stdClass();
         $this->belongsTo->{ResourceIdentifier::TYPE} = 'foo';
         $this->belongsTo->{ResourceIdentifier::ID} = 123;
 
-        $a = new \stdClass();
+        $a = new stdClass();
         $a->{ResourceIdentifier::TYPE} = 'bar';
         $a->{ResourceIdentifier::ID} = 456;
 
-        $b = new \stdClass();
+        $b = new stdClass();
         $b->{ResourceIdentifier::TYPE} = 'baz';
         $b->{ResourceIdentifier::ID} = 789;
 
@@ -47,52 +49,52 @@ class RelationshipTest extends \PHPUnit_Framework_TestCase
 
     public function testBelongsTo()
     {
-        $input = new \stdClass();
+        $input = new stdClass();
         $input->{Relationship::DATA} = $this->belongsTo;
 
         $object = new Relationship($input);
         $expected = new ResourceIdentifier($this->belongsTo);
 
-        $this->assertEquals($expected, $object->getData());
-        $this->assertTrue($object->isBelongsTo());
+        $this->assertEquals($expected, $object->data());
+        $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
     }
 
     public function testEmptyBelongsTo()
     {
-        $input = new \stdClass();
+        $input = new stdClass();
         $input->{Relationship::DATA} = null;
 
         $object = new Relationship($input);
 
-        $this->assertNull($object->getData());
-        $this->assertTrue($object->isBelongsTo());
+        $this->assertNull($object->data());
+        $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
     }
 
     public function testHasMany()
     {
-        $input = new \stdClass();
+        $input = new stdClass();
         $input->{Relationship::DATA} = $this->hasMany;
 
         $object = new Relationship($input);
         $expected = ResourceIdentifierCollection::create($this->hasMany);
 
-        $this->assertEquals($expected, $object->getData());
+        $this->assertEquals($expected, $object->data());
         $this->assertTrue($object->isHasMany());
-        $this->assertFalse($object->isBelongsTo());
+        $this->assertFalse($object->isHasOne());
     }
 
     public function testEmptyHasMany()
     {
-        $input = new \stdClass();
+        $input = new stdClass();
         $input->{Relationship::DATA} = [];
 
         $object = new Relationship($input);
 
-        $this->assertEquals(new ResourceIdentifierCollection(), $object->getData());
+        $this->assertEquals(new ResourceIdentifierCollection(), $object->data());
         $this->assertTrue($object->isHasMany());
-        $this->assertFalse($object->isBelongsTo());
+        $this->assertFalse($object->isHasOne());
     }
 
     public function testGetMeta()
@@ -100,15 +102,15 @@ class RelationshipTest extends \PHPUnit_Framework_TestCase
         $object = new Relationship();
 
         $this->assertFalse($object->hasMeta());
-        $this->assertEquals(new StandardObject(), $object->getMeta());
+        $this->assertEquals(new StandardObject(), $object->meta());
 
-        $input = new \stdClass();
-        $input->meta = new \stdClass();
+        $input = new stdClass();
+        $input->meta = new stdClass();
         $input->meta->foo = 'bar';
 
         $object->setProxy($input);
 
         $this->assertTrue($object->hasMeta());
-        $this->assertEquals(new StandardObject($input->meta), $object->getMeta());
+        $this->assertEquals(new StandardObject($input->meta), $object->meta());
     }
 }

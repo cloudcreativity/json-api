@@ -19,7 +19,8 @@
 namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Object\Meta\MetaMemberTrait;
 use CloudCreativity\JsonApi\Object\StandardObject;
 
 /**
@@ -29,39 +30,22 @@ use CloudCreativity\JsonApi\Object\StandardObject;
 class ResourceIdentifier extends StandardObject implements ResourceIdentifierInterface
 {
 
-    const TYPE = 'type';
-    const ID = 'id';
-    const META = 'meta';
+    use IdentifiableTrait,
+        MetaMemberTrait;
 
     /**
      * @param $type
-     * @return $this
+     * @param $id
+     * @return ResourceIdentifier
      */
-    public function setType($type)
+    public static function create($type, $id)
     {
-        $this->set(static::TYPE, $type);
+        $identifier = new self();
 
-        return $this;
-    }
+        $identifier->set(self::TYPE, $type)
+            ->set(self::ID, $id);
 
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        if (!$this->hasType()) {
-            throw new \RuntimeException('No type set.');
-        }
-
-        return $this->get(static::TYPE);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasType()
-    {
-        return $this->has(static::TYPE);
+        return $identifier;
     }
 
     /**
@@ -89,44 +73,13 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
      */
     public function mapType(array $map)
     {
-        $type = $this->getType();
+        $type = $this->type();
 
         if (array_key_exists($type, $map)) {
             return $map[$type];
         }
 
-        throw new \RuntimeException(sprintf('Type "%s" is not in the supplied map.', $type));
-    }
-
-    /**
-     * @param $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->set(static::ID, $id);
-
-        return $this;
-    }
-
-    /**
-     * @return string|int
-     */
-    public function getId()
-    {
-        if (!$this->hasId()) {
-            throw new \RuntimeException('No id set.');
-        }
-
-        return $this->get(static::ID);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasId()
-    {
-        return $this->has(static::ID);
+        throw new DocumentException(sprintf('Type "%s" is not in the supplied map.', $type));
     }
 
     /**
@@ -135,14 +88,6 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     public function isComplete()
     {
         return $this->hasType() && $this->hasId();
-    }
-
-    /**
-     * @return StandardObjectInterface
-     */
-    public function getMeta()
-    {
-        return new StandardObject($this->get(static::META));
     }
 
 }

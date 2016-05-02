@@ -21,7 +21,8 @@ namespace CloudCreativity\JsonApi\Contracts\Object\Relationships;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
-use RuntimeException;
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**
  * Interface RelationshipInterface
@@ -30,17 +31,44 @@ use RuntimeException;
 interface RelationshipInterface
 {
 
+    const DATA = DocumentInterface::KEYWORD_DATA;
+    const META = DocumentInterface::KEYWORD_META;
+
     /**
-     * Get the data as a correctly casted object.
-     *
-     * If this is a belongs to relationship, a ResourceIdentifierInterface object or null will be returned. If it is
-     * a has many relationship, a ResourceIdentifierCollectionInterface will be returned.
-     *
      * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
-     * @throws RuntimeException
-     *      if the value for the data key is not a valid relationship value.
+     * @deprecated use `data()`
      */
     public function getData();
+
+    /**
+     * Get the data member as a correctly casted object.
+     *
+     * If this is a has-one relationship, a ResourceIdentifierInterface object or null will be returned. If it is
+     * a has-many relationship, a ResourceIdentifierCollectionInterface will be returned.
+     *
+     * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
+     * @throws DocumentException
+     *      if the value for the data member is not a valid relationship value.
+     */
+    public function data();
+
+    /**
+     * Get the data member as a has-one relationship.
+     *
+     * @return ResourceIdentifierInterface|null
+     * @throws DocumentException
+     *      if the data member is not a resource identifier or null.
+     */
+    public function hasOne();
+
+    /**
+     * Get the data member as a has-many relationship.
+     *
+     * @return ResourceIdentifierCollectionInterface
+     * @throws DocumentException
+     *      if the data member is not an array.
+     */
+    public function hasMany();
 
     /**
      * @return bool
@@ -60,8 +88,16 @@ interface RelationshipInterface
 
     /**
      * @return StandardObjectInterface
+     * @deprecated use `meta()`
      */
     public function getMeta();
+
+    /**
+     * @return StandardObjectInterface
+     * @throws DocumentException
+     *      if the meta member is present and is not an object.
+     */
+    public function meta();
 
     /**
      * @return bool
