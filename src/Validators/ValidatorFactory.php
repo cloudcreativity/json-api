@@ -26,6 +26,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 
 class ValidatorFactory implements ValidatorFactoryInterface
 {
@@ -122,21 +123,21 @@ class ValidatorFactory implements ValidatorFactoryInterface
      *      the expected type or types
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return RelationshipValidatorInterface
      */
     public function hasOne(
         $expectedType,
         $allowEmpty = true,
-        callable $acceptable = null
+        $acceptable = null
     ) {
         return new HasOneValidator(
             $this->messages,
             $this->store,
             $expectedType,
             $allowEmpty,
-            $acceptable
+            $this->acceptableRelationship($acceptable)
         );
     }
 
@@ -147,23 +148,34 @@ class ValidatorFactory implements ValidatorFactoryInterface
      *      the expected type or types.
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return RelationshipValidatorInterface
      */
     public function hasMany(
         $expectedType,
         $allowEmpty = false,
-        callable $acceptable = null
+        $acceptable = null
     ) {
         return new HasManyValidator(
             $this->messages,
             $this->store,
             $expectedType,
             $allowEmpty,
-            $acceptable
+            $this->acceptableRelationship($acceptable)
         );
     }
 
+    /**
+     * @param $acceptable
+     * @return AcceptRelatedResourceInterface|null
+     */
+    protected function acceptableRelationship($acceptable)
+    {
+        if (!is_null($acceptable) && !$acceptable instanceof AcceptRelatedResourceInterface) {
+            $acceptable = new AcceptRelatedResourceCallback($acceptable);
+        }
 
+        return $acceptable;
+    }
 }

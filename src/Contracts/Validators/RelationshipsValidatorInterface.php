@@ -42,7 +42,7 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return $this
      */
@@ -51,7 +51,7 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
         $expectedType = null,
         $required = false,
         $allowEmpty = true,
-        callable $acceptable = null
+        $acceptable = null
     );
 
     /**
@@ -65,7 +65,7 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return $this
      */
@@ -74,7 +74,7 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
         $expectedType = null,
         $required = false,
         $allowEmpty = false,
-        callable $acceptable = null
+        $acceptable = null
     );
 
     /**

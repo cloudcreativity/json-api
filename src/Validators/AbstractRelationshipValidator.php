@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 
@@ -44,7 +45,7 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
     private $allowEmpty;
 
     /**
-     * @var callable|null
+     * @var AcceptRelatedResourceInterface|null
      */
     private $acceptable;
 
@@ -54,14 +55,14 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
      * @param StoreInterface $store;
      * @param $expectedType
      * @param bool $allowEmpty
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|null $acceptable
      */
     public function __construct(
         ValidatorErrorFactoryInterface $errorFactory,
         StoreInterface $store,
         $expectedType,
         $allowEmpty = false,
-        callable $acceptable = null
+        AcceptRelatedResourceInterface $acceptable = null
     ) {
         parent::__construct($errorFactory);
         $this->store = $store;
@@ -85,25 +86,6 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
     protected function doesExist(ResourceIdentifierInterface $identifier)
     {
         return $this->store->exists($identifier);
-    }
-
-    /**
-     * @param ResourceIdentifierInterface $identifier
-     *      the identifier being validated.
-     * @param string|null $key
-     *      if validating a resource's relationships, the key that is being validated.
-     * @param ResourceInterface|null $resource
-     *      if validating a resource's relationships, the resource for context.
-     * @return bool
-     */
-    protected function isAcceptable(
-        ResourceIdentifierInterface $identifier,
-        $key = null,
-        ResourceInterface $resource = null
-    ) {
-        $callback = $this->acceptable;
-
-        return $callback ? (bool) $callback($identifier, $key, $resource) : true;
     }
 
     /**
@@ -202,7 +184,7 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
         $key = null,
         ResourceInterface $resource = null
     ) {
-        if (!$this->isAcceptable($identifier, $key, $resource)) {
+        if ($this->acceptable && !$this->acceptable->accept($identifier, $key, $resource)) {
             $this->addError($this->errorFactory->relationshipNotAcceptable(
                 $identifier,
                 $key

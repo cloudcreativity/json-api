@@ -73,14 +73,14 @@ interface ValidatorFactoryInterface
      *      the expected type or types
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return RelationshipValidatorInterface
      */
     public function hasOne(
         $expectedType,
         $allowEmpty = true,
-        callable $acceptable = null
+        $acceptable = null
     );
 
     /**
@@ -90,13 +90,13 @@ interface ValidatorFactoryInterface
      *      the expected type or types.
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return RelationshipValidatorInterface
      */
     public function hasMany(
         $expectedType,
         $allowEmpty = false,
-        callable $acceptable = null
+        $acceptable = null
     );
 }

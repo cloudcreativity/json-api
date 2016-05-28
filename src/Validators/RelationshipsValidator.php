@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
@@ -77,7 +78,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return $this
      */
@@ -86,7 +87,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $expectedType = null,
         $required = false,
         $allowEmpty = true,
-        callable $acceptable = null
+        $acceptable = null
     ) {
         $expectedType = $expectedType ?: $key;
 
@@ -114,7 +115,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return $this
      */
@@ -123,7 +124,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $expectedType = null,
         $required = false,
         $allowEmpty = false,
-        callable $acceptable = null
+        $acceptable = null
     ) {
         $expectedType = $expectedType ?: $key;
 
