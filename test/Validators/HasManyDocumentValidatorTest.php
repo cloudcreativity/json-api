@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Object\Document;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 final class HasManyDocumentValidatorTest extends TestCase
@@ -225,7 +225,7 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_INVALID);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data', 'has-many');
     }
 
@@ -236,7 +236,7 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_INVALID);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data', 'has-many');
     }
 

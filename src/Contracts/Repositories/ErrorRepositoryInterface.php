@@ -16,18 +16,30 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Validators;
+namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
-interface ValidationMessageFactoryInterface
+interface ErrorRepositoryInterface
 {
 
     /**
      * @param string $key
+     * @param int|null $status
+     *      the status specified by the Json-Api spec, or null if none specified.
      * @param array $values
      *      values to substitute into error detail.
      * @return ErrorInterface
      */
-    public function error($key, array $values = []);
+    public function error($key, $status = null, array $values = []);
+
+    /**
+     * @param $key
+     * @param $pointer
+     * @param int|null $status
+     *      the status specified by the Json-Api spec, or null if none specified.
+     * @param array $values
+     * @return ErrorInterface
+     */
+    public function errorWithPointer($key, $pointer, $status = null, array $values = []);
 }

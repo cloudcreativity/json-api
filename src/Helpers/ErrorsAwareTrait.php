@@ -2,6 +2,7 @@
 
 namespace CloudCreativity\JsonApi\Helpers;
 
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -23,6 +24,20 @@ trait ErrorsAwareTrait
         }
 
         return $this->errors;
+    }
+
+    /**
+     * @param ErrorInterface $error
+     * @return $this
+     */
+    public function addError(ErrorInterface $error)
+    {
+        // @todo https://github.com/neomerx/json-api/issues/141
+        if ($error instanceof Error) {
+            $this->errors()->add($error);
+        }
+
+        return $this;
     }
 
     /**

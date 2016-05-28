@@ -62,4 +62,20 @@ class Error extends BaseError
             $meta
         );
     }
+
+    /**
+     * @param array $input
+     * @param $pointer
+     * @return Error
+     */
+    public static function createWithPointer(array $input, $pointer)
+    {
+        if (!isset($input[self::SOURCE]) || is_array($input[self::SOURCE])) {
+            $input[self::SOURCE] = [];
+        }
+
+        $input[self::SOURCE][self::SOURCE_POINTER] = $pointer;
+
+        return self::create($input);
+    }
 }

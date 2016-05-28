@@ -22,9 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 class RelationshipsValidator extends AbstractValidator implements RelationshipsValidatorInterface
 {
@@ -46,12 +45,12 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
 
     /**
      * RelationshipsValidator constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $errorFactory
      * @param ValidatorFactoryInterface $factory
      */
-    public function __construct(ValidationMessageFactoryInterface $messages, ValidatorFactoryInterface $factory)
+    public function __construct(ValidatorErrorFactoryInterface $errorFactory, ValidatorFactoryInterface $factory)
     {
-        parent::__construct($messages);
+        parent::__construct($errorFactory);
         $this->factory = $factory;
     }
 
@@ -185,9 +184,10 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         foreach ($this->required as $key) {
 
             if (!$relationships->has($key)) {
-                $this->addDataRelationshipsError(Keys::MEMBER_REQUIRED, [
-                    ':member' => $key,
-                ]);
+                $this->addError($this->errorFactory->memberRequired(
+                    $key,
+                    $this->getPathToRelationships()
+                ));
                 $valid = false;
             }
         }
@@ -207,17 +207,18 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         ResourceInterface $resource
     ) {
         if (!is_object($relationships->get($key))) {
-            $this->addDataRelationshipError($key, Keys::MEMBER_MUST_BE_OBJECT, [
-                ':member' => $key,
-            ]);
+            $this->addError($this->errorFactory->memberObjectExpected(
+                $key,
+                $this->getPathToRelationship($key)
+            ));
             return false;
         }
 
         $validator = $this->get($key);
         $relationship = $relationships->rel($key);
 
-        if ($validator && !$validator->isValid($relationship, $resource)) {
-            $this->addDataRelationshipErrors($key, $validator->errors());
+        if ($validator && !$validator->isValid($relationship, $key, $resource)) {
+            $this->addErrors($validator->errors());
             return false;
         }
 

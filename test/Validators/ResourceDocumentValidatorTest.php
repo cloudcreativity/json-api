@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -127,8 +127,8 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_DATA);
+        $this->assertErrorAt($validator->errors(), '/', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->errors(), '/', DocumentInterface::KEYWORD_DATA);
     }
 
     public function testDataNotObject()
@@ -143,7 +143,7 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_MUST_BE_OBJECT);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_OBJECT_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_DATA);
     }
 
@@ -163,8 +163,8 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/type', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data/type', DocumentInterface::KEYWORD_TYPE);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
     public function testDataTypeNotSupported()
@@ -184,7 +184,12 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/type', Keys::RESOURCE_UNSUPPORTED_TYPE);
+        $this->assertErrorAt(
+            $validator->errors(),
+            '/data/type',
+            Keys::RESOURCE_UNSUPPORTED_TYPE,
+            Keys::STATUS_UNSUPPORTED_TYPE
+        );
         $this->assertDetailContains($validator->errors(), '/data/type', 'people');
         $this->assertDetailContains($validator->errors(), '/data/type', 'posts');
     }
@@ -206,8 +211,8 @@ JSON_API;
         $validator = $this->validator('1');
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/id', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data/id', DocumentInterface::KEYWORD_ID);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_ID);
     }
 
     public function testDataIdNotSupported()
@@ -228,7 +233,12 @@ JSON_API;
         $validator = $this->validator('1');
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/id', Keys::RESOURCE_UNSUPPORTED_ID);
+        $this->assertErrorAt(
+            $validator->errors(),
+            '/data/id',
+            Keys::RESOURCE_UNSUPPORTED_ID,
+            Keys::STATUS_UNSUPPORTED_ID
+        );
         $this->assertDetailContains($validator->errors(), '/data/id', '2');
         $this->assertDetailContains($validator->errors(), '/data/id', '1');
     }
@@ -249,7 +259,7 @@ JSON_API;
         $validator = $this->validator('1');
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/attributes', Keys::MEMBER_MUST_BE_OBJECT);
+        $this->assertErrorAt($validator->errors(), '/data/attributes', Keys::MEMBER_OBJECT_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data/attributes', DocumentInterface::KEYWORD_ATTRIBUTES);
     }
 
@@ -271,7 +281,7 @@ JSON_API;
         $validator = $this->validator('1', $this->attributes(false));
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/attributes', Keys::RESOURCE_ATTRIBUTES_INVALID);
+        $this->assertErrorAt($validator->errors(), '/data/attributes', Keys::RESOURCE_INVALID_ATTRIBUTES);
     }
 
     public function testDataRelationshipsNotObject()
@@ -293,7 +303,7 @@ JSON_API;
         $validator = $this->validator('1');
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/relationships', Keys::MEMBER_MUST_BE_OBJECT);
+        $this->assertErrorAt($validator->errors(), '/data/relationships', Keys::MEMBER_OBJECT_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data/relationships', DocumentInterface::KEYWORD_RELATIONSHIPS);
     }
 
@@ -317,7 +327,7 @@ JSON_API;
         $validator = $this->validator(null, null, $this->relationships());
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/relationships/user', Keys::MEMBER_MUST_BE_OBJECT);
+        $this->assertErrorAt($validator->errors(), '/data/relationships/user', Keys::MEMBER_OBJECT_EXPECTED);
     }
 
     public function testDataNonExistingRelationship()

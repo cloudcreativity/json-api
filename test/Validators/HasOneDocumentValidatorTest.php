@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Object\Document;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 final class HasOneDocumentValidatorTest extends TestCase
@@ -88,7 +88,7 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_MUST_BE_RELATIONSHIP);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_RELATIONSHIP_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_DATA);
     }
 
@@ -175,7 +175,12 @@ JSON_API;
         $validator = $this->hasOne(false, false);
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_DOES_NOT_EXIST);
+        $this->assertErrorAt(
+            $validator->errors(),
+            '/data',
+            Keys::RELATIONSHIP_DOES_NOT_EXIST,
+            Keys::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST
+        );
         $this->assertDetailContains($validator->errors(), '/data', 'exist');
     }
 
@@ -222,7 +227,7 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_INVALID);
+        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_ONE_EXPECTED);
         $this->assertDetailContains($validator->errors(), '/data', 'has-one');
     }
 

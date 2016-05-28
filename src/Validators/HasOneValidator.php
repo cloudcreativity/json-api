@@ -21,7 +21,6 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 class HasOneValidator extends AbstractRelationshipValidator
 {
@@ -30,41 +29,46 @@ class HasOneValidator extends AbstractRelationshipValidator
      * Is the provided relationship valid?
      *
      * @param RelationshipInterface $relationship
+     * @param string|null $key
+     *      if a full resource is being validated, the key of the relationship.
      * @param ResourceInterface|null $resource
      *      if a full resource is being validated, the resource for context.
      * @return bool
      */
-    public function isValid(RelationshipInterface $relationship, ResourceInterface $resource = null)
-    {
+    public function isValid(
+        RelationshipInterface $relationship,
+        $key = null,
+        ResourceInterface $resource = null
+    ) {
         $this->reset();
 
-        if (!$this->validateRelationship($relationship)) {
+        if (!$this->validateRelationship($relationship, $key)) {
             return false;
         }
 
-        if (!$this->validateHasOne($relationship)) {
+        if (!$this->validateHasOne($relationship, $key)) {
             return false;
         }
 
         $identifier = $relationship->hasOne();
 
         /** If there's an identifier, it must be a valid identifier object. */
-        if ($identifier && !$this->validateIdentifier($identifier)) {
+        if ($identifier && !$this->validateIdentifier($identifier, $key)) {
             return false;
         }
 
         /** Check that empty is allowed. */
-        if (!$this->validateEmpty($identifier)) {
+        if (!$this->validateEmpty($identifier, $key)) {
             return false;
         }
 
         /** If an identifier has been provided, the resource it references must exist. */
-        if ($identifier && !$this->validateExists($identifier)) {
+        if ($identifier && !$this->validateExists($identifier, $key)) {
             return false;
         }
 
         /** If an identifier has been provided, is it acceptable for the relationship? */
-        if ($identifier && !$this->validateAcceptable($identifier, $resource)) {
+        if ($identifier && !$this->validateAcceptable($identifier, $key, $resource)) {
             return false;
         }
 
@@ -73,14 +77,13 @@ class HasOneValidator extends AbstractRelationshipValidator
 
     /**
      * @param RelationshipInterface $relationship
+     * @param string|null $key
      * @return bool
      */
-    protected function validateHasOne(RelationshipInterface $relationship)
+    protected function validateHasOne(RelationshipInterface $relationship, $key = null)
     {
         if (!$relationship->isHasOne()) {
-            $this->addDataError(Keys::RELATIONSHIP_INVALID, [
-                ':relationship' => 'has-one',
-            ]);
+            $this->addError($this->errorFactory->relationshipHasOneExpected($key));
             return false;
         }
 
@@ -89,12 +92,13 @@ class HasOneValidator extends AbstractRelationshipValidator
 
     /**
      * @param ResourceIdentifierInterface|null $identifier
+     * @param string|null $key
      * @return bool
      */
-    protected function validateEmpty(ResourceIdentifierInterface $identifier = null)
+    protected function validateEmpty(ResourceIdentifierInterface $identifier = null, $key = null)
     {
         if (!$this->isEmptyAllowed() && !$identifier) {
-            $this->addDataError(Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
+            $this->addError($this->errorFactory->relationshipEmptyNotAllowed($key));
             return false;
         }
 

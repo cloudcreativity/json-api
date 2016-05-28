@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase as BaseTestCase;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -28,9 +29,14 @@ class TestCase extends BaseTestCase
 {
 
     /**
-     * @var ValidationMessageFactory
+     * @var ErrorRepository
      */
-    protected $messages;
+    protected $errorRepository;
+
+    /**
+     * @var ValidatorErrorFactory
+     */
+    protected $errorFactory;
 
     /**
      * @var PHPUnit_Framework_MockObject_MockObject
@@ -49,26 +55,26 @@ class TestCase extends BaseTestCase
     {
         /** @var StoreInterface $store */
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
-
         $config = require __DIR__ . '/../../config/validation.php';
-        $this->messages = new ValidationMessageFactory($config);
+
+        $this->errorRepository = new ErrorRepository($config);
+        $this->errorFactory = new ValidatorErrorFactory($this->errorRepository);
+        $this->factory = new ValidatorFactory($this->errorFactory, $store);
         $this->store = $store;
-        $this->factory = new ValidatorFactory($this->messages, $store);
     }
 
     /**
      * @param ErrorCollection $errors
      * @param $pointer
-     * @param $messageKey
+     * @param $errorKey
+     * @param $status
      */
-    protected function assertErrorAt(ErrorCollection $errors, $pointer, $messageKey)
+    protected function assertErrorAt(ErrorCollection $errors, $pointer, $errorKey, $status = null)
     {
         $error = $this->findErrorAt($errors, $pointer);
-        $expected = $this->messages->error($messageKey);
+        $expected = $this->errorRepository->error($errorKey, $status);
 
-        $this->assertEquals($expected->getId(), $error->getId(), 'Unexpected error id.');
         $this->assertEquals($expected->getTitle(), $error->getTitle(), 'Unexpected error title.');
-        $this->assertEquals($expected->getCode(), $error->getCode(), 'Unexpected error code.');
         $this->assertEquals($expected->getStatus(), $error->getStatus(), 'Unexpected error status.');
     }
 

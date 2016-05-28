@@ -22,7 +22,6 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 class HasManyValidator extends AbstractRelationshipValidator
 {
@@ -31,29 +30,34 @@ class HasManyValidator extends AbstractRelationshipValidator
      * Is the provided relationship valid?
      *
      * @param RelationshipInterface $relationship
+     * @param string|null $key
+     *      if a full resource is being validated, the key of the relationship.
      * @param ResourceInterface|null $resource
      *      if a full resource is being validated, the resource for context.
      * @return bool
      */
-    public function isValid(RelationshipInterface $relationship, ResourceInterface $resource = null)
-    {
+    public function isValid(
+        RelationshipInterface $relationship,
+        $key = null,
+        ResourceInterface $resource = null
+    ) {
         $this->reset();
 
-        if (!$this->validateRelationship($relationship)) {
+        if (!$this->validateRelationship($relationship, $key)) {
             return false;
         }
 
-        if (!$this->validateHasMany($relationship)) {
+        if (!$this->validateHasMany($relationship, $key)) {
             return false;
         }
 
         $identifiers = $relationship->hasMany();
 
-        if (!$this->validateEmpty($identifiers)) {
+        if (!$this->validateEmpty($identifiers, $key)) {
             return false;
         }
 
-        if (!$this->validateIdentifiers($identifiers, $resource)) {
+        if (!$this->validateIdentifiers($identifiers, $key, $resource)) {
             return false;
         }
 
@@ -62,14 +66,13 @@ class HasManyValidator extends AbstractRelationshipValidator
 
     /**
      * @param RelationshipInterface $relationship
+     * @param string|null $key
      * @return bool
      */
-    protected function validateHasMany(RelationshipInterface $relationship)
+    protected function validateHasMany(RelationshipInterface $relationship, $key = null)
     {
         if (!$relationship->isHasMany()) {
-            $this->addDataError(Keys::RELATIONSHIP_INVALID, [
-                ':relationship' => 'has-many',
-            ]);
+            $this->addError($this->errorFactory->relationshipHasManyExpected($key));
             return false;
         }
 
@@ -78,12 +81,13 @@ class HasManyValidator extends AbstractRelationshipValidator
 
     /**
      * @param ResourceIdentifierCollectionInterface $identifiers
+     * @param string|null $key
      * @return bool
      */
-    protected function validateEmpty(ResourceIdentifierCollectionInterface $identifiers)
+    protected function validateEmpty(ResourceIdentifierCollectionInterface $identifiers, $key = null)
     {
         if (!$this->isEmptyAllowed() && $identifiers->isEmpty()) {
-            $this->addDataError(Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
+            $this->addError($this->errorFactory->relationshipEmptyNotAllowed($key));
             return false;
         }
 
@@ -92,17 +96,19 @@ class HasManyValidator extends AbstractRelationshipValidator
 
     /**
      * @param ResourceIdentifierCollectionInterface $identifiers
+     * @param string|null $key
      * @param ResourceInterface $resource
      * @return bool
      */
     protected function validateIdentifiers(
         ResourceIdentifierCollectionInterface $identifiers,
+        $key = null,
         ResourceInterface $resource = null
     ) {
         /** @var ResourceIdentifierInterface $identifier */
         foreach ($identifiers as $identifier) {
 
-            if (!$this->validateIdentifier($identifier) || !$this->validateExists($identifier)) {
+            if (!$this->validateIdentifier($identifier, $key) || !$this->validateExists($identifier, $key)) {
                 return false;
             }
         }
@@ -110,7 +116,7 @@ class HasManyValidator extends AbstractRelationshipValidator
         /** @var ResourceIdentifierInterface $identifier */
         foreach ($identifiers as $identifier) {
 
-            if (!$this->validateAcceptable($identifier, $resource)) {
+            if (!$this->validateAcceptable($identifier, $key, $resource)) {
                 return false;
             }
         }

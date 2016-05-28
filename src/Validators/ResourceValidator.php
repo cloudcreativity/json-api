@@ -22,8 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 
 class ResourceValidator extends AbstractValidator implements ResourceValidatorInterface
 {
@@ -50,20 +49,20 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
     /**
      * ResourceValidator constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $errorFactory
      * @param string $expectedType
      * @param string|int|null $expectedId
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
      */
     public function __construct(
-        ValidationMessageFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $errorFactory,
         $expectedType,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null
     ) {
-        parent::__construct($messages);
+        parent::__construct($errorFactory);
         $this->expectedType = $expectedType;
         $this->expectedId = $expectedId;
         $this->attributes = $attributes;
@@ -103,20 +102,19 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
     {
         /** Type is required */
         if (!$resource->has(ResourceInterface::TYPE)) {
-            $this->addDataTypeError(
-                Keys::MEMBER_REQUIRED,
-                [':member' => ResourceInterface::TYPE]
-            );
+            $this->addError($this->errorFactory->memberRequired(
+                ResourceInterface::TYPE,
+                $this->getPathToData()
+            ));
             return false;
         }
 
         /** Must be the expected type */
         if ($this->expectedType !== $resource->type()) {
-            $this->addDataTypeError(
-                Keys::RESOURCE_UNSUPPORTED_TYPE,
-                [':actual' => $resource->type(), ':expected' => $this->expectedType],
-                409
-            );
+            $this->addError($this->errorFactory->resourceUnsupportedType(
+                $this->expectedType,
+                $resource->type()
+            ));
             return false;
         }
 
@@ -131,20 +129,19 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
     {
         /** If expecting an id, one must be provided */
         if (!is_null($this->expectedId) && !$resource->has(ResourceInterface::ID)) {
-            $this->addDataIdError(
-                Keys::MEMBER_REQUIRED,
-                [':member' => ResourceInterface::ID]
-            );
+            $this->addError($this->errorFactory->memberRequired(
+                ResourceInterface::ID,
+                $this->getPathToData()
+            ));
             return false;
         }
 
         /** If expecting an id, must match the one we're expecting */
         if (!is_null($this->expectedId) && $this->expectedId != $resource->id()) {
-            $this->addDataIdError(
-                Keys::RESOURCE_UNSUPPORTED_ID,
-                [':expected' => $this->expectedId, ':actual' => $resource->id()],
-                409
-            );
+            $this->addError($this->errorFactory->resourceUnsupportedId(
+                $this->expectedId,
+                $resource->id()
+            ));
             return false;
         }
 
@@ -161,10 +158,10 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
         /** Attributes member must be an object. */
         if ($resource->has(ResourceInterface::ATTRIBUTES) && !is_object($raw)) {
-            $this->addDataAttributesError(
-                Keys::MEMBER_MUST_BE_OBJECT,
-                [':member' => ResourceInterface::ATTRIBUTES]
-            );
+            $this->addError($this->errorFactory->memberObjectExpected(
+                ResourceInterface::ATTRIBUTES,
+                $this->getPathToAttributes()
+            ));
             return false;
         }
 
@@ -177,7 +174,7 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         if (0 < count($this->attributes->errors())) {
             $this->addErrors($this->attributes->errors());
         } else {
-            $this->addDataAttributesError(Keys::RESOURCE_ATTRIBUTES_INVALID);
+            $this->addError($this->errorFactory->resourceInvalidAttributes());
         }
 
         return false;
@@ -193,10 +190,10 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
         /** Relationships member must be an object. */
         if ($resource->has(ResourceInterface::RELATIONSHIPS) && !is_object($raw)) {
-            $this->addDataRelationshipsError(
-                Keys::MEMBER_MUST_BE_OBJECT,
-                [':member' => ResourceInterface::RELATIONSHIPS]
-            );
+            $this->addError($this->errorFactory->memberObjectExpected(
+                ResourceInterface::RELATIONSHIPS,
+                $this->getPathToRelationships()
+            ));
             return false;
         }
 
@@ -205,10 +202,11 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
             return true;
         }
 
+        /** Ensure there is at least one error message. */
         if (0 < count($this->relationships->errors())) {
             $this->addErrors($this->relationships->errors());
         } else {
-            $this->addDataRelationshipsError(Keys::RESOURCE_RELATIONSHIPS_INVALID);
+            $this->addError($this->errorFactory->resourceInvalidRelationships());
         }
 
         return false;

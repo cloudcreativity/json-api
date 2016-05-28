@@ -24,14 +24,14 @@ use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 
 class ValidatorFactory implements ValidatorFactoryInterface
 {
 
     /**
-     * @var ValidationMessageFactoryInterface
+     * @var ValidatorErrorFactoryInterface
      */
     private $messages;
 
@@ -42,11 +42,11 @@ class ValidatorFactory implements ValidatorFactoryInterface
 
     /**
      * ValidatorFactory constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $messages
      * @param StoreInterface $store
      */
     public function __construct(
-        ValidationMessageFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $messages,
         StoreInterface $store
     ) {
         $this->messages = $messages;

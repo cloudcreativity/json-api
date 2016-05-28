@@ -1,15 +1,14 @@
 <?php
 
 use CloudCreativity\JsonApi\Document\Error;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as V;
 
 return [
 
     /**
      * A compulsory member has not been included in document.
      */
-    Keys::MEMBER_REQUIRED => [
-        Error::CODE => 'required',
+    V::MEMBER_REQUIRED => [
         Error::TITLE => 'Required Member',
         Error::DETAIL => "The member ':member' is required.",
         Error::STATUS => 400,
@@ -18,8 +17,7 @@ return [
     /**
      * A non-object has been provided for a member that must be an object.
      */
-    Keys::MEMBER_MUST_BE_OBJECT => [
-        Error::CODE => 'non-object',
+    V::MEMBER_OBJECT_EXPECTED => [
         Error::TITLE => 'Object Expected',
         Error::DETAIL => "The member ':member' must be an object.",
         Error::STATUS => 400,
@@ -28,46 +26,34 @@ return [
     /**
      * A member that is expected to be a relationship is not an object, array or null value.
      */
-    Keys::MEMBER_MUST_BE_RELATIONSHIP => [
-        Error::CODE => 'non-relationship',
+    V::MEMBER_RELATIONSHIP_EXPECTED => [
         Error::TITLE => 'Relationship Expected',
         Error::DETAIL => "The member ':member' must be a relationship object.",
         Error::STATUS => 400,
     ],
 
     /**
-     * "A server MUST return 409 Conflict when processing a POST request in which the resource object's type is
-     * not among the type(s) that constitute the collection represented by the endpoint."
-     * http://jsonapi.org/format/#crud-creating
-     *
-     * "A server MUST return 409 Conflict when processing a PATCH request in which the resource object's type
-     * and id do not match the server's endpoint."
-     * http://jsonapi.org/format/#crud-updating
+     * A resource's type is not supported.
      */
-    Keys::RESOURCE_UNSUPPORTED_TYPE => [
-        Error::CODE => 'unsupported-type',
+    V::RESOURCE_UNSUPPORTED_TYPE => [
         Error::TITLE => 'Unsupported Resource',
         Error::DETAIL => "Resource ':actual' is not among the type(s) supported by this endpoint. Expecting only ':expected' resources.",
-        Error::STATUS => 409,
+        Error::STATUS => V::STATUS_UNSUPPORTED_TYPE,
     ],
 
     /**
-     * "A server MUST return 409 Conflict when processing a PATCH request in which the resource object's type
-     * and id do not match the server's endpoint."
-     * http://jsonapi.org/format/#crud-updating
+     * A resource's id is not supported.
      */
-    Keys::RESOURCE_UNSUPPORTED_ID => [
-        Error::CODE => 'unsupported-id',
+    V::RESOURCE_UNSUPPORTED_ID => [
         Error::TITLE => 'Unsupported Resource',
         Error::DETAIL => "Resource id ':actual' is not supported by this endpoint. Expecting only resource ':expected'.",
-        Error::STATUS => 409,
+        Error::STATUS => V::STATUS_UNSUPPORTED_ID,
     ],
 
     /**
      * Used when attributes are invalid but there are no validation error messages in the attributes validator.
      */
-    Keys::RESOURCE_ATTRIBUTES_INVALID => [
-        Error::CODE => 'invalid',
+    V::RESOURCE_INVALID_ATTRIBUTES => [
         Error::TITLE => 'Invalid Attributes',
         Error::DETAIL => 'The attributes member is invalid.',
         Error::STATUS => 400,
@@ -76,50 +62,49 @@ return [
     /**
      * Used when relationships are invalid but there are no validation error messages in the relationships validator.
      */
-    Keys::RESOURCE_RELATIONSHIPS_INVALID => [
-        Error::CODE => 'invalid',
+    V::RESOURCE_INVALID_RELATIONSHIPS => [
         Error::TITLE => 'Invalid Relationships',
         Error::DETAIL => 'The relationships member is invalid.',
         Error::STATUS => 400,
     ],
 
     /**
-     * Used when a has-one relationship is expected, but a has-many has been provided; or vice-versa.
+     * Used when a has-one relationship is expected, but a has-many has been provided; and vice-versa
      */
-    Keys::RELATIONSHIP_INVALID => [
-        Error::CODE => 'invalid',
+    V::RELATIONSHIP_HAS_ONE_EXPECTED => [
         Error::TITLE => 'Invalid Relationship',
-        Error::DETAIL => 'The provided relationship must be a :relationship relationship',
+        Error::DETAIL => 'The provided relationship must be a has-one relationship',
+        Error::STATUS => 400,
+    ],
+
+    V::RELATIONSHIP_HAS_MANY_EXPECTED => [
+        Error::TITLE => 'Invalid Relationship',
+        Error::DETAIL => 'The provided relationship must be a has-many relationship',
         Error::STATUS => 400,
     ],
 
     /**
      * When an empty relationship is not allowed.
      */
-    Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED => [
-        Error::CODE => 'invalid',
+    V::RELATIONSHIP_EMPTY_NOT_ALLOWED => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => 'The provided relationship cannot be empty.',
         Error::STATUS => 422,
     ],
 
     /**
-     * "A server MUST return 404 Not Found when processing a request that references a related resource that does
-     * not exist."
-     * http://jsonapi.org/format/#crud-updating-relationships
+     * The related resource does not exist.
      */
-    Keys::RELATIONSHIP_DOES_NOT_EXIST => [
-        Error::CODE => 'invalid',
+    V::RELATIONSHIP_DOES_NOT_EXIST => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => 'The related resource does not exist.',
-        Error::STATUS => 404,
+        Error::STATUS => V::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST,
     ],
 
     /**
      * When a related resource is not logically acceptable for the relationship.
      */
-    Keys::RELATIONSHIP_NOT_ACCEPTABLE => [
-        Error::CODE => 'invalid',
+    V::RELATIONSHIP_NOT_ACCEPTABLE => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => 'The related resource is not acceptable.',
         Error::STATUS => 422,
@@ -128,8 +113,7 @@ return [
     /**
      * When a related resource is not of the correct type for the relationship.
      */
-    Keys::RELATIONSHIP_UNSUPPORTED_TYPE => [
-        Error::CODE => 'unsupported-type',
+    V::RELATIONSHIP_UNSUPPORTED_TYPE => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => "Resource ':actual' is not among the type(s) supported by this relationship. Expecting only ':expected' resources.",
         Error::STATUS => 400,

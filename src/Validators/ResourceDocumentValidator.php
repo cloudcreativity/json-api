@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 class ResourceDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
@@ -34,14 +34,14 @@ class ResourceDocumentValidator extends AbstractValidator implements DocumentVal
 
     /**
      * ResourceDocumentValidator constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $errorFactory
      * @param ResourceValidatorInterface $validator
      */
     public function __construct(
-        ValidationMessageFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $errorFactory,
         ResourceValidatorInterface $validator
     ) {
-        parent::__construct($messages);
+        parent::__construct($errorFactory);
         $this->resourceValidator = $validator;
     }
 
@@ -54,20 +54,17 @@ class ResourceDocumentValidator extends AbstractValidator implements DocumentVal
         $this->reset();
 
         if (!$document->has(DocumentInterface::DATA)) {
-            $this->addDataError(
-                Keys::MEMBER_REQUIRED,
-                [':member' => DocumentInterface::DATA]
-            );
+            $this->addError($this->errorFactory->memberRequired(DocumentInterface::DATA, '/'));
             return false;
         }
 
         $data = $document->get(DocumentInterface::DATA);
 
         if (!is_object($data)) {
-            $this->addDataError(
-                Keys::MEMBER_MUST_BE_OBJECT,
-                [':member' => DocumentInterface::DATA]
-            );
+            $this->addError($this->errorFactory->memberObjectExpected(
+                DocumentInterface::DATA,
+                $this->getPathToData()
+            ));
             return false;
         }
 

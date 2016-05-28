@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 
 class RelationshipDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
 {
@@ -33,14 +33,14 @@ class RelationshipDocumentValidator extends AbstractValidator implements Documen
 
     /**
      * RelationshipDocumentValidator constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $errorFactory
      * @param RelationshipValidatorInterface $validator
      */
     public function __construct(
-        ValidationMessageFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $errorFactory,
         RelationshipValidatorInterface $validator
     ) {
-        parent::__construct($messages);
+        parent::__construct($errorFactory);
         $this->relationshipValidator = $validator;
     }
 

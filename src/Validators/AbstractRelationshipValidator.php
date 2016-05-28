@@ -23,8 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 
 abstract class AbstractRelationshipValidator extends AbstractValidator implements RelationshipValidatorInterface
 {
@@ -51,20 +50,20 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * HasOneValidator constructor.
-     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $errorFactory
      * @param StoreInterface $store;
      * @param $expectedType
      * @param bool $allowEmpty
      * @param callable|null $acceptable
      */
     public function __construct(
-        ValidationMessageFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $errorFactory,
         StoreInterface $store,
         $expectedType,
         $allowEmpty = false,
         callable $acceptable = null
     ) {
-        parent::__construct($messages);
+        parent::__construct($errorFactory);
         $this->store = $store;
         $this->expectedTypes = (array) $expectedType;
         $this->allowEmpty = $allowEmpty;
@@ -90,16 +89,21 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param ResourceIdentifierInterface $identifier
+     *      the identifier being validated.
+     * @param string|null $key
+     *      if validating a resource's relationships, the key that is being validated.
      * @param ResourceInterface|null $resource
+     *      if validating a resource's relationships, the resource for context.
      * @return bool
      */
     protected function isAcceptable(
         ResourceIdentifierInterface $identifier,
+        $key = null,
         ResourceInterface $resource = null
     ) {
         $callback = $this->acceptable;
 
-        return $callback ? (bool) $callback($identifier, $resource) : true;
+        return $callback ? (bool) $callback($identifier, $key, $resource) : true;
     }
 
     /**
@@ -113,21 +117,25 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param RelationshipInterface $relationship
+     * @param string|null $key
      * @return bool
      */
-    protected function validateRelationship(RelationshipInterface $relationship)
+    protected function validateRelationship(RelationshipInterface $relationship, $key = null)
     {
-        if (!$relationship->has('data')) {
-            $this->addDataError(Keys::MEMBER_REQUIRED, [
-                ':member' => 'data',
-            ]);
+        if (!$relationship->has(RelationshipInterface::DATA)) {
+            $this->addError($this->errorFactory->memberRequired(
+                RelationshipInterface::DATA,
+                $key ? $this->getPathToRelationship($key) : $this->getPathToData()
+            ));
             return false;
         }
 
         if (!$relationship->isHasOne() && !$relationship->isHasMany()) {
-            $this->addDataError(Keys::MEMBER_MUST_BE_RELATIONSHIP, [
-                ':member' => 'data',
-            ]);
+            $this->addError($this->errorFactory->memberRelationshipExpected(
+                RelationshipInterface::DATA,
+                $key ? $this->getPathToRelationship($key) : $this->getPathToData()
+            ));
+            return false;
         }
 
         return true;
@@ -135,29 +143,33 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param ResourceIdentifierInterface $identifier
+     * @param string|null $key
      * @return bool
      */
-    protected function validateIdentifier(ResourceIdentifierInterface $identifier)
+    protected function validateIdentifier(ResourceIdentifierInterface $identifier, $key = null)
     {
         $valid = true;
 
         if (!$identifier->hasType()) {
-            $this->addDataError(Keys::MEMBER_REQUIRED, [
-                ':member' => 'type',
-            ]);
+            $this->addError($this->errorFactory->memberRequired(
+                ResourceIdentifierInterface::TYPE,
+                $key ? $this->getPathToRelationshipData($key) : $this->getPathToData()
+            ));
             $valid = false;
         } elseif (!$this->isSupportedType($identifier->type())) {
-            $this->addDataTypeError(Keys::RELATIONSHIP_UNSUPPORTED_TYPE, [
-                ':actual' => $identifier->type(),
-                ':expected' => implode(', ', $this->expectedTypes)
-            ]);
+            $this->addError($this->errorFactory->relationshipUnsupportedType(
+                $this->expectedTypes,
+                $identifier->type(),
+                $key
+            ));
             $valid = false;
         }
 
         if (!$identifier->hasId()) {
-            $this->addDataError(Keys::MEMBER_REQUIRED, [
-                ':member' => 'id',
-            ]);
+            $this->addError($this->errorFactory->memberRequired(
+                ResourceIdentifierInterface::ID,
+                $key ? $this->getPathToRelationshipId($key) : $this->getPathToData()
+            ));
             $valid = false;
         }
 
@@ -166,12 +178,13 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param ResourceIdentifierInterface $identifier
+     * @param string|null
      * @return bool
      */
-    protected function validateExists(ResourceIdentifierInterface $identifier)
+    protected function validateExists(ResourceIdentifierInterface $identifier, $key = null)
     {
         if (!$this->doesExist($identifier)) {
-            $this->addDataError(Keys::RELATIONSHIP_DOES_NOT_EXIST);
+            $this->addError($this->errorFactory->relationshipDoesNotExist($identifier, $key));
             return false;
         }
 
@@ -180,15 +193,20 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param ResourceIdentifierInterface $identifier
+     * @param string|null $key
      * @param ResourceInterface|null $resource
      * @return bool
      */
     protected function validateAcceptable(
         ResourceIdentifierInterface $identifier,
+        $key = null,
         ResourceInterface $resource = null
     ) {
-        if (!$this->isAcceptable($identifier, $resource)) {
-            $this->addDataError(Keys::RELATIONSHIP_NOT_ACCEPTABLE);
+        if (!$this->isAcceptable($identifier, $key, $resource)) {
+            $this->addError($this->errorFactory->relationshipNotAcceptable(
+                $identifier,
+                $key
+            ));
             return false;
         }
 
