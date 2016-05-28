@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
+namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\TestCase;
 

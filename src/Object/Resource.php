@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Resource;
+namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
-use CloudCreativity\JsonApi\Contracts\Object\Resource\ResourceInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use CloudCreativity\JsonApi\Object\Meta\MetaMemberTrait;
-use CloudCreativity\JsonApi\Object\Relationships\Relationships;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier\IdentifiableTrait;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
-use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
+use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 
 /**
  * Class Resource

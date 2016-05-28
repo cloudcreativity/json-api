@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Object;
 
 use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Object\Helpers\ObjectProxyTrait;
 use IteratorAggregate;
 use Traversable;
 

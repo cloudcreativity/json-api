@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
+namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use CloudCreativity\JsonApi\Object\Meta\MetaMemberTrait;
-use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
+use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 
 /**
  * Class ResourceIdentifier

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object;
+namespace CloudCreativity\JsonApi\Object\Helpers;
 
 use CloudCreativity\JsonApi\TestCase;
 use DateTime;
@@ -46,7 +46,7 @@ class ObjectProxyTraitTest extends TestCase
         $this->proxy->{static::KEY_A} = static::VALUE_A;
         $this->proxy->{static::KEY_B} = static::VALUE_B;
 
-        $this->trait = $this->getMockForTrait('CloudCreativity\JsonApi\Object\ObjectProxyTrait');
+        $this->trait = $this->getMockForTrait(__NAMESPACE__ . '\ObjectProxyTrait');
     }
 
     public function testSetProxy()

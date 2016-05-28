@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Relationships;
+namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use Generator;
 
 /**

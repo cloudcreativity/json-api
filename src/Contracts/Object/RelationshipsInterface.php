@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Object\Relationships;
+namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use IteratorAggregate;
 use Traversable;

@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Relationships;
+namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifier;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier\ResourceIdentifierCollection;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 

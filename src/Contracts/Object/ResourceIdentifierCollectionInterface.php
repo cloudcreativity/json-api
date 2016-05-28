@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier;
+namespace CloudCreativity\JsonApi\Contracts\Object;
 
 use Countable;
 use IteratorAggregate;

@@ -69,8 +69,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null
-    )
-    {
+    ) {
         return new ResourceValidator(
             $this->messages,
             $expectedType,
@@ -101,8 +100,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         $allowEmpty = false,
         callable $exists = null,
         callable $acceptable = null
-    )
-    {
+    ) {
         // TODO: Implement hasOne() method.
     }
 
@@ -127,8 +125,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         $allowEmpty = false,
         callable $exists = null,
         callable $acceptable = null
-    )
-    {
+    ) {
         // TODO: Implement hasMany() method.
     }
 

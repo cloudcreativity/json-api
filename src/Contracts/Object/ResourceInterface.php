@@ -16,14 +16,10 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Object\Resource;
+namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\Relationships\RelationshipsInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifier\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
-use RuntimeException;
 
 /**
  * Interface ResourceObjectInterface

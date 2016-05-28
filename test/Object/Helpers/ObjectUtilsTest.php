@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object;
+namespace CloudCreativity\JsonApi\Object\Helpers;
 
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;

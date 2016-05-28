@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\ResourceIdentifier;
+namespace CloudCreativity\JsonApi\Object\Helpers;
 
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
