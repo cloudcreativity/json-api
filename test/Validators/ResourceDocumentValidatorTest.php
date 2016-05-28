@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -50,11 +51,11 @@ final class ResourceDocumentValidatorTest extends TestCase
             "tags": {
                 "data": [
                     {
-                        "type": "tag",
+                        "type": "tags",
                         "id": "1"
                     },
                     {
-                        "type": "tag",
+                        "type": "tags",
                         "id": "2"
                     }
                 ]
@@ -64,8 +65,13 @@ final class ResourceDocumentValidatorTest extends TestCase
 }
 JSON_API;
 
+        $relationships = $this
+            ->relationships()
+            ->hasOne('author', 'people', true)
+            ->hasMany('tags', null, false);
+
         $document = $this->decode($content);
-        $validator = $this->validator();
+        $validator = $this->validator(null, null, $relationships);
 
         $this->assertTrue($validator->isValid($document));
     }
@@ -291,14 +297,125 @@ JSON_API;
         $this->assertDetailContains($validator->errors(), '/data/relationships', DocumentInterface::KEYWORD_RELATIONSHIPS);
     }
 
+    public function testDataRelationshipNotObject()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": "foo"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator(null, null, $this->relationships());
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->errors(), '/data/relationships/user', Keys::MEMBER_MUST_BE_OBJECT);
+    }
+
+    public function testDataNonExistingRelationship()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": {
+                "data": {
+                    "type": "users",
+                    "id": "1"
+                }
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $relationships = $this->relationships(false)->hasOne('user', 'users');
+        $validator = $this->validator(null, null, $relationships);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->errors(), '/data/relationships/user', Keys::RELATIONSHIP_DOES_NOT_EXIST);
+    }
+
+    public function testDataRelationshipsHasOneRequired()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "tags": {
+                "data": []
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $relationships = $this->relationships()->hasOne('user', 'users', true);
+        $validator = $this->validator(null, null, $relationships);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->errors(), '/data/relationships', Keys::MEMBER_REQUIRED);
+    }
+
+    public function testDataRelationshipsHasManyRequired()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": {
+                "data": {
+                    "type": "users",
+                    "id": "1"
+                }
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $relationships = $this->relationships()->hasMany('tags', 'tags', true);
+        $validator = $this->validator(null, null, $relationships);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->errors(), '/data/relationships', Keys::MEMBER_REQUIRED);
+    }
+
     /**
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
+     * @param RelationshipsValidatorInterface|null $relationships
      * @return DocumentValidatorInterface
      */
-    private function validator($id = null, AttributesValidatorInterface $attributes = null)
-    {
-        $resource = $this->factory->resource('posts', $id, $attributes);
+    private function validator(
+        $id = null,
+        AttributesValidatorInterface $attributes = null,
+        RelationshipsValidatorInterface $relationships = null
+    ) {
+        $resource = $this->factory->resource('posts', $id, $attributes, $relationships);
         $validator = $this->factory->resourceDocument($resource);
 
         return $validator;
@@ -315,5 +432,15 @@ JSON_API;
         $mock->method('errors')->willReturn(new ErrorCollection());
 
         return $mock;
+    }
+
+    /**
+     * @param bool $exists
+     * @return RelationshipsValidatorInterface
+     */
+    private function relationships($exists = true)
+    {
+        $this->store->method('exists')->willReturn($exists);
+        return $this->factory->relationships();
     }
 }

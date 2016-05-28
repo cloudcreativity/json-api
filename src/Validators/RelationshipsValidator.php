@@ -18,11 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 class RelationshipsValidator extends AbstractValidator implements RelationshipsValidatorInterface
 {
@@ -76,8 +78,6 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $exists
-     *      if a non-empty relationship, does the type/id exist?
      * @param callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return $this
@@ -87,7 +87,6 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $expectedType = null,
         $required = false,
         $allowEmpty = true,
-        callable $exists = null,
         callable $acceptable = null
     ) {
         $expectedType = $expectedType ?: $key;
@@ -95,7 +94,6 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $this->add($key, $this->factory->hasOne(
             $expectedType,
             $allowEmpty,
-            $exists,
             $acceptable
         ));
 
@@ -117,8 +115,6 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $exists
-     *      does the type/id of an identifier within the relationship exist?
      * @param callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return $this
@@ -128,18 +124,19 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $expectedType = null,
         $required = false,
         $allowEmpty = false,
-        callable $exists = null,
         callable $acceptable = null
     ) {
         $expectedType = $expectedType ?: $key;
 
         $this->add($key, $this->factory->hasMany(
             $expectedType,
-            $required,
             $allowEmpty,
-            $exists,
             $acceptable
         ));
+
+        if ($required) {
+            $this->required[] = $key;
+        }
 
         return $this;
     }
@@ -152,8 +149,78 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      */
     public function isValid(ResourceInterface $resource)
     {
-        // TODO: Implement isValid() method.
+        $relationships = $resource->relationships();
+        $valid = true;
+
+        if (!$this->validateRequired($relationships)) {
+            $valid = false;
+        }
+
+        foreach ($relationships->keys() as $key) {
+            if (!$this->validateRelationship($key, $relationships, $resource)) {
+                $valid = false;
+            }
+        }
+
+        return $valid;
     }
 
+    /**
+     * @param $key
+     * @return RelationshipValidatorInterface|null
+     */
+    protected function get($key)
+    {
+        return isset($this->stack[$key]) ? $this->stack[$key] : null;
+    }
 
+    /**
+     * @param RelationshipsInterface $relationships
+     * @return bool
+     */
+    protected function validateRequired(RelationshipsInterface $relationships)
+    {
+        $valid = true;
+
+        foreach ($this->required as $key) {
+
+            if (!$relationships->has($key)) {
+                $this->addDataRelationshipsError(Keys::MEMBER_REQUIRED, [
+                    ':member' => $key,
+                ]);
+                $valid = false;
+            }
+        }
+
+        return $valid;
+    }
+
+    /**
+     * @param $key
+     * @param RelationshipsInterface $relationships
+     * @param ResourceInterface $resource
+     * @return bool
+     */
+    protected function validateRelationship(
+        $key,
+        RelationshipsInterface $relationships,
+        ResourceInterface $resource
+    ) {
+        if (!is_object($relationships->get($key))) {
+            $this->addDataRelationshipError($key, Keys::MEMBER_MUST_BE_OBJECT, [
+                ':member' => $key,
+            ]);
+            return false;
+        }
+
+        $validator = $this->get($key);
+        $relationship = $relationships->rel($key);
+
+        if ($validator && !$validator->isValid($relationship, $resource)) {
+            $this->addDataRelationshipErrors($key, $validator->errors());
+            return false;
+        }
+
+        return true;
+    }
 }

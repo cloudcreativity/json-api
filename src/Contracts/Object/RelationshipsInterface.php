@@ -30,17 +30,6 @@ interface RelationshipsInterface extends StandardObjectInterface, IteratorAggreg
 {
 
     /**
-     * @param $key
-     * @param $default
-     *      the default value to use for the RelationshipInterface object if the relationship does not exist.
-     * @return RelationshipInterface
-     * @deprecated
-     *      this will be reverted to the definition as per the StandardObjectInterface. Use `rel()` or
-     *      `relationship()` instead.
-     */
-    public function get($key, $default = null);
-
-    /**
      * Get a traversable object of keys to relationship objects.
      *
      * This iterator will return all keys with values cast to `RelationshipInterface` objects.

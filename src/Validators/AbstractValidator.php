@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Helpers\ErrorsAwareTrait;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 abstract class AbstractValidator
 {
@@ -145,9 +146,58 @@ abstract class AbstractValidator
     protected function addDataRelationshipsError($messageKey, array $messageValues = [])
     {
         $error = $this->messages->error($messageKey, $messageValues);
-        $pointer = sprintf('/%s/%s', DocumentInterface::KEYWORD_DATA, DocumentInterface::KEYWORD_RELATIONSHIPS);
 
-        $this->errors()->add($this->withPointer($error, $pointer));
+        $this->errors()->addRelationshipsError(
+            $error->getTitle(),
+            $error->getDetail(),
+            $error->getStatus(),
+            $error->getId(),
+            $this->aboutLink($error),
+            $error->getCode(),
+            $error->getMeta()
+        );
+    }
+
+    /**
+     * @param $relationshipKey
+     * @param $messageKey
+     * @param array $messageValues
+     */
+    public function addDataRelationshipError($relationshipKey, $messageKey, array $messageValues = [])
+    {
+        $error = $this->messages->error($messageKey, $messageValues);
+
+        $this->errors()->addRelationshipError(
+            $relationshipKey,
+            $error->getTitle(),
+            $error->getDetail(),
+            $error->getStatus(),
+            $error->getId(),
+            $this->aboutLink($error),
+            $error->getCode(),
+            $error->getMeta()
+        );
+    }
+
+    /**
+     * @param $relationshipKey
+     * @param ErrorCollection $errors
+     */
+    protected function addDataRelationshipErrors($relationshipKey, ErrorCollection $errors)
+    {
+        /** @var ErrorInterface $error */
+        foreach ($errors as $error) {
+            $this->errors()->addRelationshipError(
+                $relationshipKey,
+                $error->getTitle(),
+                $error->getDetail(),
+                $error->getStatus(),
+                $error->getId(),
+                $this->aboutLink($error),
+                $error->getCode(),
+                $error->getMeta()
+            );
+        }
     }
 
     /**

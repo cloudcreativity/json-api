@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
+use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;
 use Neomerx\JsonApi\Decoders\ObjectDecoder;
@@ -31,7 +32,7 @@ use Neomerx\JsonApi\Http\Headers\Header;
  * Class CodecMatcherRepositoryTest
  * @package CloudCreativity\JsonApi
  */
-class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
+class CodecMatcherRepositoryTest extends TestCase
 {
 
     const A = 'application/vnd.api+json';

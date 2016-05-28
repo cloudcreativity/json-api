@@ -18,13 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Repositories;
 
+use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepositoryTest
  * @package CloudCreativity\JsonApi
  */
-class SchemasRepositoryTest extends \PHPUnit_Framework_TestCase
+class SchemasRepositoryTest extends TestCase
 {
 
     const A = 'foo';
