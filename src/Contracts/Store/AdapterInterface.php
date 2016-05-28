@@ -19,16 +19,21 @@
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 
-interface StoreInterface
+interface AdapterInterface
 {
 
     /**
-     * Does the record this resource identifier refers to exist?
+     * Is this adapter responsible for the supplied resource type?
      *
-     * @param ResourceIdentifierInterface $identifier
+     * @param $resourceType
      * @return bool
+     */
+    public function recognises($resourceType);
+
+    /**
+     * @param ResourceIdentifierInterface $identifier
+     * @return mixed
      */
     public function exists(ResourceIdentifierInterface $identifier);
 
@@ -38,13 +43,4 @@ interface StoreInterface
      *      the record, or null if it does not exist.
      */
     public function find(ResourceIdentifierInterface $identifier);
-
-    /**
-     * @param ResourceIdentifierInterface $identifier
-     * @return object
-     *      the record
-     * @throws RecordNotFoundException
-     *      if the record does not exist.
-     */
-    public function findRecord(ResourceIdentifierInterface $identifier);
 }
