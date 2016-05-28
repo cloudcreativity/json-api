@@ -19,11 +19,8 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
-use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\TestCase as BaseTestCase;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use PHPUnit_Framework_MockObject_MockObject;
 
@@ -46,11 +43,6 @@ class TestCase extends BaseTestCase
     protected $factory;
 
     /**
-     * @var ObjectDecoder
-     */
-    protected $decoder;
-
-    /**
      * @return void
      */
     protected function setUp()
@@ -62,16 +54,6 @@ class TestCase extends BaseTestCase
         $this->messages = new ValidationMessageFactory($config);
         $this->store = $store;
         $this->factory = new ValidatorFactory($this->messages, $store);
-        $this->decoder = new DocumentDecoder();
-    }
-
-    /**
-     * @param $content
-     * @return Document
-     */
-    protected function decode($content)
-    {
-        return $this->decoder->decode($content);
     }
 
     /**

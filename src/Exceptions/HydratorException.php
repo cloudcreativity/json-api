@@ -16,22 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi;
+namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
-use PHPUnit_Framework_TestCase;
+use RuntimeException;
 
-class TestCase extends PHPUnit_Framework_TestCase
+class HydratorException extends RuntimeException
 {
 
-    /**
-     * @param $content
-     * @return Object\Document
-     */
-    protected function decode($content)
-    {
-        $decoder = new DocumentDecoder();
-
-        return $decoder->decode($content);
-    }
 }
