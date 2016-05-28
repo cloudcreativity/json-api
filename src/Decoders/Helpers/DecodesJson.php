@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,34 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Decoders;
+namespace CloudCreativity\JsonApi\Decoders\Helpers;
 
-use CloudCreativity\JsonApi\Error\ErrorException;
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
+use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 
-/**
- * Class AbstractDecoder
- * @package CloudCreativity\JsonApi
- */
-abstract class AbstractDecoder implements DecoderInterface
+trait DecodesJson
 {
 
     /**
      * @param $content
-     * @param bool|false $assoc
+     * @param bool $assoc
      * @param int $depth
      * @param int $options
      * @return mixed
      */
-    public function parseJson($content, $assoc = false, $depth = 512, $options = 0)
+    protected function decodeJson($content, $assoc = false, $depth = 512, $options = 0)
     {
         $parsed = json_decode($content, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new ErrorException([
-                ErrorException::TITLE => 'Invalid JSON',
-                ErrorException::DETAIL => 'Request body content could not be parsed as JSON: ' . json_last_error_msg(),
-                ErrorException::STATUS => 400,
-            ]);
+            throw new JsonApiException(new Error(
+                null,
+                null,
+                400,
+                null,
+                'Invalid JSON',
+                'Request body content could not be parsed as JSON: ' . json_last_error_msg()
+            ));
         }
 
         return $parsed;

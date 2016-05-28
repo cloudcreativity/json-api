@@ -1,7 +1,24 @@
 <?php
 
+/**
+ * Copyright 2016 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi\Validators;
 
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
@@ -19,12 +36,21 @@ class ValidatorFactory implements ValidatorFactoryInterface
     private $messages;
 
     /**
+     * @var StoreInterface
+     */
+    private $store;
+
+    /**
      * ValidatorFactory constructor.
      * @param ValidationMessageFactoryInterface $messages
+     * @param StoreInterface $store
      */
-    public function __construct(ValidationMessageFactoryInterface $messages)
-    {
+    public function __construct(
+        ValidationMessageFactoryInterface $messages,
+        StoreInterface $store
+    ) {
         $this->messages = $messages;
+        $this->store = $store;
     }
 
     /**
@@ -48,7 +74,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
      */
     public function relationshipDocument(RelationshipValidatorInterface $relationship)
     {
-        // TODO: Implement relationshipDocument() method.
+        return new RelationshipDocumentValidator($this->messages, $relationship);
     }
 
     /**
@@ -80,28 +106,38 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
+     * Create a validator for a relationships object.
+     *
+     * @return RelationshipsValidatorInterface
+     */
+    public function relationships()
+    {
+        return new RelationshipsValidator($this->messages, $this);
+    }
+
+    /**
      * Create a relationship validator for a has-one relationship.
      *
      * @param string|string[] $expectedType
      *      the expected type or types
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $exists
-     *      if a non-empty relationship, does the type/id exist?
      * @param callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return RelationshipValidatorInterface
      */
     public function hasOne(
         $expectedType,
-        $required = false,
-        $allowEmpty = false,
-        callable $exists = null,
+        $allowEmpty = true,
         callable $acceptable = null
     ) {
-        // TODO: Implement hasOne() method.
+        return new HasOneValidator(
+            $this->messages,
+            $this->store,
+            $expectedType,
+            $allowEmpty,
+            $acceptable
+        );
     }
 
     /**
@@ -109,24 +145,24 @@ class ValidatorFactory implements ValidatorFactoryInterface
      *
      * @param $expectedType
      *      the expected type or types.
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $exists
-     *      does the type/id of an identifier within the relationship exist?
      * @param callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return RelationshipValidatorInterface
      */
     public function hasMany(
         $expectedType,
-        $required = false,
         $allowEmpty = false,
-        callable $exists = null,
         callable $acceptable = null
     ) {
-        // TODO: Implement hasMany() method.
+        return new HasManyValidator(
+            $this->messages,
+            $this->store,
+            $expectedType,
+            $allowEmpty,
+            $acceptable
+        );
     }
 
 

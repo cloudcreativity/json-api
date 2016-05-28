@@ -68,11 +68,9 @@ interface DocumentInterface extends StandardObjectInterface
     public function getRelationship();
 
     /**
-     * Get the data member as a relationship.
+     * Get the document as a relationship.
      *
      * @return RelationshipInterface
-     * @throws DocumentException
-     *      if the data member is not an object or null, or is not present.
      */
     public function relationship();
 

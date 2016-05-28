@@ -95,24 +95,12 @@ class Document extends StandardObject implements DocumentInterface
     }
 
     /**
-     * Get the data member as a relationship.
+     * Get the document as a relationship.
      *
      * @return RelationshipInterface
-     * @throws DocumentException
-     *      if the data member is not an object or null, or is not present.
      */
     public function relationship()
     {
-        if (!$this->has(self::DATA)) {
-            throw new DocumentException('Data member is not present.');
-        }
-
-        $data = $this->get(self::DATA);
-
-        if (!is_object($data) && !is_null($data)) {
-            throw new DocumentException('Data member is not an object or null.');
-        }
-
-        return new Relationship($data);
+        return new Relationship($this->getProxy());
     }
 }

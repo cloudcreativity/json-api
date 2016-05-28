@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,71 +18,28 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
-use CloudCreativity\JsonApi\Contracts\Decoders\DocumentDecoderInterface;
-use CloudCreativity\JsonApi\Contracts\Validator\ValidatorInterface;
-use CloudCreativity\JsonApi\Error\MultiErrorException;
-use CloudCreativity\JsonApi\Object\Document\Document;
-use CloudCreativity\JsonApi\Validator\Document\DocumentValidator;
-use CloudCreativity\JsonApi\Validator\ValidatorAwareTrait;
+use CloudCreativity\JsonApi\Decoders\Helpers\DecodesJson;
+use CloudCreativity\JsonApi\Object\Document;
+use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 
 /**
  * Class ResourceDecoder
  * @package CloudCreativity\JsonApi
  */
-class DocumentDecoder extends AbstractDecoder implements DocumentDecoderInterface
+class DocumentDecoder implements DecoderInterface
 {
 
-    use ValidatorAwareTrait;
-
-    /**
-     * @param ValidatorInterface|null $validator
-     */
-    public function __construct(ValidatorInterface $validator = null)
-    {
-        if ($validator) {
-            $this->setValidator($validator);
-        } else {
-            $this->setValidator(new DocumentValidator());
-        }
-    }
-
-    /**
-     * @return DocumentValidator
-     */
-    public function getDocumentValidator()
-    {
-        $validator = $this->getValidator();
-
-        if (!$validator instanceof DocumentValidator) {
-            throw new \RuntimeException('Expecting a document validator to be set.');
-        }
-
-        return $validator;
-    }
+    use DecodesJson;
 
     /**
      * @param string $content
      * @return Document
-     * @throws MultiErrorException
      */
     public function decode($content)
     {
-        $content = $this->parseJson($content);
-        $validator = $this->getValidator();
+        $obj = $this->decodeJson($content);
 
-        if (!$validator->isValid($content)) {
-            throw new MultiErrorException($validator->getErrors(), 'Invalid request body content.');
-        }
-
-        return $content;
+        return new Document($obj);
     }
 
-    /**
-     * @param string $content
-     * @return Document
-     */
-    public function decodeDocument($content)
-    {
-        return new Document($this->decode($content));
-    }
 }

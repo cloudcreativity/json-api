@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2016 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 interface ValidatorFactoryInterface
@@ -44,48 +60,43 @@ interface ValidatorFactoryInterface
     );
 
     /**
+     * Create a validator for a relationships object.
+     *
+     * @return RelationshipsValidatorInterface
+     */
+    public function relationships();
+
+    /**
      * Create a relationship validator for a has-one relationship.
      *
      * @param string|string[] $expectedType
      *      the expected type or types
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
-     * @param callable|null $exists
-     *      if a non-empty relationship, does the type/id exist?
      * @param callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return RelationshipValidatorInterface
      */
     public function hasOne(
         $expectedType,
-        $required = false,
-        $allowEmpty = false,
-        callable $exists = null,
+        $allowEmpty = true,
         callable $acceptable = null
     );
 
     /**
      * Create a relationship validator for a has-many relationship.
-     * 
-     * @param $expectedType
+     *
+     * @param string|string[] $expectedType
      *      the expected type or types.
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
-     * @param callable|null $exists
-     *      does the type/id of an identifier within the relationship exist?
      * @param callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return RelationshipValidatorInterface
      */
     public function hasMany(
         $expectedType,
-        $required = false,
         $allowEmpty = false,
-        callable $exists = null,
         callable $acceptable = null
     );
 }

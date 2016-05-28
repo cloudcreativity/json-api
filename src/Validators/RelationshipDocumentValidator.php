@@ -20,29 +20,28 @@ namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
-class ResourceDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
+class RelationshipDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
 {
 
     /**
-     * @var ResourceValidatorInterface
+     * @var RelationshipValidatorInterface
      */
-    private $resourceValidator;
+    private $relationshipValidator;
 
     /**
-     * ResourceDocumentValidator constructor.
+     * RelationshipDocumentValidator constructor.
      * @param ValidationMessageFactoryInterface $messages
-     * @param ResourceValidatorInterface $validator
+     * @param RelationshipValidatorInterface $validator
      */
     public function __construct(
         ValidationMessageFactoryInterface $messages,
-        ResourceValidatorInterface $validator
+        RelationshipValidatorInterface $validator
     ) {
         parent::__construct($messages);
-        $this->resourceValidator = $validator;
+        $this->relationshipValidator = $validator;
     }
 
     /**
@@ -53,29 +52,12 @@ class ResourceDocumentValidator extends AbstractValidator implements DocumentVal
     {
         $this->reset();
 
-        if (!$document->has(DocumentInterface::DATA)) {
-            $this->addDataError(
-                Keys::MEMBER_REQUIRED,
-                [':member' => DocumentInterface::DATA]
-            );
-            return false;
-        }
-
-        $data = $document->get(DocumentInterface::DATA);
-
-        if (!is_object($data)) {
-            $this->addDataError(
-                Keys::MEMBER_MUST_BE_OBJECT,
-                [':member' => DocumentInterface::DATA]
-            );
-            return false;
-        }
-
-        if (!$this->resourceValidator->isValid($document->resource())) {
-            $this->addErrors($this->resourceValidator->errors());
+        if (!$this->relationshipValidator->isValid($document->relationship())) {
+            $this->addErrors($this->relationshipValidator->errors());
             return false;
         }
 
         return true;
     }
+
 }

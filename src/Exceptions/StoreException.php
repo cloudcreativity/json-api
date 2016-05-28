@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validator\Helper;
+namespace CloudCreativity\JsonApi\Exceptions;
 
-/**
- * Class NullableTrait
- * @package CloudCreativity\JsonApi
- */
-trait NullableTrait
+use RuntimeException;
+
+class StoreException extends RuntimeException
 {
 
-    private $acceptNull;
-
-    /**
-     * @param $accept
-     * @return $this
-     */
-    public function setAcceptNull($accept)
-    {
-        $this->acceptNull = (bool) $accept;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNullAllowed()
-    {
-        return (bool) $this->acceptNull;
-    }
 }

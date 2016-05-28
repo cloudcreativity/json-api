@@ -16,20 +16,54 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Validators;
+namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Stdlib\ErrorsAwareInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidationMessageFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 
-interface RelationshipsValidatorInterface extends ErrorsAwareInterface
+class RelationshipsValidator extends AbstractValidator implements RelationshipsValidatorInterface
 {
+
+    /**
+     * @var ValidatorFactoryInterface
+     */
+    private $factory;
+
+    /**
+     * @var array
+     */
+    private $stack = [];
+
+    /**
+     * @var string[]
+     */
+    private $required = [];
+
+    /**
+     * RelationshipsValidator constructor.
+     * @param ValidationMessageFactoryInterface $messages
+     * @param ValidatorFactoryInterface $factory
+     */
+    public function __construct(ValidationMessageFactoryInterface $messages, ValidatorFactoryInterface $factory)
+    {
+        parent::__construct($messages);
+        $this->factory = $factory;
+    }
 
     /**
      * @param $key
      * @param RelationshipValidatorInterface $validator
      * @return $this
      */
-    public function add($key, RelationshipValidatorInterface $validator);
+    public function add($key, RelationshipValidatorInterface $validator)
+    {
+        $this->stack[$key] = $validator;
+
+        return $this;
+    }
 
     /**
      * Add a has-one relationship validator for the specified relationship key.
@@ -42,6 +76,8 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-one relationship acceptable?
+     * @param callable|null $exists
+     *      if a non-empty relationship, does the type/id exist?
      * @param callable|null $acceptable
      *      if a non-empty relationship that exists, is it acceptable?
      * @return $this
@@ -51,8 +87,24 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
         $expectedType = null,
         $required = false,
         $allowEmpty = true,
+        callable $exists = null,
         callable $acceptable = null
-    );
+    ) {
+        $expectedType = $expectedType ?: $key;
+
+        $this->add($key, $this->factory->hasOne(
+            $expectedType,
+            $allowEmpty,
+            $exists,
+            $acceptable
+        ));
+
+        if ($required) {
+            $this->required[] = $key;
+        }
+
+        return $this;
+    }
 
     /**
      * Add a has-many relationship validator for the specified relationship key.
@@ -65,6 +117,8 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      *      must the relationship exist as a member on the relationship object?
      * @param bool $allowEmpty
      *      is an empty has-many relationship acceptable?
+     * @param callable|null $exists
+     *      does the type/id of an identifier within the relationship exist?
      * @param callable|null $acceptable
      *      if an identifier exists, is it acceptable within this relationship?
      * @return $this
@@ -74,8 +128,21 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
         $expectedType = null,
         $required = false,
         $allowEmpty = false,
+        callable $exists = null,
         callable $acceptable = null
-    );
+    ) {
+        $expectedType = $expectedType ?: $key;
+
+        $this->add($key, $this->factory->hasMany(
+            $expectedType,
+            $required,
+            $allowEmpty,
+            $exists,
+            $acceptable
+        ));
+
+        return $this;
+    }
 
     /**
      * Are the relationships on the supplied resource valid?
@@ -83,5 +150,10 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      * @param ResourceInterface $resource
      * @return bool
      */
-    public function isValid(ResourceInterface $resource);
+    public function isValid(ResourceInterface $resource)
+    {
+        // TODO: Implement isValid() method.
+    }
+
+
 }

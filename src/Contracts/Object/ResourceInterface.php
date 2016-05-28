@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
  * Interface ResourceObjectInterface
@@ -28,11 +28,11 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 interface ResourceInterface extends StandardObjectInterface
 {
 
-    const TYPE = DocumentInterface::KEYWORD_TYPE;
-    const ID = DocumentInterface::KEYWORD_ID;
-    const ATTRIBUTES = DocumentInterface::KEYWORD_ATTRIBUTES;
-    const RELATIONSHIPS = DocumentInterface::KEYWORD_RELATIONSHIPS;
-    const META = DocumentInterface::KEYWORD_META;
+    const TYPE = NeomerxDocumentInterface::KEYWORD_TYPE;
+    const ID = NeomerxDocumentInterface::KEYWORD_ID;
+    const ATTRIBUTES = NeomerxDocumentInterface::KEYWORD_ATTRIBUTES;
+    const RELATIONSHIPS = NeomerxDocumentInterface::KEYWORD_RELATIONSHIPS;
+    const META = NeomerxDocumentInterface::KEYWORD_META;
 
     /**
      * Get the type member.
