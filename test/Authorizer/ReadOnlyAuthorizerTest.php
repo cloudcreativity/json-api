@@ -21,23 +21,27 @@ namespace CloudCreativity\JsonApi\Authorizer;
 use CloudCreativity\JsonApi\Object\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 final class ReadOnlyAuthorizerTest extends TestCase
 {
 
     public function testReadOnly()
     {
+        /** @var EncodingParametersInterface $parameters */
+        $parameters = $this->getMockBuilder(EncodingParametersInterface::class)->getMock();
         $authorizer = new ReadOnlyAuthorizer();
         $record = new StandardObject();
 
-        $this->assertTrue($authorizer->canRead($record));
-        $this->assertTrue($authorizer->canReadRelationship('posts', $record));
+        $this->assertTrue($authorizer->canReadMany($parameters));
+        $this->assertTrue($authorizer->canRead($record, $parameters));
+        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters));
 
-        $this->assertFalse($authorizer->canCreate(new Resource()));
-        $this->assertFalse($authorizer->canUpdate($record));
-        $this->assertFalse($authorizer->canDelete($record));
-        $this->assertFalse($authorizer->canReplaceRelationship('posts', $record));
-        $this->assertFalse($authorizer->canAddToRelationship('posts', $record));
-        $this->assertFalse($authorizer->canRemoveFromRelationship('posts', $record));
+        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters));
+        $this->assertFalse($authorizer->canUpdate($record, $parameters));
+        $this->assertFalse($authorizer->canDelete($record, $parameters));
+        $this->assertFalse($authorizer->canReplaceRelationship('posts', $record, $parameters));
+        $this->assertFalse($authorizer->canAddToRelationship('posts', $record, $parameters));
+        $this->assertFalse($authorizer->canRemoveFromRelationship('posts', $record, $parameters));
     }
 }

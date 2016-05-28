@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 abstract class AbstractAuthorizer implements AuthorizerInterface
 {
@@ -30,11 +31,13 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
      *      the relationship that the client is trying to read.
      * @param object $record
      *      the record to which the relationship relates.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canReadRelationship($relationshipKey, $record)
+    public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
-        return $this->canRead($record);
+        return $this->canRead($record, $parameters);
     }
 
     /**
@@ -46,11 +49,13 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
      *
      * @param string $relationshipKey
      * @param object $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canReplaceRelationship($relationshipKey, $record)
+    public function canReplaceRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
-        return $this->canUpdate($record);
+        return $this->canUpdate($record, $parameters);
     }
 
     /**
@@ -62,11 +67,13 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
      *
      * @param $relationshipKey
      * @param $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canAddToRelationship($relationshipKey, $record)
+    public function canAddToRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
-        return $this->canUpdate($record);
+        return $this->canUpdate($record, $parameters);
     }
 
     /**
@@ -78,11 +85,13 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
      *
      * @param $relationshipKey
      * @param $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canRemoveFromRelationship($relationshipKey, $record)
+    public function canRemoveFromRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
-        return $this->canUpdate($record);
+        return $this->canUpdate($record, $parameters);
     }
 
 }

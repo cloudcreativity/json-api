@@ -19,45 +19,66 @@
 namespace CloudCreativity\JsonApi\Contracts\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 interface AuthorizerInterface
 {
+
+    /**
+     * Can the client read many resources at once?
+     *
+     * Encoding parameters are provided in case the parameters such as
+     * filtering or inclusion paths affect whether the resources can be read.
+     *
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
+     * @return bool
+     */
+    public function canReadMany(EncodingParametersInterface $parameters);
 
     /**
      * Can the client create the provided resource?
      *
      * @param ResourceInterface $resource
      *      the resource provided by the client.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canCreate(ResourceInterface $resource);
+    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified record?
      *
      * @param object $record
      *      the record that the client is trying to read.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canRead($record);
+    public function canRead($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client update the specified record?
      *
      * @param object $record
      *      the record that the client is trying to update.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canUpdate($record);
+    public function canUpdate($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client delete the specified record?
      *
      * @param object $record
      *      the record that the client is trying to delete.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canDelete($record);
+    public function canDelete($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified resource relationship?
@@ -66,9 +87,11 @@ interface AuthorizerInterface
      *      the relationship that the client is trying to read.
      * @param object $record
      *      the record to which the relationship relates.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canReadRelationship($relationshipKey, $record);
+    public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client replace the specified resource relationship?
@@ -79,9 +102,11 @@ interface AuthorizerInterface
      *
      * @param string $relationshipKey
      * @param object $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canReplaceRelationship($relationshipKey, $record);
+    public function canReplaceRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client add members to the specified resource has-many relationship?
@@ -92,9 +117,11 @@ interface AuthorizerInterface
      *
      * @param $relationshipKey
      * @param $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canAddToRelationship($relationshipKey, $record);
+    public function canAddToRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client remove members from the specified resource has-many relationship?
@@ -105,7 +132,9 @@ interface AuthorizerInterface
      *
      * @param $relationshipKey
      * @param $record
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canRemoveFromRelationship($relationshipKey, $record);
+    public function canRemoveFromRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 }

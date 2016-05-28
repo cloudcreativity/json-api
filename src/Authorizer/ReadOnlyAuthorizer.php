@@ -19,18 +19,36 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 class ReadOnlyAuthorizer extends AbstractAuthorizer
 {
+
+    /**
+     * Can the client read many resources at once?
+     *
+     * Encoding parameters are provided in case the parameters such as
+     * filtering or inclusion paths affect whether the resources can be read.
+     *
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
+     * @return bool
+     */
+    public function canReadMany(EncodingParametersInterface $parameters)
+    {
+        return true;
+    }
 
     /**
      * Can the client create the provided resource?
      *
      * @param ResourceInterface $resource
      *      the resource provided by the client.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canCreate(ResourceInterface $resource)
+    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters)
     {
         return false;
     }
@@ -40,9 +58,11 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
      *
      * @param object $record
      *      the record that the client is trying to read.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canRead($record)
+    public function canRead($record, EncodingParametersInterface $parameters)
     {
         return true;
     }
@@ -52,9 +72,11 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
      *
      * @param object $record
      *      the record that the client is trying to update.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canUpdate($record)
+    public function canUpdate($record, EncodingParametersInterface $parameters)
     {
         return false;
     }
@@ -64,9 +86,11 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
      *
      * @param object $record
      *      the record that the client is trying to delete.
+     * @param EncodingParametersInterface $parameters
+     *      the parameters provided by the client
      * @return bool
      */
-    public function canDelete($record)
+    public function canDelete($record, EncodingParametersInterface $parameters)
     {
         return false;
     }
