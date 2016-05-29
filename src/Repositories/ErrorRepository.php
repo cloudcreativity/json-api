@@ -44,11 +44,12 @@ class ErrorRepository implements ErrorRepositoryInterface
      * @param int|null $status
      *      the status specified by the Json-Api spec, or null if none specified.
      * @param array $values
+     * @param array $merge
      * @return ErrorInterface
      */
-    public function error($key, $status = null, array $values = [])
+    public function error($key, $status = null, array $values = [], array $merge = [])
     {
-        $errorArray = $this->replacer($this->get($key, $status), $values);
+        $errorArray = $this->template($key, $status, $values, $merge);
 
         return Error::create($errorArray);
     }
@@ -59,29 +60,41 @@ class ErrorRepository implements ErrorRepositoryInterface
      * @param int|null $status
      *      the status specified by the Json-Api spec, or null if none specified.
      * @param array $values
+     * @param array $merge
      * @return ErrorInterface
      */
-    public function errorWithPointer($key, $pointer, $status = null, array $values = [])
+    public function errorWithPointer($key, $pointer, $status = null, array $values = [], array $merge = [])
     {
-        $errorArray = $this->replacer($this->get($key, $status), $values);
+        $errorArray = $this->template($key, $status, $values, $merge);
 
         return Error::createWithPointer($errorArray, $pointer);
     }
 
     /**
      * @param $key
-     * @param $status
+     * @param null $status
+     * @param array $values
+     * @param array $merge
      * @return array
      */
-    protected function get($key, $status)
+    protected function template($key, $status = null, array $values = [], array $merge = [])
     {
-        $errorArray = isset($this->errors[$key]) ? (array) $this->errors[$key] : [];
+        $errorArray = array_merge($this->get($key), $merge);
 
         if (is_int($status)) {
             $errorArray[Error::STATUS] = $status;
         }
 
-        return $errorArray;
+        return $this->replacer($errorArray, $values);
+    }
+
+    /**
+     * @param $key
+     * @return array
+     */
+    protected function get($key)
+    {
+        return isset($this->errors[$key]) ? (array) $this->errors[$key] : [];
     }
 
     /**

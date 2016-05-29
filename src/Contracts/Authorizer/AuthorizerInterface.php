@@ -81,6 +81,16 @@ interface AuthorizerInterface
     public function canDelete($record, EncodingParametersInterface $parameters);
 
     /**
+     * Can the client read the related resource?
+     * 
+     * @param $relationshipKey
+     * @param $record
+     * @param EncodingParametersInterface $parameters
+     * @return bool
+     */
+    public function canReadRelatedResource($relationshipKey, $record, EncodingParametersInterface $parameters);
+
+    /**
      * Can the client read the specified resource relationship?
      *
      * @param string $relationshipKey

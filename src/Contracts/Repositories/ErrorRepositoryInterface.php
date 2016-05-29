@@ -29,9 +29,11 @@ interface ErrorRepositoryInterface
      *      the status specified by the Json-Api spec, or null if none specified.
      * @param array $values
      *      values to substitute into error detail.
+     * @param array $merge
+     *      error keys to merge in before creating the error object.
      * @return ErrorInterface
      */
-    public function error($key, $status = null, array $values = []);
+    public function error($key, $status = null, array $values = [], array $merge = []);
 
     /**
      * @param $key
@@ -39,7 +41,8 @@ interface ErrorRepositoryInterface
      * @param int|null $status
      *      the status specified by the Json-Api spec, or null if none specified.
      * @param array $values
+     * @param array $merge
      * @return ErrorInterface
      */
-    public function errorWithPointer($key, $pointer, $status = null, array $values = []);
+    public function errorWithPointer($key, $pointer, $status = null, array $values = [], array $merge = []);
 }

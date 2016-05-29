@@ -41,12 +41,12 @@ trait ErrorsAwareTrait
     }
 
     /**
-     * @param ErrorCollection $errors
+     * @param ErrorCollection|ErrorInterface[] $errors
      * @return $this
      */
-    public function addErrors(ErrorCollection $errors)
+    public function addErrors($errors)
     {
-        /** @var Error $error */
+        /** @var ErrorInterface $error */
         foreach ($errors as $error) {
             $this->errors()->add($error);
         }

@@ -34,7 +34,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     /**
      * @var ValidatorErrorFactoryInterface
      */
-    private $messages;
+    protected $validationErrors;
 
     /**
      * @var StoreInterface
@@ -43,14 +43,14 @@ class ValidatorFactory implements ValidatorFactoryInterface
 
     /**
      * ValidatorFactory constructor.
-     * @param ValidatorErrorFactoryInterface $messages
+     * @param ValidatorErrorFactoryInterface $validationErrors
      * @param StoreInterface $store
      */
     public function __construct(
-        ValidatorErrorFactoryInterface $messages,
+        ValidatorErrorFactoryInterface $validationErrors,
         StoreInterface $store
     ) {
-        $this->messages = $messages;
+        $this->validationErrors = $validationErrors;
         $this->store = $store;
     }
 
@@ -63,7 +63,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
      */
     public function resourceDocument(ResourceValidatorInterface $resource)
     {
-        return new ResourceDocumentValidator($this->messages, $resource);
+        return new ResourceDocumentValidator($this->validationErrors, $resource);
     }
 
     /**
@@ -75,7 +75,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
      */
     public function relationshipDocument(RelationshipValidatorInterface $relationship)
     {
-        return new RelationshipDocumentValidator($this->messages, $relationship);
+        return new RelationshipDocumentValidator($this->validationErrors, $relationship);
     }
 
     /**
@@ -98,7 +98,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         RelationshipsValidatorInterface $relationships = null
     ) {
         return new ResourceValidator(
-            $this->messages,
+            $this->validationErrors,
             $expectedType,
             $expectedId,
             $attributes,
@@ -113,7 +113,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
      */
     public function relationships()
     {
-        return new RelationshipsValidator($this->messages, $this);
+        return new RelationshipsValidator($this->validationErrors, $this);
     }
 
     /**
@@ -133,7 +133,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         $acceptable = null
     ) {
         return new HasOneValidator(
-            $this->messages,
+            $this->validationErrors,
             $this->store,
             $expectedType,
             $allowEmpty,
@@ -158,7 +158,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
         $acceptable = null
     ) {
         return new HasManyValidator(
-            $this->messages,
+            $this->validationErrors,
             $this->store,
             $expectedType,
             $allowEmpty,

@@ -25,6 +25,19 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
 {
 
     /**
+     * Can the client read the related resource?
+     *
+     * @param $relationshipKey
+     * @param $record
+     * @param EncodingParametersInterface $parameters
+     * @return bool
+     */
+    public function canReadRelatedResource($relationshipKey, $record, EncodingParametersInterface $parameters)
+    {
+        return $this->canRead($record, $parameters);
+    }
+
+    /**
      * Can the client read the specified resource relationship?
      *
      * @param string $relationshipKey
@@ -37,7 +50,7 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
      */
     public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
-        return $this->canRead($record, $parameters);
+        return $this->canReadRelatedResource($relationshipKey, $record, $parameters);
     }
 
     /**

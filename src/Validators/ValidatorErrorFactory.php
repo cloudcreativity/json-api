@@ -46,7 +46,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     /**
      * @var ErrorRepositoryInterface
      */
-    private $repository;
+    protected $repository;
 
     /**
      * ValidatorErrorFactory constructor.

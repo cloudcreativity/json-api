@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Document;
 
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Document\Error as BaseError;
 
 class Error extends BaseError
@@ -77,5 +78,46 @@ class Error extends BaseError
         $input[self::SOURCE][self::SOURCE_POINTER] = $pointer;
 
         return self::create($input);
+    }
+
+    /**
+     * Get the most applicable HTTP status code.
+     *
+     * From the spec:
+     * When a server encounters multiple problems for a single request, the most generally applicable HTTP error
+     * code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate for multiple
+     * 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
+     *
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection
+     * @return string
+     */
+    public static function getErrorStatus($errors)
+    {
+        if ($errors instanceof ErrorInterface) {
+            return $errors->getStatus();
+        }
+
+        $request = null;
+        $internal = null;
+
+        /** @var ErrorInterface $error */
+        foreach ($errors as $error) {
+
+            $status = $error->getStatus();
+
+            if (400 <= $status && 499 >= $status) {
+                $request = is_null($request) ? $status : ($request == $status) ? $status : 400;
+            } elseif (500 <= $status && 599 >= $status) {
+                $internal = is_null($internal) ? $status : ($internal == $status) ? $status : 500;
+            }
+        }
+
+        if (!is_null($internal) && !is_null($request)) {
+            return '500';
+        } elseif (!is_null($internal)) {
+            return (string) $internal;
+        }
+
+        return !is_null($request) ? (string) $request : '500';
     }
 }
