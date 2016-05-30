@@ -34,19 +34,6 @@ class Store implements StoreInterface
     private $adapters = [];
 
     /**
-     * Store constructor.
-     * @param AdapterInterface|AdapterInterface[] $adapters
-     */
-    public function __construct($adapters)
-    {
-        if ($adapters instanceof AdapterInterface) {
-            $this->register($adapters);
-        } else {
-            $this->registerMany((array) $adapters);
-        }
-    }
-
-    /**
      * Does the record this resource identifier refers to exist?
      *
      * @param ResourceIdentifierInterface $identifier
@@ -92,7 +79,7 @@ class Store implements StoreInterface
     /**
      * @param AdapterInterface $adapter
      */
-    protected function register(AdapterInterface $adapter)
+    public function register(AdapterInterface $adapter)
     {
         $this->adapters[] = $adapter;
     }

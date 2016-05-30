@@ -33,7 +33,7 @@ final class StoreTest extends TestCase
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
-        $store = new Store([
+        $store = $this->store([
             $this->adapter(),
             $this->willExist($identifier)
         ]);
@@ -45,7 +45,7 @@ final class StoreTest extends TestCase
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
-        $store = new Store([
+        $store = $this->store([
             $this->adapter(),
             $this->willNotExist($identifier)
         ]);
@@ -58,7 +58,7 @@ final class StoreTest extends TestCase
         /** @var AdapterInterface $adapter */
         $adapter = $this->adapter();
         $identifier = ResourceIdentifier::create('users', '99');
-        $store = new Store($adapter);
+        $store = $this->store([$adapter]);
 
         $this->setExpectedException(StoreException::class);
         $store->exists($identifier);
@@ -69,7 +69,7 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
         $expected = new StandardObject();
 
-        $store = new Store([
+        $store = $this->store([
             $this->adapter(),
             $this->willFind($identifier, $expected)
         ]);
@@ -82,7 +82,7 @@ final class StoreTest extends TestCase
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
-        $store = new Store([
+        $store = $this->store([
             $this->adapter(),
             $this->willNotFind($identifier)
         ]);
@@ -90,6 +90,21 @@ final class StoreTest extends TestCase
         $this->assertNull($store->find($identifier));
         $this->setExpectedException(RecordNotFoundException::class, 'users:99');
         $store->findRecord($identifier);
+    }
+
+    /**
+     * @param array $adapters
+     * @return Store
+     */
+    private function store(array $adapters)
+    {
+        $store = new Store();
+
+        foreach ($adapters as $adapter) {
+            $store->register($adapter);
+        }
+
+        return $store;
     }
 
     /**

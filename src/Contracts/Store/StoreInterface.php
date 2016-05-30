@@ -25,6 +25,12 @@ interface StoreInterface
 {
 
     /**
+     * @param AdapterInterface $adapter
+     * @return void
+     */
+    public function register(AdapterInterface $adapter);
+
+    /**
      * Does the record this resource identifier refers to exist?
      *
      * @param ResourceIdentifierInterface $identifier
