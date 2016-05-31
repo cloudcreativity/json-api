@@ -32,10 +32,7 @@ trait ErrorsAwareTrait
      */
     public function addError(ErrorInterface $error)
     {
-        // @todo https://github.com/neomerx/json-api/issues/141
-        if ($error instanceof Error) {
-            $this->errors()->add($error);
-        }
+        $this->errors()->add($error);
 
         return $this;
     }

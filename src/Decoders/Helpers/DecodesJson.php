@@ -39,7 +39,7 @@ trait DecodesJson
             throw new JsonApiException(new Error(
                 null,
                 null,
-                400,
+                JsonApiException::HTTP_CODE_BAD_REQUEST,
                 null,
                 'Invalid JSON',
                 'Request body content could not be parsed as JSON: ' . json_last_error_msg()
