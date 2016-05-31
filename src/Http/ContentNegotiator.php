@@ -24,6 +24,10 @@ use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Class ContentNegotiator
+ * @package CloudCreativity\JsonApi
+ */
 class ContentNegotiator implements ContentNegotiatorInterface
 {
 
