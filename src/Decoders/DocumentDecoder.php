@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Decoders\Helpers\DecodesJson;
 use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
@@ -33,7 +34,7 @@ class DocumentDecoder implements DecoderInterface
 
     /**
      * @param string $content
-     * @return Document
+     * @return DocumentInterface
      */
     public function decode($content)
     {

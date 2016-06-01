@@ -85,7 +85,7 @@ class Api implements ApiInterface
     /**
      * @return string
      */
-    public function name()
+    public function getNamespace()
     {
         return $this->namespace;
     }
@@ -93,7 +93,7 @@ class Api implements ApiInterface
     /**
      * @return CodecMatcherInterface
      */
-    public function codecMatcher()
+    public function getCodecMatcher()
     {
         return $this->codecMatcher;
     }
@@ -101,15 +101,23 @@ class Api implements ApiInterface
     /**
      * @return EncoderInterface|null
      */
-    public function encoder()
+    public function getEncoder()
     {
-        return $this->codecMatcher()->getEncoder();
+        return $this->getCodecMatcher()->getEncoder();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasEncoder()
+    {
+        return $this->getEncoder() instanceof EncoderInterface;
     }
 
     /**
      * @return SchemaContainerInterface
      */
-    public function schemas()
+    public function getSchemas()
     {
         return $this->schemas;
     }
@@ -117,7 +125,7 @@ class Api implements ApiInterface
     /**
      * @return null|string
      */
-    public function urlPrefix()
+    public function getUrlPrefix()
     {
         return $this->urlPrefix;
     }
@@ -125,7 +133,7 @@ class Api implements ApiInterface
     /**
      * @return SupportedExtensionsInterface|null
      */
-    public function supportedExts()
+    public function getSupportedExts()
     {
         return $this->supportedExtensions;
     }

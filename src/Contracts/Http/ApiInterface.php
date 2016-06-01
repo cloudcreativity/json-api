@@ -35,40 +35,47 @@ interface ApiInterface
      *
      * @return string
      */
-    public function name();
+    public function getNamespace();
 
     /**
      * Get the codec matcher for this API.
      *
      * @return CodecMatcherInterface
      */
-    public function codecMatcher();
+    public function getCodecMatcher();
 
     /**
      * Get the encoder for this API.
      *
      * @return EncoderInterface|null
      */
-    public function encoder();
+    public function getEncoder();
+
+    /**
+     * Has an encoder been matched to the Accept headers?
+     *
+     * @return bool
+     */
+    public function hasEncoder();
 
     /**
      * Get the schema container for this API.
      *
      * @return SchemaContainerInterface
      */
-    public function schemas();
+    public function getSchemas();
 
     /**
      * Get the URL prefix for this API.
      *
      * @return string|null
      */
-    public function urlPrefix();
+    public function getUrlPrefix();
 
     /**
      * Get the supported extensions for this API.
      *
      * @return SupportedExtensionsInterface|null
      */
-    public function supportedExts();
+    public function getSupportedExts();
 }
