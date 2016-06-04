@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Exceptions\StoreException;
 
 interface AdapterInterface
 {
@@ -43,4 +44,13 @@ interface AdapterInterface
      *      the record, or null if it does not exist.
      */
     public function find(ResourceIdentifierInterface $identifier);
+
+    /**
+     * @param $resourceType
+     * @param $id
+     * @return object
+     * @throws StoreException
+     *      if identities cannot be created for the supplied resource type.
+     */
+    public function createIdentity($resourceType, $id);
 }

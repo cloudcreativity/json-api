@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Store;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
+use CloudCreativity\JsonApi\Exceptions\StoreException;
 
 interface StoreInterface
 {
@@ -53,4 +54,13 @@ interface StoreInterface
      *      if the record does not exist.
      */
     public function findRecord(ResourceIdentifierInterface $identifier);
+
+    /**
+     * @param $resourceType
+     * @param $id
+     * @return object
+     * @throws StoreException
+     *      if identities cannot be created for the supplied resource type.
+     */
+    public function createIdentity($resourceType, $id);
 }
