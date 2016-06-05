@@ -77,20 +77,6 @@ class Store implements StoreInterface
     }
 
     /**
-     * @param $resourceType
-     * @param $id
-     * @return object
-     * @throws StoreException
-     *      if identities cannot be created for the supplied resource type.
-     */
-    public function createIdentity($resourceType, $id)
-    {
-        return $this
-            ->adapterFor($resourceType)
-            ->createIdentity($resourceType, $id);
-    }
-
-    /**
      * @param AdapterInterface $adapter
      */
     public function register(AdapterInterface $adapter)

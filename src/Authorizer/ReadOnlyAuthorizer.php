@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Authorizer;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
+/**
+ * Class ReadOnlyAuthorizer
+ * @package CloudCreativity\JsonApi
+ */
 class ReadOnlyAuthorizer extends AbstractAuthorizer
 {
 

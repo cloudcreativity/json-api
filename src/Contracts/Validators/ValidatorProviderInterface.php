@@ -18,15 +18,23 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
+/**
+ * Interface ValidatorProviderInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface ValidatorProviderInterface
 {
 
     /**
+     * Get a validator for a create resource request.
+     *
      * @return DocumentValidatorInterface
      */
     public function createResource();
 
     /**
+     * Get a validator for an update resource request.
+     *
      * @param object $record
      * @param string $resourceId
      * @return DocumentValidatorInterface
@@ -34,24 +42,12 @@ interface ValidatorProviderInterface
     public function updateResource($record, $resourceId);
 
     /**
+     * Get a validator for modifying a relationship.
+     *
      * @param string $relationshipName
      * @param object $record
      * @return DocumentValidatorInterface
      */
-    public function replaceRelationship($relationshipName, $record);
-
-    /**
-     * @param string $relationshipName
-     * @param object $record
-     * @return DocumentValidatorInterface
-     */
-    public function addToRelationship($relationshipName, $record);
-
-    /**
-     * @param string $relationshipName
-     * @param object $record
-     * @return DocumentValidatorInterface
-     */
-    public function removeFromRelationship($relationshipName, $record);
+    public function modifyRelationship($relationshipName, $record);
 
 }

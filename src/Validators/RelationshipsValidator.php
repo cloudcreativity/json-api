@@ -26,6 +26,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 
+/**
+ * Class RelationshipsValidator
+ * @package CloudCreativity\JsonApi
+ */
 class RelationshipsValidator extends AbstractValidator implements RelationshipsValidatorInterface
 {
 
@@ -65,6 +69,15 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $this->stack[$key] = $validator;
 
         return $this;
+    }
+
+    /**
+     * @param $key
+     * @return RelationshipValidatorInterface|null
+     */
+    public function get($key)
+    {
+        return isset($this->stack[$key]) ? $this->stack[$key] : null;
     }
 
     /**
@@ -163,15 +176,6 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         }
 
         return $valid;
-    }
-
-    /**
-     * @param $key
-     * @return RelationshipValidatorInterface|null
-     */
-    protected function get($key)
-    {
-        return isset($this->stack[$key]) ? $this->stack[$key] : null;
     }
 
     /**

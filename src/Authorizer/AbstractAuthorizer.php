@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Authorizer;
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
+/**
+ * Class AbstractAuthorizer
+ * @package CloudCreativity\JsonApi
+ */
 abstract class AbstractAuthorizer implements AuthorizerInterface
 {
 
@@ -54,55 +58,16 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
     }
 
     /**
-     * Can the client replace the specified resource relationship?
-     *
-     * A replace request is a PATCH request on a has-one or has-many relationship. For
-     * has-many, this involves the client asking to replace the entire relationship. See:
-     * http://jsonapi.org/format/#crud-updating-relationships
+     * Can the client modified the specified resource relationship?
      *
      * @param string $relationshipKey
      * @param object $record
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
+     * @see http://jsonapi.org/format/#crud-updating-relationships
      */
-    public function canReplaceRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canUpdate($record, $parameters);
-    }
-
-    /**
-     * Can the client add members to the specified resource has-many relationship?
-     *
-     * A POST request to a has-many relationship endpoint is interpreted as the client asking to
-     * add to the existing relationship. See
-     * http://jsonapi.org/format/#crud-updating-relationships
-     *
-     * @param $relationshipKey
-     * @param $record
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
-     */
-    public function canAddToRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canUpdate($record, $parameters);
-    }
-
-    /**
-     * Can the client remove members from the specified resource has-many relationship?
-     *
-     * A DELETE request to a has-many relationship endpoint is interpreted as the client asking
-     * to remove the specified resources from the relationship. See:
-     * http://jsonapi.org/format/#crud-updating-relationships
-     *
-     * @param $relationshipKey
-     * @param $record
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
-     */
-    public function canRemoveFromRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
+    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
         return $this->canUpdate($record, $parameters);
     }

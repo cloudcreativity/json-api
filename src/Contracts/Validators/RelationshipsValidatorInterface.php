@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 use CloudCreativity\JsonApi\Contracts\Stdlib\ErrorsAwareInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
+/**
+ * Interface RelationshipsValidatorInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface RelationshipsValidatorInterface extends ErrorsAwareInterface
 {
 
@@ -30,6 +34,12 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      * @return $this
      */
     public function add($key, RelationshipValidatorInterface $validator);
+
+    /**
+     * @param $key
+     * @return RelationshipValidatorInterface
+     */
+    public function get($key);
 
     /**
      * Add a has-one relationship validator for the specified relationship key.
