@@ -50,4 +50,11 @@ interface ValidatorProviderInterface
      */
     public function modifyRelationship($relationshipName, $record);
 
+    /**
+     * Get a validator for filtering resources.
+     * 
+     * @return FilterValidatorInterface
+     */
+    public function filterResources();
+
 }

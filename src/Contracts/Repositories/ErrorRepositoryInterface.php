@@ -20,13 +20,17 @@ namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
+/**
+ * Interface ErrorRepositoryInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface ErrorRepositoryInterface
 {
 
     /**
      * @param string $key
      * @param int|null $status
-     *      the status specified by the Json-Api spec, or null if none specified.
+     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
      *      values to substitute into error detail.
      * @param array $merge
@@ -39,10 +43,21 @@ interface ErrorRepositoryInterface
      * @param $key
      * @param $pointer
      * @param int|null $status
-     *      the status specified by the Json-Api spec, or null if none specified.
+     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
      * @param array $merge
      * @return ErrorInterface
      */
     public function errorWithPointer($key, $pointer, $status = null, array $values = [], array $merge = []);
+
+    /**
+     * @param $key
+     * @param $parameter
+     * @param int|null $status
+     *      the status specified by the JSON API spec, or null if none specified.
+     * @param array $values
+     * @param array $merge
+     * @return ErrorInterface
+     */
+    public function errorWithParameter($key, $parameter, $status = null, array $values = [], array $merge = []);
 }

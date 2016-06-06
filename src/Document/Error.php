@@ -81,6 +81,22 @@ class Error extends BaseError
     }
 
     /**
+     * @param array $input
+     * @param $parameter
+     * @return Error
+     */
+    public static function createWithParameter(array $input, $parameter)
+    {
+        if (!isset($input[self::SOURCE]) || is_array($input[self::SOURCE])) {
+            $input[self::SOURCE] = [];
+        }
+
+        $input[self::SOURCE][self::SOURCE_PARAMETER] = $parameter;
+
+        return self::create($input);
+    }
+
+    /**
      * Get the most applicable HTTP status code.
      *
      * From the spec:

@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Document\Error;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
+/**
+ * Class ErrorRepository
+ * @package CloudCreativity\JsonApi
+ */
 class ErrorRepository implements ErrorRepositoryInterface
 {
 
@@ -42,7 +46,7 @@ class ErrorRepository implements ErrorRepositoryInterface
     /**
      * @param string $key
      * @param int|null $status
-     *      the status specified by the Json-Api spec, or null if none specified.
+     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
      * @param array $merge
      * @return ErrorInterface
@@ -58,7 +62,7 @@ class ErrorRepository implements ErrorRepositoryInterface
      * @param $key
      * @param $pointer
      * @param int|null $status
-     *      the status specified by the Json-Api spec, or null if none specified.
+     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
      * @param array $merge
      * @return ErrorInterface
@@ -68,6 +72,22 @@ class ErrorRepository implements ErrorRepositoryInterface
         $errorArray = $this->template($key, $status, $values, $merge);
 
         return Error::createWithPointer($errorArray, $pointer);
+    }
+
+    /**
+     * @param $key
+     * @param $parameter
+     * @param int|null $status
+     *      the status specified by the JSON API spec, or null if none specified.
+     * @param array $values
+     * @param array $merge
+     * @return Error
+     */
+    public function errorWithParameter($key, $parameter, $status = null, array $values = [], array $merge = [])
+    {
+        $errorArray = $this->template($key, $status, $values, $merge);
+
+        return Error::createWithParameter($errorArray, $parameter);
     }
 
     /**
