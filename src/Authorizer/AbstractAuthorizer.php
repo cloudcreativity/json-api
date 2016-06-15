@@ -20,6 +20,8 @@ namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Class AbstractAuthorizer
@@ -70,6 +72,18 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
     public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
         return $this->canUpdate($record, $parameters);
+    }
+
+    /**
+     * Get the JSON API error that should be used if a request is denied.
+     *
+     * Child classes can override this to provide a more customised error message if needed.
+     *
+     * @return Error
+     */
+    public function denied()
+    {
+        return new Error(null, null, JsonApiException::HTTP_CODE_FORBIDDEN);
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Object\Helpers;
 
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Object\StandardObject;
 use InvalidArgumentException;
 use RuntimeException;
 use stdClass;
@@ -72,15 +74,15 @@ trait ObjectProxyTrait
     }
 
     /**
-     * @param array $keys
-     * @param null $default
+     * @param string|string[] $keys
+     * @param mixed $default
      * @return array
      */
-    public function getProperties(array $keys, $default = null)
+    public function getProperties($keys, $default = null)
     {
         $ret = [];
 
-        foreach ($keys as $key) {
+        foreach ((array) $keys as $key) {
             $ret[$key] = $this->get($key, $default);
         }
 
@@ -90,14 +92,14 @@ trait ObjectProxyTrait
     /**
      * Get properties if they exist.
      *
-     * @param array $keys
+     * @param string|string[] $keys
      * @return array
      */
-    public function getMany(array $keys)
+    public function getMany($keys)
     {
         $ret = [];
 
-        foreach ($keys as $key) {
+        foreach ((array) $keys as $key) {
 
             if ($this->has($key)) {
                 $ret[$key] = $this->get($key);
@@ -133,23 +135,13 @@ trait ObjectProxyTrait
     }
 
     /**
-     * @param $key
+     * @param string|string[] $keys
      * @return bool
      */
-    public function has($key)
+    public function has($keys)
     {
-        return property_exists($this->getProxy(), $key);
-    }
-
-    /**
-     * @param array $keys
-     * @return bool
-     */
-    public function hasAll(array $keys)
-    {
-        foreach ($keys as $key) {
-
-            if (!$this->has($key)) {
+        foreach ((array) $keys as $key) {
+            if (!property_exists($this->getProxy(), $key)) {
                 return false;
             }
         }
@@ -160,10 +152,20 @@ trait ObjectProxyTrait
     /**
      * @param array $keys
      * @return bool
+     * @deprecated use `has()`
      */
-    public function hasAny(array $keys)
+    public function hasAll(array $keys)
     {
-        foreach ($keys as $key) {
+        return $this->has($keys);
+    }
+
+    /**
+     * @param string|string[] $keys
+     * @return bool
+     */
+    public function hasAny($keys)
+    {
+        foreach ((array) $keys as $key) {
 
             if ($this->has($key)) {
                 return true;
@@ -187,12 +189,12 @@ trait ObjectProxyTrait
     }
 
     /**
-     * @param array $keys
+     * @param string|string $keys
      * @return $this
      */
-    public function removeProperties(array $keys)
+    public function removeProperties($keys)
     {
-        foreach ($keys as $key) {
+        foreach ((array) $keys as $key) {
             $this->remove($key);
         }
 
@@ -202,11 +204,13 @@ trait ObjectProxyTrait
     /**
      * Reduce this object so that it only has the supplied allowed keys.
      *
-     * @param array $keys
+     * @param string|string[] $keys
      * @return $this
      */
-    public function reduce(array $keys)
+    public function reduce($keys)
     {
+        $keys = (array) $keys;
+
         foreach ($this->keys() as $key) {
 
             if (!in_array($key, $keys)) {
@@ -257,6 +261,23 @@ trait ObjectProxyTrait
     }
 
     /**
+     * @param string|string[] $keys
+     * @param callable $transform
+     * @return $this
+     */
+    public function transform($keys, callable $transform)
+    {
+        foreach ((array) $keys as $key) {
+
+            if ($this->has($key)) {
+                $this->set($key, call_user_func($transform, $this->get($key)));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @param callable $transform
      * @return $this
      */
@@ -271,28 +292,22 @@ trait ObjectProxyTrait
      * @param $key
      * @param callable $converter
      * @return $this
+     * @deprecated use `transform()`
      */
     public function convertValue($key, callable $converter)
     {
-        if ($this->has($key)) {
-            $this->set($key, call_user_func($converter, $this->get($key)));
-        }
-
-        return $this;
+        return $this->transform($key, $converter);
     }
 
     /**
      * @param array $keys
      * @param callable $converter
      * @return $this
+     * @deprecated use `transform()`
      */
     public function convertValues(array $keys, callable $converter)
     {
-        foreach ($keys as $key) {
-            $this->convertValue($key, $converter);
-        }
-
-        return $this;
+        return $this->transform($keys, $converter);
     }
 
     /**
@@ -316,7 +331,7 @@ trait ObjectProxyTrait
 
     /**
      * @param $key
-     * @return StandardObject
+     * @return StandardObjectInterface
      */
     public function asObject($key)
     {

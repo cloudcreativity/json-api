@@ -22,6 +22,7 @@ use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Object\Helpers\ObjectProxyTrait;
 use IteratorAggregate;
+use OutOfBoundsException;
 use Traversable;
 
 /**
@@ -50,7 +51,7 @@ class StandardObject implements IteratorAggregate, StandardObjectInterface
     public function __get($key)
     {
         if (!$this->has($key)) {
-            throw new \OutOfBoundsException(sprintf('Key "%s" does not exist.', $key));
+            throw new OutOfBoundsException(sprintf('Key "%s" does not exist.', $key));
         }
 
         return $this->get($key);

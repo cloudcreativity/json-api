@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use Exception;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -121,9 +121,9 @@ interface AuthorizerInterface
     public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
-     * Get the exception that should be thrown if a request is denied.
-     * 
-     * @return Exception
+     * Get the JSON API error to use if a request is denied.
+     *
+     * @return ErrorInterface
      */
     public function denied();
 
