@@ -22,6 +22,10 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Document\Error as BaseError;
 
+/**
+ * Class Error
+ * @package CloudCreativity\JsonApi
+ */
 class Error extends BaseError
 {
 

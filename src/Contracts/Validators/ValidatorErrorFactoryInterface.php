@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
+/**
+ * Interface ValidatorErrorFactoryInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface ValidatorErrorFactoryInterface
 {
 

@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Object;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
+/**
+ * Class RelationshipTest
+ * @package CloudCreativity\JsonApi
+ */
 class RelationshipTest extends TestCase
 {
 

@@ -23,6 +23,10 @@ use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
+/**
+ * Class ReadOnlyAuthorizerTest
+ * @package CloudCreativity\JsonApi
+ */
 final class ReadOnlyAuthorizerTest extends TestCase
 {
 
@@ -40,8 +44,6 @@ final class ReadOnlyAuthorizerTest extends TestCase
         $this->assertFalse($authorizer->canCreate(new Resource(), $parameters));
         $this->assertFalse($authorizer->canUpdate($record, $parameters));
         $this->assertFalse($authorizer->canDelete($record, $parameters));
-        $this->assertFalse($authorizer->canReplaceRelationship('posts', $record, $parameters));
-        $this->assertFalse($authorizer->canAddToRelationship('posts', $record, $parameters));
-        $this->assertFalse($authorizer->canRemoveFromRelationship('posts', $record, $parameters));
+        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, $parameters));
     }
 }

@@ -20,6 +20,10 @@ namespace CloudCreativity\JsonApi\Exceptions;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 
+/**
+ * Class RecordNotFoundException
+ * @package CloudCreativity\JsonApi
+ */
 class RecordNotFoundException extends StoreException
 {
 

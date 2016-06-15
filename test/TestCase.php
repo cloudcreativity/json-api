@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi;
 use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * Class TestCase
+ * @package CloudCreativity\JsonApi
+ */
 class TestCase extends PHPUnit_Framework_TestCase
 {
 

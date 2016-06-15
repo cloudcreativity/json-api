@@ -20,6 +20,10 @@ namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\TestCase;
 
+/**
+ * Class ResourceIdentifierCollectionTest
+ * @package CloudCreativity\JsonApi
+ */
 class ResourceIdentifierCollectionTest extends TestCase
 {
 

@@ -25,6 +25,10 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\HydratorException;
 
+/**
+ * Class AbstractHydrator
+ * @package CloudCreativity\JsonApi
+ */
 abstract class AbstractHydrator implements HydratorInterface
 {
 

@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Decoders\Helpers;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
+/**
+ * Class DecodesJson
+ * @package CloudCreativity\JsonApi
+ */
 trait DecodesJson
 {
 

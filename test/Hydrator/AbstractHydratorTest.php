@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Exceptions\HydratorException;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
+/**
+ * Class AbstractHydratorTest
+ * @package CloudCreativity\JsonApi
+ */
 final class AbstractHydratorTest extends TestCase
 {
 

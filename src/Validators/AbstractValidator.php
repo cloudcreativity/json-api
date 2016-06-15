@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Helpers\ErrorsAwareTrait;
 use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
+/**
+ * Class AbstractValidator
+ * @package CloudCreativity\JsonApi
+ */
 abstract class AbstractValidator
 {
 

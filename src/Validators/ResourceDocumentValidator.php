@@ -24,6 +24,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
+/**
+ * Class ResourceDocumentValidator
+ * @package CloudCreativity\JsonApi
+ */
 class ResourceDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
 {
 

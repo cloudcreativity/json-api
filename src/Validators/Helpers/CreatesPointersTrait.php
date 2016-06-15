@@ -20,6 +20,10 @@ namespace CloudCreativity\JsonApi\Validators\Helpers;
 
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
+/**
+ * Class CreatesPointersTrait
+ * @package CloudCreativity\JsonApi
+ */
 trait CreatesPointersTrait
 {
 

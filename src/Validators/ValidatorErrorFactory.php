@@ -24,6 +24,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
+/**
+ * Class ValidatorErrorFactory
+ * @package CloudCreativity\JsonApi
+ */
 class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 {
 

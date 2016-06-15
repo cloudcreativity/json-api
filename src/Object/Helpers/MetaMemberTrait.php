@@ -23,6 +23,10 @@ use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
+/**
+ * Class MetaMemberTrait
+ * @package CloudCreativity\JsonApi
+ */
 trait MetaMemberTrait
 {
 

@@ -18,21 +18,21 @@
 
 namespace CloudCreativity\JsonApi\Object\Helpers;
 
+use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\TestCase;
 use DateTime;
 use stdClass;
 
+/**
+ * Class ObjectProxyTraitTest
+ * @package CloudCreativity\JsonApi
+ */
 class ObjectProxyTraitTest extends TestCase
 {
 
-    const KEY_A = 'foo';
-    const VALUE_A = 'foobar';
-
-    const KEY_B = 'bar';
-    const VALUE_B = 'bazbat';
-
-    const KEY_C = 'baz';
-
+    /**
+     * @var stdClass
+     */
     protected $proxy;
 
     /**
@@ -43,8 +43,8 @@ class ObjectProxyTraitTest extends TestCase
     protected function setUp()
     {
         $this->proxy = new stdClass();
-        $this->proxy->{static::KEY_A} = static::VALUE_A;
-        $this->proxy->{static::KEY_B} = static::VALUE_B;
+        $this->proxy->foo = 'foobar';
+        $this->proxy->bar = 'bazbat';
 
         $this->trait = $this->getMockForTrait(__NAMESPACE__ . '\ObjectProxyTrait');
     }
@@ -58,59 +58,59 @@ class ObjectProxyTraitTest extends TestCase
     public function testGet()
     {
         $this->trait->setProxy($this->proxy);
-        $this->assertSame(static::VALUE_A, $this->trait->get(static::KEY_A));
-        $this->assertNull($this->trait->get(static::KEY_C));
-        $this->assertFalse($this->trait->get(static::KEY_C, false));
+        $this->assertSame('foobar', $this->trait->get('foo'));
+        $this->assertNull($this->trait->get('baz'));
+        $this->assertFalse($this->trait->get('baz', false));
     }
 
     public function testSet()
     {
-        $this->assertSame($this->trait, $this->trait->set(static::KEY_A, static::VALUE_A));
-        $this->assertSame(static::VALUE_A, $this->trait->get(static::KEY_A));
+        $this->assertSame($this->trait, $this->trait->set('foo', 'foobar'));
+        $this->assertSame('foobar', $this->trait->get('foo'));
     }
 
     public function testHas()
     {
-        $this->assertFalse($this->trait->has(static::KEY_A));
-        $this->trait->set(static::KEY_A, static::VALUE_A);
-        $this->assertTrue($this->trait->has(static::KEY_A));
+        $this->assertFalse($this->trait->has('foo'));
+        $this->trait->set('foo', 'foobar');
+        $this->assertTrue($this->trait->has('foo'));
 
-        $this->trait->set(static::KEY_B, null);
-        $this->assertTrue($this->trait->has(static::KEY_B));
+        $this->trait->set('bar', null);
+        $this->assertTrue($this->trait->has('bar'));
     }
 
     public function testHasAll()
     {
         $this->trait->setProxy($this->proxy);
 
-        $this->assertTrue($this->trait->hasAll([static::KEY_A, static::KEY_B]));
-        $this->assertFalse($this->trait->hasAll([static::KEY_A, static::KEY_B, static::KEY_C]));
+        $this->assertTrue($this->trait->has(['foo', 'bar']));
+        $this->assertFalse($this->trait->has(['foo', 'bar', 'baz']));
     }
 
     public function testHasAny()
     {
         $this->trait->setProxy($this->proxy);
-        $this->assertTrue($this->trait->hasAny([static::KEY_A, static::KEY_C]));
-        $this->assertFalse($this->trait->hasAny([static::KEY_C]));
+        $this->assertTrue($this->trait->hasAny(['foo', 'baz']));
+        $this->assertFalse($this->trait->hasAny(['baz']));
     }
 
     public function testRemove()
     {
-        $this->trait->set(static::KEY_A, static::VALUE_A);
-        $this->assertSame($this->trait, $this->trait->remove(static::KEY_A));
-        $this->assertNull($this->trait->get(static::KEY_A));
-        $this->assertFalse($this->trait->has(static::KEY_A));
+        $this->trait->set('foo', 'foobar');
+        $this->assertSame($this->trait, $this->trait->remove('foo'));
+        $this->assertNull($this->trait->get('foo'));
+        $this->assertFalse($this->trait->has('foo'));
     }
 
     public function testGetProperties()
     {
         $this->trait->setProxy($this->proxy);
         $expected = (array) $this->proxy;
-        $expected[static::KEY_C] = null;
-        $keys = [static::KEY_A, static::KEY_B, static::KEY_C];
+        $expected['baz'] = null;
+        $keys = ['foo', 'bar', 'baz'];
 
         $this->assertEquals($expected, $this->trait->getProperties($keys));
-        $expected[static::KEY_C] = false;
+        $expected['baz'] = false;
         $this->assertEquals($expected, $this->trait->getProperties($keys, false));
     }
 
@@ -119,25 +119,33 @@ class ObjectProxyTraitTest extends TestCase
         $expected = (array) $this->proxy;
 
         $this->assertSame($this->trait, $this->trait->setProperties($expected));
-        $this->assertEquals(static::VALUE_A, $this->trait->get(static::KEY_A));
-        $this->assertEquals(static::VALUE_B, $this->trait->get(static::KEY_B));
+        $this->assertEquals('foobar', $this->trait->get('foo'));
+        $this->assertEquals('bazbat', $this->trait->get('bar'));
+    }
+
+    public function testGetMany()
+    {
+        $this->trait->setProxy($this->proxy);
+        $expected = ['foo' => 'foobar'];
+
+        $this->assertEquals($expected, $this->trait->getMany(['foo', 'baz']));
     }
 
     public function testRemoveProperties()
     {
         $this->trait->setProxy($this->proxy);
 
-        $this->assertSame($this->trait, $this->trait->removeProperties([static::KEY_A, static::KEY_C]));
-        $this->assertFalse($this->trait->has(static::KEY_A));
+        $this->assertSame($this->trait, $this->trait->removeProperties(['foo', 'baz']));
+        $this->assertFalse($this->trait->has('foo'));
     }
 
     public function testReduce()
     {
         $this->trait->setProxy($this->proxy);
         $expected = clone $this->proxy;
-        unset($expected->{static::KEY_B});
+        unset($expected->bar);
 
-        $this->assertSame($this->trait, $this->trait->reduce([static::KEY_A, static::KEY_C]));
+        $this->assertSame($this->trait, $this->trait->reduce(['foo', 'baz']));
         $this->assertEquals($expected, $this->trait->getProxy());
     }
 
@@ -145,39 +153,39 @@ class ObjectProxyTraitTest extends TestCase
     {
         $this->assertEmpty($this->trait->keys());
         $this->trait->setProxy($this->proxy);
-        $this->assertEquals([static::KEY_A, static::KEY_B], $this->trait->keys());
+        $this->assertEquals(['foo', 'bar'], $this->trait->keys());
     }
 
     public function testMapKey()
     {
-        $alt = static::KEY_A . static::KEY_B;
+        $alt = 'foo' . 'bar';
 
         $expected = clone $this->proxy;
-        $expected->{$alt} = $expected->{static::KEY_A};
-        unset($expected->{static::KEY_A});
+        $expected->{$alt} = $expected->foo;
+        unset($expected->foo);
 
         $this->trait->setProxy($this->proxy);
-        $this->assertSame($this->trait, $this->trait->mapKey(static::KEY_A, $alt));
+        $this->assertSame($this->trait, $this->trait->mapKey('foo', $alt));
 
         $this->assertEquals($expected, $this->trait->getProxy());
-        $this->assertFalse($this->trait->has(static::KEY_A));
+        $this->assertFalse($this->trait->has('foo'));
     }
 
     public function testMapKeys()
     {
-        $altA = static::KEY_A . static::KEY_B;
-        $altB = static::KEY_B . static::KEY_A;
+        $altA = 'foo' . 'bar';
+        $altB = 'bar' . 'foo';
 
         $expected = new stdClass();
-        $expected->{$altA} = $this->proxy->{static::KEY_A};
-        $expected->{$altB} = $this->proxy->{static::KEY_B};
+        $expected->{$altA} = $this->proxy->foo;
+        $expected->{$altB} = $this->proxy->bar;
 
         $this->trait->setProxy($this->proxy);
 
         $this->assertSame($this->trait, $this->trait->mapKeys([
-            static::KEY_A => $altA,
-            static::KEY_B => $altB,
-            static::KEY_C => 'ignored',
+            'foo' => $altA,
+            'bar' => $altB,
+            'baz' => 'ignored',
         ]));
 
         $this->assertEquals($expected, $this->trait->getProxy());
@@ -188,17 +196,17 @@ class ObjectProxyTraitTest extends TestCase
         $this->trait->setProxy($this->proxy);
 
         $expected = new stdClass();
-        $expected->a = $this->proxy->{static::KEY_A};
-        $expected->b = $this->proxy->{static::KEY_B};
+        $expected->a = $this->proxy->foo;
+        $expected->b = $this->proxy->bar;
 
         $this->assertSame($this->trait, $this->trait->transformKeys(function ($key) {
-            return (static::KEY_A) === $key ? 'a' : 'b';
+            return ('foo') === $key ? 'a' : 'b';
         }));
 
         $this->assertEquals($expected, $this->trait->getProxy());
     }
 
-    public function testConvertValues()
+    public function testTransform()
     {
         $proxy = new stdClass();
         $proxy->start = '2015-01-01 12:00:00';
@@ -210,7 +218,7 @@ class ObjectProxyTraitTest extends TestCase
 
         $this->trait->setProxy($proxy);
 
-        $this->assertSame($this->trait, $this->trait->convertValues([
+        $this->assertSame($this->trait, $this->trait->transform([
             'start',
             'finish',
             'foo'
@@ -224,8 +232,8 @@ class ObjectProxyTraitTest extends TestCase
     public function testArrayExchangeable()
     {
         $arr = [
-            static::KEY_A => static::VALUE_A,
-            static::KEY_B => static::VALUE_B,
+            'foo' => 'foobar',
+            'bar' => 'bazbat',
         ];
 
         $this->assertSame($this->trait, $this->trait->exchangeArray($arr));
@@ -243,5 +251,18 @@ class ObjectProxyTraitTest extends TestCase
         $expected = ObjectUtils::toArray($object);
         $this->trait->setProxy($object);
         $this->assertSame($expected, $this->trait->toArray());
+    }
+
+    public function testAsObject()
+    {
+        $expected = new stdClass();
+        $expected->some = 'value';
+
+        $this->proxy->foo = $expected;
+        $this->trait->setProxy($this->proxy);
+
+        $actual = $this->trait->asObject('foo');
+        $this->assertInstanceOf(StandardObjectInterface::class, $actual);
+        $this->assertEquals('value', $actual->get('some'));
     }
 }

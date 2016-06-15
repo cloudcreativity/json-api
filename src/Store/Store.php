@@ -25,6 +25,10 @@ use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\StoreException;
 use InvalidArgumentException;
 
+/**
+ * Class Store
+ * @package CloudCreativity\JsonApi
+ */
 class Store implements StoreInterface
 {
 

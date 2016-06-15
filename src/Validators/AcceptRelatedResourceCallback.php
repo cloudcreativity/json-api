@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 
+/**
+ * Class AcceptRelatedResourceCallback
+ * @package CloudCreativity\JsonApi
+ */
 class AcceptRelatedResourceCallback implements AcceptRelatedResourceInterface
 {
 

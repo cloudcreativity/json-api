@@ -25,6 +25,10 @@ use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use PHPUnit_Framework_MockObject_MockObject;
 
+/**
+ * Class TestCase
+ * @package CloudCreativity\JsonApi
+ */
 class TestCase extends BaseTestCase
 {
 

@@ -24,6 +24,10 @@ use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
+/**
+ * Class HasOneDocumentValidatorTest
+ * @package CloudCreativity\JsonApi
+ */
 final class HasOneDocumentValidatorTest extends TestCase
 {
 

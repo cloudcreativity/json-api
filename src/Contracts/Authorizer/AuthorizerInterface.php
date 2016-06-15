@@ -24,7 +24,7 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
  * Interface AuthorizerInterface
- * @package CloudCreativity\JsonApi\Contracts\Authorizer
+ * @package CloudCreativity\JsonApi
  */
 interface AuthorizerInterface
 {

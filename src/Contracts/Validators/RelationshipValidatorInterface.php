@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Stdlib\ErrorsAwareInterface;
 
+/**
+ * Interface RelationshipValidatorInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface RelationshipValidatorInterface extends ErrorsAwareInterface
 {
 

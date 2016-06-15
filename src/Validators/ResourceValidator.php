@@ -24,6 +24,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 
+/**
+ * Class ResourceValidator
+ * @package CloudCreativity\JsonApi
+ */
 class ResourceValidator extends AbstractValidator implements ResourceValidatorInterface
 {
 

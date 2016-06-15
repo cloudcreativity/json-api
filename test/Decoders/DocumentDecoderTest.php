@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Decoders;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
+/**
+ * Class DocumentDecoderTest
+ * @package CloudCreativity\JsonApi
+ */
 class DocumentDecoderTest extends TestCase
 {
 

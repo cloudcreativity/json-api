@@ -28,6 +28,10 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 
+/**
+ * Class ValidatorFactory
+ * @package CloudCreativity\JsonApi
+ */
 class ValidatorFactory implements ValidatorFactoryInterface
 {
 

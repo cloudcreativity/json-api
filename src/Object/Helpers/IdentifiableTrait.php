@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Object\Helpers;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
+/**
+ * Class IdentifiableTrait
+ * @package CloudCreativity\JsonApi
+ */
 trait IdentifiableTrait
 {
 

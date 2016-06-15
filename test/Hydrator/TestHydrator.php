@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Hydrator;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 
+/**
+ * Class TestHydrator
+ * @package CloudCreativity\JsonApi
+ */
 final class TestHydrator extends AbstractHydrator
 {
 

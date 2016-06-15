@@ -26,6 +26,10 @@ use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 
+/**
+ * Class StoreTest
+ * @package CloudCreativity\JsonApi
+ */
 final class StoreTest extends TestCase
 {
 

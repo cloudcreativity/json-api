@@ -20,6 +20,10 @@ namespace CloudCreativity\JsonApi\Exceptions;
 
 use RuntimeException;
 
+/**
+ * Class StoreException
+ * @package CloudCreativity\JsonApi
+ */
 class StoreException extends RuntimeException
 {
 

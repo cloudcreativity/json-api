@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
+/**
+ * Interface AcceptRelatedResourceInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface AcceptRelatedResourceInterface
 {
 

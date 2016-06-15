@@ -18,6 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
+/**
+ * Interface ValidatorFactoryInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface ValidatorFactoryInterface
 {
 

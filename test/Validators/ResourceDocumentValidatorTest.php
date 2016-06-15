@@ -25,6 +25,10 @@ use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
+/**
+ * Class ResourceDocumentValidatorTest
+ * @package CloudCreativity\JsonApi
+ */
 final class ResourceDocumentValidatorTest extends TestCase
 {
 

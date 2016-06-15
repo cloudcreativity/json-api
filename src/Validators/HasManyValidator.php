@@ -23,6 +23,10 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterfa
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
+/**
+ * Class HasManyValidator
+ * @package CloudCreativity\JsonApi
+ */
 class HasManyValidator extends AbstractRelationshipValidator
 {
 

@@ -20,6 +20,10 @@ namespace CloudCreativity\JsonApi\Exceptions;
 
 use RuntimeException;
 
+/**
+ * Class HydratorException
+ * @package CloudCreativity\JsonApi
+ */
 class HydratorException extends RuntimeException
 {
 

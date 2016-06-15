@@ -21,6 +21,10 @@ namespace CloudCreativity\JsonApi\Contracts\Hydrator;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
+/**
+ * Interface HydratorInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface HydratorInterface
 {
 
