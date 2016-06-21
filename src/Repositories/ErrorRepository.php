@@ -129,10 +129,23 @@ class ErrorRepository implements ErrorRepositoryInterface
         }
 
         foreach ($values as $key => $value) {
-            $error[Error::DETAIL] = str_replace($key, $this->parseValue($value), $error[Error::DETAIL]);
+            $error[Error::DETAIL] = str_replace(
+                $this->parseKey($key),
+                $this->parseValue($value),
+                $error[Error::DETAIL]
+            );
         }
 
         return $error;
+    }
+
+    /**
+     * @param $key
+     * @return string
+     */
+    protected function parseKey($key)
+    {
+        return ':' . $key;
     }
 
     /**
