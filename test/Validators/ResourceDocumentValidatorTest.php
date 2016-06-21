@@ -18,9 +18,11 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -418,18 +420,118 @@ JSON_API;
         $this->assertErrorAt($validator->errors(), '/data/relationships', Keys::MEMBER_REQUIRED);
     }
 
+    public function testContextValid()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": {
+                "data": {
+                    "type": "users",
+                    "id": "1"
+                }
+            }
+        }
+    }
+}
+JSON_API;
+
+        $called = false;
+
+        $context = function (ResourceInterface $resource) use (&$called) {
+            $this->assertEquals('posts', $resource->type());
+            $this->assertEquals('123', $resource->id());
+            $this->assertEquals('My first post', $resource->attributes()->get('title'));
+            $this->assertEquals('users', $resource->relationships()->rel('user')->data()->type());
+            $called = true;
+            return true;
+        };
+
+        $document = $this->decode($content);
+        $validator = $this->validator("123", null, null, $context);
+
+        $this->assertTrue($validator->isValid($document));
+
+        if (!$called) {
+            $this->fail('Context validator was not called.');
+        }
+    }
+
+    public function testContextInvalid()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        }
+    }
+}
+JSON_API;
+
+        $expected = Error::createWithPointer([
+            Error::TITLE => 'Context',
+            Error::DETAIL => 'Context is invalid',
+        ], '/data/foo');
+
+        $context = function ($resource, TestContextValidator $validator) use ($expected) {
+            $validator->addError($expected);
+            return false;
+        };
+
+        $document = $this->decode($content);
+        $validator = $this->validator(null, null, null, $context);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertEquals($expected, $this->findErrorAt($validator->errors(), '/data/foo'));
+    }
+
+    /**
+     * The context validator should not be called if any other part of the
+     * resource is invalid.
+     */
+    public function testContextNotCalledIfInvalid()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "99"
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator('123', null, null, function () {
+            $this->fail('Context validator should not be called.');
+        });
+
+        $this->assertFalse($validator->isValid($document));
+    }
+
     /**
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
+     * @param callable|null $context
      * @return DocumentValidatorInterface
      */
     private function validator(
         $id = null,
         AttributesValidatorInterface $attributes = null,
-        RelationshipsValidatorInterface $relationships = null
+        RelationshipsValidatorInterface $relationships = null,
+        callable $context = null
     ) {
-        $resource = $this->factory->resource('posts', $id, $attributes, $relationships);
+        $context = $context ? new TestContextValidator($context) : null;
+
+        $resource = $this->factory->resource('posts', $id, $attributes, $relationships, $context);
         $validator = $this->factory->resourceDocument($resource);
 
         return $validator;

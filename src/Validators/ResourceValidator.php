@@ -52,25 +52,33 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
     private $relationships;
 
     /**
+     * @var ResourceValidatorInterface|null
+     */
+    private $context;
+
+    /**
      * ResourceValidator constructor.
      * @param ValidatorErrorFactoryInterface $errorFactory
      * @param string $expectedType
      * @param string|int|null $expectedId
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
+     * @param ResourceValidatorInterface|null $context
      */
     public function __construct(
         ValidatorErrorFactoryInterface $errorFactory,
         $expectedType,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
-        RelationshipsValidatorInterface $relationships = null
+        RelationshipsValidatorInterface $relationships = null,
+        ResourceValidatorInterface $context = null
     ) {
         parent::__construct($errorFactory);
         $this->expectedType = $expectedType;
         $this->expectedId = $expectedId;
         $this->attributes = $attributes;
         $this->relationships = $relationships;
+        $this->context = $context;
     }
 
     /**
@@ -92,6 +100,10 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         }
 
         if (!$this->validateRelationships($resource)) {
+            $valid = false;
+        }
+
+        if ($valid && !$this->validateContext($resource)) {
             $valid = false;
         }
 
@@ -212,6 +224,21 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         } else {
             $this->addError($this->errorFactory->resourceInvalidRelationships());
         }
+
+        return false;
+    }
+
+    /**
+     * @param ResourceInterface $resource
+     * @return bool
+     */
+    protected function validateContext(ResourceInterface $resource)
+    {
+        if (!$this->context || $this->context->isValid($resource)) {
+            return true;
+        }
+
+        $this->addErrors($this->context->errors());
 
         return false;
     }

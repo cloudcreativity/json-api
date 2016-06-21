@@ -54,13 +54,16 @@ interface ValidatorFactoryInterface
      *      the validator to use for the attributes member.
      * @param RelationshipsValidatorInterface|null $relationships
      *      the validator to use for the relationships member.
+     * @param ResourceValidatorInterface|null $context
+     *      validates the whole resource once all of its constituent parts have been validated.
      * @return ResourceValidatorInterface
      */
     public function resource(
         $expectedType,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
-        RelationshipsValidatorInterface $relationships = null
+        RelationshipsValidatorInterface $relationships = null,
+        ResourceValidatorInterface $context = null
     );
 
     /**
