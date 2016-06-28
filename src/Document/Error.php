@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Document;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Document\Error as BaseError;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Class Error
@@ -41,6 +42,8 @@ class Error extends BaseError
     const LINKS_ABOUT = DocumentInterface::KEYWORD_ERRORS_ABOUT;
 
     /**
+     * Create an error object from an array.
+     *
      * @param array $input
      * @return Error
      */
@@ -69,13 +72,15 @@ class Error extends BaseError
     }
 
     /**
+     * Create an error object from an array, ensuring the pointer is as specified.
+     *
      * @param array $input
      * @param $pointer
      * @return Error
      */
     public static function createWithPointer(array $input, $pointer)
     {
-        if (!isset($input[self::SOURCE]) || is_array($input[self::SOURCE])) {
+        if (!isset($input[self::SOURCE]) || !is_array($input[self::SOURCE])) {
             $input[self::SOURCE] = [];
         }
 
@@ -85,13 +90,15 @@ class Error extends BaseError
     }
 
     /**
+     * Create an error object from an array, ensuring the parameter is as specified.
+     *
      * @param array $input
      * @param $parameter
      * @return Error
      */
     public static function createWithParameter(array $input, $parameter)
     {
-        if (!isset($input[self::SOURCE]) || is_array($input[self::SOURCE])) {
+        if (!isset($input[self::SOURCE]) || !is_array($input[self::SOURCE])) {
             $input[self::SOURCE] = [];
         }
 
@@ -109,12 +116,14 @@ class Error extends BaseError
      * 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
      *
      * @param ErrorInterface|ErrorInterface[]|ErrorCollection
-     * @return string
+     * @param string|int $default
+     *      the default to use if an error status cannot be resolved.
+     * @return string|int
      */
-    public static function getErrorStatus($errors)
+    public static function resolveHttpStatus($errors, $default = JsonApiException::DEFAULT_HTTP_CODE)
     {
         if ($errors instanceof ErrorInterface) {
-            return $errors->getStatus();
+            return $errors->getStatus() ?: $default;
         }
 
         $request = null;
@@ -132,12 +141,12 @@ class Error extends BaseError
             }
         }
 
-        if (!is_null($internal) && !is_null($request)) {
-            return '500';
-        } elseif (!is_null($internal)) {
-            return (string) $internal;
+        if (!$request && !$internal) {
+            return $default;
+        } elseif ($request && $internal) {
+            return 500;
         }
 
-        return !is_null($request) ? (string) $request : '500';
+        return $request ?: $internal;
     }
 }

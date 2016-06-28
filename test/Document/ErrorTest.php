@@ -80,4 +80,33 @@ class ErrorTest extends TestCase
         $this->assertEquals($status, $error->getStatus(), 'Invalid status');
         $this->assertEquals($code, $error->getCode(), 'Invalid code');
     }
+
+    public function testCreateWithPointer()
+    {
+        $error = Error::createWithPointer([
+            Error::TITLE => 'Error Title',
+        ], '/data/attributes');
+
+        $expected = [
+            Error::SOURCE_POINTER => '/data/attributes',
+        ];
+
+        $this->assertEquals('Error Title', $error->getTitle(), 'Invalid title');
+        $this->assertEquals($expected, $error->getSource(), 'Invalid source pointer.');
+    }
+
+    public function testCreateWithParameter()
+    {
+        $error = Error::createWithParameter([
+            Error::TITLE => 'Error Title',
+        ], 'filter');
+
+        $expected = [
+            Error::SOURCE_PARAMETER => 'filter',
+        ];
+
+        $this->assertEquals('Error Title', $error->getTitle(), 'Invalid title.');
+        $this->assertEquals($expected, $error->getSource(), 'Invalid source parameter.');
+    }
+
 }
