@@ -33,6 +33,7 @@ trait DecodesJson
      * @param int $depth
      * @param int $options
      * @return mixed
+     * @throws InvalidJsonException
      */
     protected function decodeJson($content, $assoc = false, $depth = 512, $options = 0)
     {
