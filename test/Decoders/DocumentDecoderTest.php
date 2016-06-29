@@ -18,8 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Decoders;
 
+use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 use CloudCreativity\JsonApi\TestCase;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Exception;
 
 /**
  * Class DocumentDecoderTest
@@ -39,7 +40,14 @@ JSON_API;
 
         $decoder = new DocumentDecoder();
 
-        $this->setExpectedException(JsonApiException::class);
-        $decoder->decode($content);
+        try {
+            $decoder->decode($content);
+            $this->fail('No exception thrown.');
+        } catch (Exception $ex) {
+            $this->assertInstanceOf(InvalidJsonException::class, $ex);
+            /** @var InvalidJsonException $ex */
+            $this->assertEquals(json_last_error(), $ex->getJsonError());
+            $this->assertEquals(json_last_error_msg(), $ex->getJsonErrorMessage());
+        }
     }
 }

@@ -18,8 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Decoders\Helpers;
 
-use Neomerx\JsonApi\Document\Error;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
+use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 
 /**
  * Class DecodesJson
@@ -40,14 +39,7 @@ trait DecodesJson
         $parsed = json_decode($content, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new JsonApiException(new Error(
-                null,
-                null,
-                JsonApiException::HTTP_CODE_BAD_REQUEST,
-                null,
-                'Invalid JSON',
-                'Request body content could not be parsed as JSON: ' . json_last_error_msg()
-            ));
+            throw InvalidJsonException::create();
         }
 
         return $parsed;
