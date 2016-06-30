@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Document;
 
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Document\Link;
+use Neomerx\JsonApi\Document\Error as BaseError;
 
 /**
  * Class ErrorTest
@@ -81,32 +82,48 @@ class ErrorTest extends TestCase
         $this->assertEquals($code, $error->getCode(), 'Invalid code');
     }
 
-    public function testCreateWithPointer()
+    public function testCastReturnsSameInstance()
     {
-        $error = Error::createWithPointer([
-            Error::TITLE => 'Error Title',
-        ], '/data/attributes');
-
-        $expected = [
-            Error::SOURCE_POINTER => '/data/attributes',
-        ];
-
-        $this->assertEquals('Error Title', $error->getTitle(), 'Invalid title');
-        $this->assertEquals($expected, $error->getSource(), 'Invalid source pointer.');
+        $error = new Error();
+        $this->assertSame($error, Error::cast($error));
     }
 
-    public function testCreateWithParameter()
+    public function testCastBaseErrorToError()
     {
-        $error = Error::createWithParameter([
-            Error::TITLE => 'Error Title',
-        ], 'filter');
+        $id = '123';
+        $aboutLink = new Link('/api/errors/123');
+        $status = '500';
+        $code = 'error_code';
+        $title = 'An Error';
+        $detail = 'This is the error detail';
+        $source = [Error::SOURCE_POINTER => '/data/attributes'];
+        $meta = ['foo' => 'bar'];
 
-        $expected = [
-            Error::SOURCE_PARAMETER => 'filter',
-        ];
+        $error = new BaseError($id, $aboutLink, $status, $code, $title, $detail, $source, $meta);
+        $expected = new Error($id, [], $status, $code, $title, $detail, $source, $meta);
+        $expected->setAboutLink($aboutLink);
 
-        $this->assertEquals('Error Title', $error->getTitle(), 'Invalid title.');
-        $this->assertEquals($expected, $error->getSource(), 'Invalid source parameter.');
+        $this->assertEquals($expected, Error::cast($error));
     }
 
+    public function testMerge()
+    {
+        $id = '123';
+        $aboutLink = new Link('/api/errors/123');
+        $status = '500';
+        $code = 'error_code';
+        $title = 'An Error';
+        $detail = 'This is the error detail';
+        $source = [Error::SOURCE_POINTER => '/data/attributes'];
+        $meta = ['foo' => 'bar'];
+
+        $error = new BaseError($id, $aboutLink, $status, $code, $title, $detail, $source, $meta);
+        $expected = new Error($id, [], $status, $code, $title, $detail, $source, $meta);
+        $expected->setAboutLink($aboutLink);
+
+        $actual = new Error();
+        $actual->merge($error);
+
+        $this->assertEquals($expected, $actual);
+    }
 }

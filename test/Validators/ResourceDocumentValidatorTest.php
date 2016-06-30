@@ -476,10 +476,11 @@ JSON_API;
 }
 JSON_API;
 
-        $expected = Error::createWithPointer([
+        $expected = Error::create([
             Error::TITLE => 'Context',
             Error::DETAIL => 'Context is invalid',
-        ], '/data/foo');
+        ]);
+        $expected->setSourcePointer('/data/foo');
 
         $context = function ($resource, TestContextValidator $validator) use ($expected) {
             $validator->addError($expected);

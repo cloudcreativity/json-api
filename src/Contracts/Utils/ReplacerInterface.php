@@ -16,21 +16,20 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Validators;
-
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
-use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+namespace CloudCreativity\JsonApi\Contracts\Utils;
 
 /**
- * Interface DocumentValidatorInterface
+ * Interface ReplacerInterface
  * @package CloudCreativity\JsonApi
  */
-interface DocumentValidatorInterface extends ErrorsAwareInterface
+interface ReplacerInterface
 {
 
     /**
-     * @param DocumentInterface $document
-     * @return bool
+     * @param string $message
+     * @param array $values
+     * @return string
      */
-    public function isValid(DocumentInterface $document);
+    public function replace($message, array $values);
+
 }

@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
-use CloudCreativity\JsonApi\Helpers\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**

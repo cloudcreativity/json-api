@@ -18,16 +18,16 @@
 
 namespace CloudCreativity\JsonApi\Document;
 
+use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Document\Error as BaseError;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 /**
  * Class Error
  * @package CloudCreativity\JsonApi
  */
-class Error extends BaseError
+class Error implements ErrorInterface
 {
 
     /** Keywords for array exchanging */
@@ -42,6 +42,70 @@ class Error extends BaseError
     const LINKS_ABOUT = DocumentInterface::KEYWORD_ERRORS_ABOUT;
 
     /**
+     * @var int|string|null
+     */
+    private $id;
+
+    /**
+     * @var array
+     */
+    private $links;
+
+    /**
+     * @var string|int|null
+     */
+    private $status;
+
+    /**
+     * @var string|null
+     */
+    private $code;
+
+    /**
+     * @var string|null
+     */
+    private $title;
+
+    /**
+     * @var string|null
+     */
+    private $detail;
+
+    /**
+     * @var array
+     */
+    private $source;
+
+    /**
+     * @var array
+     */
+    private $meta;
+
+    /**
+     * @param $error
+     * @return Error
+     */
+    public static function cast($error)
+    {
+        if ($error instanceof self) {
+            return $error;
+        } elseif (!$error instanceof ErrorInterface) {
+            throw new InvalidArgumentException('Expecting an error object.');
+        }
+
+        return new self(
+            $error->getId(),
+            $error->getLinks(),
+            $error->getStatus(),
+            $error->getCode(),
+            $error->getTitle(),
+            $error->getDetail(),
+            $error->getSource(),
+            $error->getMeta()
+        );
+    }
+
+    /**
      * Create an error object from an array.
      *
      * @param array $input
@@ -49,104 +113,419 @@ class Error extends BaseError
      */
     public static function create(array $input)
     {
-        $id = isset($input[self::ID]) ? $input[self::ID] : null;
-        $links = isset($input[self::LINKS]) ? $input[self::LINKS] : [];
-        $aboutLink = isset($links[self::LINKS_ABOUT]) ? $links[self::LINKS_ABOUT] : null;
-        $status = isset($input[self::STATUS]) ? $input[self::STATUS] : null;
-        $code = isset($input[self::CODE]) ? $input[self::CODE] : null;
-        $title = isset($input[self::TITLE]) ? $input[self::TITLE] : null;
-        $detail = isset($input[self::DETAIL]) ? $input[self::DETAIL] : null;
-        $source = isset($input[self::SOURCE]) ? $input[self::SOURCE] : null;
-        $meta = isset($input[self::META]) ? $input[self::META] : null;
+        $error = new self();
+        $error->exchangeArray($input);
 
-        return new self(
-            $id,
-            $aboutLink,
-            $status,
-            $code,
-            $title,
-            $detail,
-            $source,
-            $meta
-        );
+        return $error;
     }
 
     /**
-     * Create an error object from an array, ensuring the pointer is as specified.
-     *
-     * @param array $input
-     * @param $pointer
-     * @return Error
+     * @param int|string|null $id
+     * @param array|null $links
+     * @param int|string|null $status
+     * @param int|string|null $code
+     * @param string|null $title
+     * @param string|null $detail
+     * @param array|null $source
+     * @param array|null $meta
      */
-    public static function createWithPointer(array $input, $pointer)
-    {
-        if (!isset($input[self::SOURCE]) || !is_array($input[self::SOURCE])) {
-            $input[self::SOURCE] = [];
-        }
-
-        $input[self::SOURCE][self::SOURCE_POINTER] = $pointer;
-
-        return self::create($input);
+    public function __construct(
+        $id = null,
+        array $links = null,
+        $status = null,
+        $code = null,
+        $title = null,
+        $detail = null,
+        array $source = null,
+        array $meta = null
+    ) {
+        $this->setId($id);
+        $this->setLinks($links);
+        $this->setStatus($status);
+        $this->setCode($code);
+        $this->setTitle($title);
+        $this->setDetail($detail);
+        $this->setSource($source);
+        $this->setMeta($meta);
     }
 
     /**
-     * Create an error object from an array, ensuring the parameter is as specified.
-     *
-     * @param array $input
-     * @param $parameter
-     * @return Error
+     * @param string|int|null $id
+     * @return $this
      */
-    public static function createWithParameter(array $input, $parameter)
+    public function setId($id)
     {
-        if (!isset($input[self::SOURCE]) || !is_array($input[self::SOURCE])) {
-            $input[self::SOURCE] = [];
+        if (!is_int($id) && !is_string($id) && !is_null($id)) {
+            throw new InvalidArgumentException('Expecting error id to be a string, integer or null.');
         }
 
-        $input[self::SOURCE][self::SOURCE_PARAMETER] = $parameter;
+        $this->id = $id;
 
-        return self::create($input);
+        return $this;
     }
 
     /**
-     * Get the most applicable HTTP status code.
-     *
-     * From the spec:
-     * When a server encounters multiple problems for a single request, the most generally applicable HTTP error
-     * code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate for multiple
-     * 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
-     *
-     * @param ErrorInterface|ErrorInterface[]|ErrorCollection
-     * @param string|int $default
-     *      the default to use if an error status cannot be resolved.
-     * @return string|int
+     * @inheritdoc
      */
-    public static function resolveHttpStatus($errors, $default = JsonApiException::DEFAULT_HTTP_CODE)
+    public function getId()
     {
-        if ($errors instanceof ErrorInterface) {
-            return $errors->getStatus() ?: $default;
+        return $this->id;
+    }
+
+    /**
+     * @param array|null $links
+     * @return $this
+     */
+    public function setLinks(array $links = null)
+    {
+        $this->links = [];
+
+        if ($links) {
+            $this->addLinks($links);
         }
 
-        $request = null;
-        $internal = null;
+        return $this;
+    }
 
-        /** @var ErrorInterface $error */
-        foreach ($errors as $error) {
+    /**
+     * @param array|null $links
+     * @return $this
+     */
+    public function addLinks(array $links = null)
+    {
+        foreach ((array) $links as $key => $link) {
 
-            $status = $error->getStatus();
-
-            if (400 <= $status && 499 >= $status) {
-                $request = is_null($request) ? $status : ($request == $status) ? $status : 400;
-            } elseif (500 <= $status && 599 >= $status) {
-                $internal = is_null($internal) ? $status : ($internal == $status) ? $status : 500;
+            if (!$link instanceof LinkInterface) {
+                throw new InvalidArgumentException('Expecting links to contain link objects.');
             }
+
+            $this->addLink($key, $link);
         }
 
-        if (!$request && !$internal) {
-            return $default;
-        } elseif ($request && $internal) {
-            return 500;
-        }
-
-        return $request ?: $internal;
+        return $this;
     }
+
+    /**
+     * @param $key
+     * @param LinkInterface $link
+     * @return $this
+     */
+    public function addLink($key, LinkInterface $link)
+    {
+        $this->links[$key] = $link;
+
+        return $this;
+    }
+
+    /**
+     * @param LinkInterface $link
+     * @return $this
+     */
+    public function setAboutLink(LinkInterface $link)
+    {
+        $this->addLink(self::LINKS_ABOUT, $link);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLinks()
+    {
+        return !empty($this->links) ? $this->links : null;
+    }
+
+    /**
+     * @param string|int|null $status
+     * @return $this
+     */
+    public function setStatus($status)
+    {
+        if (!is_int($status) && !is_string($status) && !is_null($status)) {
+            throw new InvalidArgumentException('Expecting error status to be a string, integer or null.');
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStatus()
+    {
+        return !is_null($this->status) ? (string) $this->status : null;
+    }
+
+    /**
+     * @param string|null $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        if (!is_string($code) && !is_null($code)) {
+            throw new InvalidArgumentException('Expecting error code to be a string or null.');
+        }
+
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCode()
+    {
+        return !empty($this->code) ? $this->code : null;
+    }
+
+    /**
+     * @param string|null $title
+     * @return $this
+     */
+    public function setTitle($title)
+    {
+        if (!is_string($title) && !is_null($title)) {
+            throw new InvalidArgumentException('Expecting error title to be a string or null.');
+        }
+
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return !empty($this->title) ? $this->title : null;
+    }
+
+    /**
+     * @param string|null $detail
+     * @return $this
+     */
+    public function setDetail($detail)
+    {
+        if (!is_string($detail) && !is_null($detail)) {
+            throw new InvalidArgumentException('Expecting error detail to be a string or null.');
+        }
+
+        $this->detail = $detail;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDetail()
+    {
+        return !empty($this->detail) ? $this->detail : null;
+    }
+
+    /**
+     * @param array|null $source
+     * @return $this
+     */
+    public function setSource(array $source = null)
+    {
+        $this->source = (array) $source;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSource()
+    {
+        return !empty($this->source) ? $this->source : null;
+    }
+
+    /**
+     * @param string|null $pointer
+     * @return $this
+     */
+    public function setSourcePointer($pointer)
+    {
+        if (!is_string($pointer) && !is_null($pointer)) {
+            throw new InvalidArgumentException('Expecting error source pointer to be a string or null');
+        }
+
+        if (empty($pointer)) {
+            unset($this->source[self::SOURCE_POINTER]);
+        } else {
+            $this->source[self::SOURCE_POINTER] = $pointer;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $parameter
+     * @return $this
+     */
+    public function setSourceParameter($parameter)
+    {
+        if (!is_string($parameter) && !is_null($parameter)) {
+            throw new InvalidArgumentException('Expecting source parameter to be a string or null');
+        }
+
+        if (empty($parameter)) {
+            unset($this->source[self::SOURCE_PARAMETER]);
+        } else {
+            $this->source[self::SOURCE_PARAMETER] = $parameter;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array|null $meta
+     * @return $this
+     */
+    public function setMeta(array $meta = null)
+    {
+        $this->meta = (array) $meta;
+
+        return $this;
+    }
+
+    /**
+     * @param array $meta
+     * @return $this
+     */
+    public function addMeta(array $meta)
+    {
+        $this->meta = array_replace_recursive($this->meta, $meta);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMeta()
+    {
+        return !empty($this->meta) ? $this->meta : null;
+    }
+
+    /**
+     * @param ErrorInterface $error
+     * @return $this
+     */
+    public function merge(ErrorInterface $error)
+    {
+        // Id
+        if ($error->getId()) {
+            $this->setId($error->getId());
+        }
+
+        // Links
+        if ($error->getLinks()) {
+            $this->addLinks($error->getLinks());
+        }
+
+        // Status
+        if ($error->getStatus()) {
+            $this->setStatus($error->getStatus());
+        }
+
+        // Code
+        if ($error->getCode()) {
+            $this->setCode($error->getCode());
+        }
+
+        // Title
+        if ($error->getTitle()) {
+            $this->setTitle($error->getTitle());
+        }
+
+        // Detail
+        if ($error->getDetail()) {
+            $this->setDetail($error->getDetail());
+        }
+
+        // Source
+        if ($error->getSource()) {
+            $this->setSource($error->getSource());
+        }
+
+        // Meta
+        if ($error->getMeta()) {
+            $this->addMeta($error->getMeta());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $input
+     * @return $this
+     */
+    public function exchangeArray(array $input)
+    {
+        // Id
+        if (array_key_exists(self::ID, $input)) {
+            $this->setId($input[self::ID]);
+        }
+
+        // Links
+        if (array_key_exists(self::LINKS, $input)) {
+            $this->addLinks($input[self::LINKS]);
+        }
+
+        // About Link
+        if (array_key_exists(self::LINKS_ABOUT, $input) && $input[self::LINKS_ABOUT] instanceof LinkInterface) {
+            $this->setAboutLink($input[self::LINKS_ABOUT]);
+        }
+
+        // Status
+        if (array_key_exists(self::STATUS, $input)) {
+            $this->setStatus($input[self::STATUS]);
+        }
+
+        // Code
+        if (array_key_exists(self::CODE, $input)) {
+            $this->setCode($input[self::CODE]);
+        }
+
+        // Title
+        if (array_key_exists(self::TITLE, $input)) {
+            $this->setTitle($input[self::TITLE]);
+        }
+
+        // Detail
+        if (array_key_exists(self::DETAIL, $input)) {
+            $this->setDetail($input[self::DETAIL]);
+        }
+
+        // Source
+        if (array_key_exists(self::SOURCE, $input)) {
+            $this->setSource($input[self::SOURCE]);
+        }
+
+        // Source Pointer
+        if (array_key_exists(self::SOURCE_POINTER, $input)) {
+            $this->setSourcePointer($input[self::SOURCE_POINTER]);
+        }
+
+        // Source Parameter
+        if (array_key_exists(self::SOURCE_PARAMETER, $input)) {
+            $this->setSourceParameter($input[self::SOURCE_PARAMETER]);
+        }
+
+        // Meta
+        if (array_key_exists(self::META, $input)) {
+            $this->addMeta($input[self::META]);
+        }
+
+        return $this;
+    }
+
 }

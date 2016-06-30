@@ -19,8 +19,10 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase as BaseTestCase;
+use CloudCreativity\JsonApi\Utils\Replacer;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use PHPUnit_Framework_MockObject_MockObject;
@@ -61,7 +63,8 @@ class TestCase extends BaseTestCase
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $config = require __DIR__ . '/../../config/validation.php';
 
-        $this->errorRepository = new ErrorRepository($config);
+        $this->errorRepository = new ErrorRepository(new Replacer());
+        $this->errorRepository->configure($config);
         $this->errorFactory = new ValidatorErrorFactory($this->errorRepository);
         $this->factory = new ValidatorFactory($this->errorFactory, $store);
         $this->store = $store;
@@ -76,7 +79,11 @@ class TestCase extends BaseTestCase
     protected function assertErrorAt(ErrorCollection $errors, $pointer, $errorKey, $status = null)
     {
         $error = $this->findErrorAt($errors, $pointer);
-        $expected = $this->errorRepository->error($errorKey, $status);
+        $expected = Error::cast($this->errorRepository->error($errorKey));
+
+        if ($status) {
+            $expected->setStatus($status);
+        }
 
         $this->assertEquals($expected->getTitle(), $error->getTitle(), 'Unexpected error title.');
         $this->assertEquals($expected->getStatus(), $error->getStatus(), 'Unexpected error status.');

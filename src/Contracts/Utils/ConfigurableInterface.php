@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2015 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,18 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Stdlib;
-
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+namespace CloudCreativity\JsonApi\Contracts\Utils;
 
 /**
- * Interface ErrorsAwareInterface
+ * Interface ConfigurableInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorsAwareInterface
+interface ConfigurableInterface
 {
 
     /**
-     * @param ErrorCollection|ErrorInterface[] $errors
+     * @param array $config
      * @return $this
      */
-    public function addErrors($errors);
-
-    /**
-     * @return ErrorCollection
-     */
-    public function errors();
+    public function configure(array $config);
 }

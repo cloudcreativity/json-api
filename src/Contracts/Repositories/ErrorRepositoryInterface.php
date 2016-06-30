@@ -18,46 +18,39 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
+use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Interface ErrorRepositoryInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorRepositoryInterface
+interface ErrorRepositoryInterface extends ConfigurableInterface
 {
 
     /**
      * @param string $key
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
      *      values to substitute into error detail.
-     * @param array $merge
-     *      error keys to merge in before creating the error object.
      * @return ErrorInterface
      */
-    public function error($key, $status = null, array $values = [], array $merge = []);
+    public function error($key, array $values = []);
 
     /**
      * @param $key
      * @param $pointer
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
-     * @param array $merge
+     *      values to substitute into error detail.
      * @return ErrorInterface
      */
-    public function errorWithPointer($key, $pointer, $status = null, array $values = [], array $merge = []);
+    public function errorWithPointer($key, $pointer, array $values = []);
 
     /**
      * @param $key
      * @param $parameter
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
-     * @param array $merge
+     *      values to substitute into error detail.
      * @return ErrorInterface
      */
-    public function errorWithParameter($key, $parameter, $status = null, array $values = [], array $merge = []);
+    public function errorWithParameter($key, $parameter, array $values = []);
 }

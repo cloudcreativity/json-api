@@ -18,10 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use CloudCreativity\JsonApi\Document\Error;
 use Exception;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Neomerx\JsonApi\Exceptions\ErrorCollection as BaseCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -33,14 +32,14 @@ class ValidationException extends JsonApiException
 
     /**
      * ValidationException constructor.
-     * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection|BaseCollection $errors
      * @param string|int|null $defaultHttpCode
      * @param Exception|null $previous
      */
     public function __construct($errors, $defaultHttpCode = self::DEFAULT_HTTP_CODE, Exception $previous = null)
     {
-        $httpCode = Error::resolveHttpStatus($errors, $defaultHttpCode);
+        $errors = ErrorCollection::cast($errors);
 
-        parent::__construct($errors, $httpCode, $previous);
+        parent::__construct($errors, $errors->getHttpStatus($defaultHttpCode), $previous);
     }
 }

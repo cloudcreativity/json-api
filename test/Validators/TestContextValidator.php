@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
-use CloudCreativity\JsonApi\Helpers\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 
 /**
  * Class TestContextValidator

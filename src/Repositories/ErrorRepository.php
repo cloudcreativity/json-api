@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Document\Error;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Class ErrorRepository
@@ -30,82 +30,79 @@ class ErrorRepository implements ErrorRepositoryInterface
 {
 
     /**
-     * @var array
+     * @var ReplacerInterface|null
      */
-    private $errors;
+    private $replacer;
 
     /**
-     * ValidationMessageRepository constructor.
-     * @param array $errors
+     * @var array
      */
-    public function __construct(array $errors)
+    private $errors = [];
+
+    /**
+     * ErrorRepository constructor.
+     * @param ReplacerInterface|null $replacer
+     */
+    public function __construct(ReplacerInterface $replacer = null)
     {
-        $this->errors = $errors;
+        $this->replacer = $replacer;
     }
 
     /**
-     * @param string $key
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
-     * @param array $values
-     * @param array $merge
-     * @return ErrorInterface
+     * Add error configuration.
+     *
+     * @param array $config
+     * @return $this
      */
-    public function error($key, $status = null, array $values = [], array $merge = [])
+    public function configure(array $config)
     {
-        $errorArray = $this->template($key, $status, $values, $merge);
+        $this->errors = array_merge($this->errors, $config);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function error($key, array $values = [])
+    {
+        $errorArray = $this->template($key, $values);
 
         return Error::create($errorArray);
     }
 
     /**
-     * @param $key
-     * @param $pointer
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
-     * @param array $values
-     * @param array $merge
-     * @return ErrorInterface
+     * @inheritdoc
      */
-    public function errorWithPointer($key, $pointer, $status = null, array $values = [], array $merge = [])
+    public function errorWithPointer($key, $pointer, array $values = [])
     {
-        $errorArray = $this->template($key, $status, $values, $merge);
+        $errorArray = $this->template($key, $values);
+        $error = Error::create($errorArray);
+        $error->setSourcePointer($pointer);
 
-        return Error::createWithPointer($errorArray, $pointer);
+        return $error;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function errorWithParameter($key, $parameter, array $values = [])
+    {
+        $errorArray = $this->template($key, $values);
+        $error = Error::create($errorArray);
+        $error->setSourceParameter($parameter);
+
+        return $error;
     }
 
     /**
      * @param $key
-     * @param $parameter
-     * @param int|null $status
-     *      the status specified by the JSON API spec, or null if none specified.
      * @param array $values
-     * @param array $merge
-     * @return Error
-     */
-    public function errorWithParameter($key, $parameter, $status = null, array $values = [], array $merge = [])
-    {
-        $errorArray = $this->template($key, $status, $values, $merge);
-
-        return Error::createWithParameter($errorArray, $parameter);
-    }
-
-    /**
-     * @param $key
-     * @param null $status
-     * @param array $values
-     * @param array $merge
      * @return array
      */
-    protected function template($key, $status = null, array $values = [], array $merge = [])
+    protected function template($key, array $values = [])
     {
-        $errorArray = array_merge($this->get($key), $merge);
-
-        if (is_int($status)) {
-            $errorArray[Error::STATUS] = $status;
-        }
-
-        return $this->replacer($errorArray, $values);
+        return $this->replace($this->get($key), $values);
     }
 
     /**
@@ -122,54 +119,13 @@ class ErrorRepository implements ErrorRepositoryInterface
      * @param array $values
      * @return array
      */
-    protected function replacer(array $error, array $values)
+    protected function replace(array $error, array $values)
     {
-        if (!isset($error[Error::DETAIL])) {
-            return $error;
-        }
-
-        foreach ($values as $key => $value) {
-            $error[Error::DETAIL] = str_replace(
-                $this->parseKey($key),
-                $this->parseValue($value),
-                $error[Error::DETAIL]
-            );
+        if (isset($error[Error::DETAIL]) && $this->replacer) {
+            $error[Error::DETAIL] = $this->replacer->replace($error[Error::DETAIL], $values);
         }
 
         return $error;
     }
 
-    /**
-     * @param $key
-     * @return string
-     */
-    protected function parseKey($key)
-    {
-        return ':' . $key;
-    }
-
-    /**
-     * @param $value
-     * @return string
-     */
-    protected function parseValue($value)
-    {
-        if(is_object($value)) {
-            return '<object>';
-        } elseif (is_null($value)) {
-            return 'null';
-        } elseif (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        } elseif (is_scalar($value)) {
-            return (string) $value;
-        }
-
-        $ret = [];
-
-        foreach ((array) $value as $v) {
-            $ret[] = $this->parseValue($v);
-        }
-
-        return implode(', ', $ret);
-    }
 }

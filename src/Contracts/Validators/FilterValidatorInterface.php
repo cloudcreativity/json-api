@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Stdlib\ErrorsAwareInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 
 /**
  * Interface FilterValidatorInterface

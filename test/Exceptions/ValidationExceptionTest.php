@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\TestCase;
-use Neomerx\JsonApi\Document\Error;
 
 /**
  * Class ValidationExceptionTest

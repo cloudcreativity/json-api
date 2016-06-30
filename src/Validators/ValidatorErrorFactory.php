@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
@@ -72,7 +73,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function memberRequired($memberKey, $pointer)
     {
-        return $this->repository->errorWithPointer(self::MEMBER_REQUIRED, $pointer, null, [
+        return $this->repository->errorWithPointer(self::MEMBER_REQUIRED, $pointer, [
             'member' => $memberKey,
         ]);
     }
@@ -88,7 +89,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function memberObjectExpected($memberKey, $pointer)
     {
-        return $this->repository->errorWithPointer(self::MEMBER_OBJECT_EXPECTED, $pointer, null, [
+        return $this->repository->errorWithPointer(self::MEMBER_OBJECT_EXPECTED, $pointer, [
             'member' => $memberKey,
         ]);
     }
@@ -102,7 +103,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function memberRelationshipExpected($memberKey, $pointer)
     {
-        return $this->repository->errorWithPointer(self::MEMBER_RELATIONSHIP_EXPECTED, $pointer, null, [
+        return $this->repository->errorWithPointer(self::MEMBER_RELATIONSHIP_EXPECTED, $pointer, [
             'member' => $memberKey,
         ]);
     }
@@ -126,12 +127,14 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function resourceUnsupportedType($expected, $actual)
     {
-        return $this->repository->errorWithPointer(
+        $error = $this->repository->errorWithPointer(
             self::RESOURCE_UNSUPPORTED_TYPE,
             $this->getPathToType(),
-            self::STATUS_UNSUPPORTED_TYPE,
             ['expected' => $expected, 'actual' => $actual]
         );
+
+        return Error::cast($error)
+            ->setStatus(self::STATUS_UNSUPPORTED_TYPE);
     }
 
     /**
@@ -147,12 +150,14 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function resourceUnsupportedId($expected, $actual)
     {
-        return $this->repository->errorWithPointer(
+        $error = $this->repository->errorWithPointer(
             self::RESOURCE_UNSUPPORTED_ID,
             $this->getPathToId(),
-            self::STATUS_UNSUPPORTED_ID,
             ['expected' => $expected, 'actual' => $actual]
         );
+
+        return Error::cast($error)
+            ->setStatus(self::STATUS_UNSUPPORTED_ID);
     }
 
     /**
@@ -197,7 +202,6 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_UNSUPPORTED_TYPE,
             $relationshipKey ? $this->getPathToRelationshipType($relationshipKey) : $this->getPathToType(),
-            null,
             ['expected' => $expected, 'actual' => $actual]
         );
     }
@@ -261,12 +265,13 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
      */
     public function relationshipDoesNotExist(ResourceIdentifierInterface $identifier, $relationshipKey = null)
     {
-        return $this->repository->errorWithPointer(
+        $error = $this->repository->errorWithPointer(
             self::RELATIONSHIP_DOES_NOT_EXIST,
             $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData(),
-            self::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST,
             ['type' => $identifier->type(), 'id' => $identifier->id()]
         );
+
+        return Error::cast($error)->setStatus(self::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST);
     }
 
     /**
@@ -283,7 +288,6 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_NOT_ACCEPTABLE,
             $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData(),
-            null,
             ['type' => $identifier->type(), 'id' => $identifier->id()]
         );
     }

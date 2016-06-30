@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Helpers;
+namespace CloudCreativity\JsonApi\Utils;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;

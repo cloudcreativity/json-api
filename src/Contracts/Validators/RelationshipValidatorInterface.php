@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Contracts\Stdlib\ErrorsAwareInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 
 /**
  * Interface RelationshipValidatorInterface
