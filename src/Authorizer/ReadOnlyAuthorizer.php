@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -29,73 +30,54 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
 {
 
     /**
-     * Can the client read many resources at once?
-     *
-     * Encoding parameters are provided in case the parameters such as
-     * filtering or inclusion paths affect whether the resources can be read.
-     *
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canReadMany(EncodingParametersInterface $parameters)
+    public function canReadMany(EncodingParametersInterface $parameters, ErrorCollection $errors)
     {
         return true;
     }
 
     /**
-     * Can the client create the provided resource?
-     *
-     * @param ResourceInterface $resource
-     *      the resource provided by the client.
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters)
-    {
+    public function canCreate(
+        ResourceInterface $resource,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
         return false;
     }
 
     /**
-     * Can the client read the specified record?
-     *
-     * @param object $record
-     *      the record that the client is trying to read.
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canRead($record, EncodingParametersInterface $parameters)
-    {
+    public function canRead(
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
         return true;
     }
 
     /**
-     * Can the client update the specified record?
-     *
-     * @param object $record
-     *      the record that the client is trying to update.
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canUpdate($record, EncodingParametersInterface $parameters)
-    {
+    public function canUpdate(
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
         return false;
     }
 
     /**
-     * Can the client delete the specified record?
-     *
-     * @param object $record
-     *      the record that the client is trying to delete.
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canDelete($record, EncodingParametersInterface $parameters)
-    {
+    public function canDelete(
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
         return false;
     }
 

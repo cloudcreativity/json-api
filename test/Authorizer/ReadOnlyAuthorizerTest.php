@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Authorizer;
 
+use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
 use CloudCreativity\JsonApi\Object\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
@@ -36,14 +37,15 @@ final class ReadOnlyAuthorizerTest extends TestCase
         $parameters = $this->getMockBuilder(EncodingParametersInterface::class)->getMock();
         $authorizer = new ReadOnlyAuthorizer();
         $record = new StandardObject();
+        $errors = new ErrorCollection();
 
-        $this->assertTrue($authorizer->canReadMany($parameters));
-        $this->assertTrue($authorizer->canRead($record, $parameters));
-        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters));
+        $this->assertTrue($authorizer->canReadMany($parameters, $errors));
+        $this->assertTrue($authorizer->canRead($record, $parameters, $errors));
+        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters, $errors));
 
-        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters));
-        $this->assertFalse($authorizer->canUpdate($record, $parameters));
-        $this->assertFalse($authorizer->canDelete($record, $parameters));
-        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, $parameters));
+        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters, $errors));
+        $this->assertFalse($authorizer->canUpdate($record, $parameters, $errors));
+        $this->assertFalse($authorizer->canDelete($record, $parameters, $errors));
+        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, $parameters, $errors));
     }
 }

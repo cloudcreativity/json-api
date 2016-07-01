@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
+use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -31,59 +31,39 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
 {
 
     /**
-     * Can the client read the related resource?
-     *
-     * @param $relationshipKey
-     * @param $record
-     * @param EncodingParametersInterface $parameters
-     * @return bool
+     * @inheritdoc
      */
-    public function canReadRelatedResource($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canRead($record, $parameters);
+    public function canReadRelatedResource(
+        $relationshipKey,
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
+        return $this->canRead($record, $parameters, $errors);
     }
 
     /**
-     * Can the client read the specified resource relationship?
-     *
-     * @param string $relationshipKey
-     *      the relationship that the client is trying to read.
-     * @param object $record
-     *      the record to which the relationship relates.
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
+     * @inheritdoc
      */
-    public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canReadRelatedResource($relationshipKey, $record, $parameters);
+    public function canReadRelationship(
+        $relationshipKey,
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
+        return $this->canReadRelatedResource($relationshipKey, $record, $parameters, $errors);
     }
 
     /**
-     * Can the client modified the specified resource relationship?
-     *
-     * @param string $relationshipKey
-     * @param object $record
-     * @param EncodingParametersInterface $parameters
-     *      the parameters provided by the client
-     * @return bool
-     * @see http://jsonapi.org/format/#crud-updating-relationships
+     * @inheritdoc
      */
-    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canUpdate($record, $parameters);
-    }
-
-    /**
-     * Get the JSON API error that should be used if a request is denied.
-     *
-     * Child classes can override this to provide a more customised error message if needed.
-     *
-     * @return Error
-     */
-    public function denied()
-    {
-        return new Error(null, null, JsonApiException::HTTP_CODE_FORBIDDEN);
+    public function canModifyRelationship(
+        $relationshipKey,
+        $record,
+        EncodingParametersInterface $parameters,
+        ErrorCollection $errors
+    ) {
+        return $this->canUpdate($record, $parameters, $errors);
     }
 
 }
