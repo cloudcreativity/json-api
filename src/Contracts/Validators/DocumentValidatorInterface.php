@@ -30,7 +30,9 @@ interface DocumentValidatorInterface extends ErrorsAwareInterface
 
     /**
      * @param DocumentInterface $document
+     * @param object|null $record
+     *      the domain object that the document represents.
      * @return bool
      */
-    public function isValid(DocumentInterface $document);
+    public function isValid(DocumentInterface $document, $record = null);
 }

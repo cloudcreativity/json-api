@@ -63,13 +63,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A compulsory member has not been included in the document.
-     *
-     * @param string $memberKey
-     *      the name of the member that is missing.
-     * @param string $pointer
-     *      the pointer of where the member is expected in the document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function memberRequired($memberKey, $pointer)
     {
@@ -79,13 +73,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A member is expected to be an object.
-     *
-     * @param string $memberKey
-     *      the name of the member that is not an object.
-     * @param string $pointer
-     *      the pointer of where the member is in the document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function memberObjectExpected($memberKey, $pointer)
     {
@@ -95,11 +83,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A member is expected to be a relationship - object, array or null.
-     *
-     * @param $memberKey
-     * @param $pointer
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function memberRelationshipExpected($memberKey, $pointer)
     {
@@ -109,21 +93,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * The resource type is not supported.
-     *
-     * "A server MUST return 409 Conflict when processing a POST request in which the resource object's type is
-     * not among the type(s) that constitute the collection represented by the endpoint."
-     * http://jsonapi.org/format/#crud-creating
-     *
-     * "A server MUST return 409 Conflict when processing a PATCH request in which the resource object's type
-     * and id do not match the server's endpoint."
-     * http://jsonapi.org/format/#crud-updating
-     *
-     * @param string|string[] $expected
-     *      the allowed resource type or types.
-     * @param string $actual
-     *      the actual resource type received.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function resourceUnsupportedType($expected, $actual)
     {
@@ -138,15 +108,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * The resource id is not supported.
-     *
-     * "A server MUST return 409 Conflict when processing a PATCH request in which the resource object's type
-     * and id do not match the server's endpoint."
-     * http://jsonapi.org/format/#crud-updating
-     *
-     * @param string $expected
-     * @param string $actual
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function resourceUnsupportedId($expected, $actual)
     {
@@ -161,9 +123,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A generic error if attributes are invalid, but there are no other messages explaining why.
-     *
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function resourceInvalidAttributes()
     {
@@ -174,9 +134,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A generic error if relationships are invalid, but there are no other messages explaining why.
-     *
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function resourceInvalidRelationships()
     {
@@ -187,15 +145,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * The related resource is not of the correct type for the relationship.
-     *
-     * @param string|string[] $expected
-     *      the allowed resource type or types.
-     * @param $actual
-     *      the actual resource type received.
-     * @param string|null $relationshipKey
-     *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipUnsupportedType($expected, $actual, $relationshipKey = null)
     {
@@ -207,11 +157,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A has-many relationship was provided for a has-one relationship.
-     *
-     * @param string|null $relationshipKey
-     *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipHasOneExpected($relationshipKey = null)
     {
@@ -222,11 +168,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A has-one relationship was provided for a has-many relationship.
-     *
-     * @param string|null $relationshipKey
-     *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipHasManyExpected($relationshipKey = null)
     {
@@ -237,10 +179,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * An empty relationship was provided, but is not allowed.
-     *
-     * @param string|null $relationshipKey
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipEmptyNotAllowed($relationshipKey = null)
     {
@@ -251,17 +190,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A request references a resource that does not exist.
-     *
-     * "A server MUST return 404 Not Found when processing a request that references a related resource that does
-     * not exist."
-     * http://jsonapi.org/format/#crud-updating-relationships
-     *
-     * @param ResourceIdentifierInterface $identifier
-     *      the resource identifier that does not exist.
-     * @param string|null $relationshipKey
-     *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipDoesNotExist(ResourceIdentifierInterface $identifier, $relationshipKey = null)
     {
@@ -275,13 +204,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     }
 
     /**
-     * A resource is not logically acceptable for the relationship.
-     *
-     * @param ResourceIdentifierInterface $identifier
-     *      the related resource that is not acceptable.
-     * @param string|null $relationshipKey
-     *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @inheritdoc
      */
     public function relationshipNotAcceptable(ResourceIdentifierInterface $identifier, $relationshipKey = null)
     {

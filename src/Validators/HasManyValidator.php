@@ -31,17 +31,11 @@ class HasManyValidator extends AbstractRelationshipValidator
 {
 
     /**
-     * Is the provided relationship valid?
-     *
-     * @param RelationshipInterface $relationship
-     * @param string|null $key
-     *      if a full resource is being validated, the key of the relationship.
-     * @param ResourceInterface|null $resource
-     *      if a full resource is being validated, the resource for context.
-     * @return bool
+     * @inheritdoc
      */
     public function isValid(
         RelationshipInterface $relationship,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {
@@ -61,7 +55,7 @@ class HasManyValidator extends AbstractRelationshipValidator
             return false;
         }
 
-        if (!$this->validateIdentifiers($identifiers, $key, $resource)) {
+        if (!$this->validateIdentifiers($identifiers, $record, $key, $resource)) {
             return false;
         }
 
@@ -100,12 +94,14 @@ class HasManyValidator extends AbstractRelationshipValidator
 
     /**
      * @param ResourceIdentifierCollectionInterface $identifiers
+     * @param object|null $record
      * @param string|null $key
      * @param ResourceInterface $resource
      * @return bool
      */
     protected function validateIdentifiers(
         ResourceIdentifierCollectionInterface $identifiers,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {
@@ -120,7 +116,7 @@ class HasManyValidator extends AbstractRelationshipValidator
         /** @var ResourceIdentifierInterface $identifier */
         foreach ($identifiers as $identifier) {
 
-            if (!$this->validateAcceptable($identifier, $key, $resource)) {
+            if (!$this->validateAcceptable($identifier, $record, $key, $resource)) {
                 return false;
             }
         }

@@ -52,6 +52,7 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
      */
     public function accept(
         ResourceIdentifierInterface $identifier,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {

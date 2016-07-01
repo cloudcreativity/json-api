@@ -25,13 +25,23 @@ use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**
  * Class AbstractRelationshipValidator
  * @package CloudCreativity\JsonApi
  */
-abstract class AbstractRelationshipValidator extends AbstractValidator implements RelationshipValidatorInterface
+abstract class AbstractRelationshipValidator implements RelationshipValidatorInterface
 {
+
+    use ErrorsAwareTrait,
+        CreatesPointersTrait;
+
+    /**
+     * @var ValidatorErrorFactoryInterface
+     */
+    protected $errorFactory;
 
     /**
      * @var StoreInterface
@@ -68,7 +78,7 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
         $allowEmpty = false,
         AcceptRelatedResourceInterface $acceptable = null
     ) {
-        parent::__construct($errorFactory);
+        $this->errorFactory = $errorFactory;
         $this->store = $store;
         $this->expectedTypes = (array) $expectedType;
         $this->allowEmpty = $allowEmpty;
@@ -179,16 +189,18 @@ abstract class AbstractRelationshipValidator extends AbstractValidator implement
 
     /**
      * @param ResourceIdentifierInterface $identifier
+     * @param object|null
      * @param string|null $key
      * @param ResourceInterface|null $resource
      * @return bool
      */
     protected function validateAcceptable(
         ResourceIdentifierInterface $identifier,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {
-        if ($this->acceptable && !$this->acceptable->accept($identifier, $key, $resource)) {
+        if ($this->acceptable && !$this->acceptable->accept($identifier, $record, $key, $resource)) {
             $this->addError($this->errorFactory->relationshipNotAcceptable(
                 $identifier,
                 $key

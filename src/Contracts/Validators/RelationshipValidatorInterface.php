@@ -33,6 +33,8 @@ interface RelationshipValidatorInterface extends ErrorsAwareInterface
      * Is the provided relationship valid?
      *
      * @param RelationshipInterface $relationship
+     * @param object|null
+     *      the domain object that owns the relationships.
      * @param string|null $key
      *      if a full resource is being validated, the key of the relationship.
      * @param ResourceInterface|null $resource
@@ -41,6 +43,7 @@ interface RelationshipValidatorInterface extends ErrorsAwareInterface
      */
     public function isValid(
         RelationshipInterface $relationship,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     );

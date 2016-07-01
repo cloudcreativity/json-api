@@ -22,13 +22,23 @@ use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**
  * Class RelationshipDocumentValidator
  * @package CloudCreativity\JsonApi
  */
-class RelationshipDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
+class RelationshipDocumentValidator implements DocumentValidatorInterface
 {
+
+    use ErrorsAwareTrait,
+        CreatesPointersTrait;
+
+    /**
+     * @var ValidatorErrorFactoryInterface
+     */
+    private $errorFactory;
 
     /**
      * @var RelationshipValidatorInterface
@@ -44,20 +54,19 @@ class RelationshipDocumentValidator extends AbstractValidator implements Documen
         ValidatorErrorFactoryInterface $errorFactory,
         RelationshipValidatorInterface $validator
     ) {
-        parent::__construct($errorFactory);
+        $this->errorFactory = $errorFactory;
         $this->relationshipValidator = $validator;
     }
 
     /**
-     * @param DocumentInterface $document
-     * @return bool
+     * @inheritdoc
      */
-    public function isValid(DocumentInterface $document)
+    public function isValid(DocumentInterface $document, $record = null)
     {
         $this->reset();
 
-        if (!$this->relationshipValidator->isValid($document->relationship())) {
-            $this->addErrors($this->relationshipValidator->errors());
+        if (!$this->relationshipValidator->isValid($document->relationship(), $record)) {
+            $this->addErrors($this->relationshipValidator->getErrors());
             return false;
         }
 

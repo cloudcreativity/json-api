@@ -46,14 +46,13 @@ final class TestContextValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
-     * @return bool
+     * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource)
+    public function isValid(ResourceInterface $resource, $record = null)
     {
         $callback = $this->callback;
 
-        return (bool) $callback($resource, $this);
+        return (bool) $callback($resource, $record, $this);
     }
 
 }

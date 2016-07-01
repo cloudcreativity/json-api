@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Utils;
 
+use CloudCreativity\JsonApi\Exceptions\ErrorCollection as Errors;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -29,14 +30,14 @@ trait ErrorsAwareTrait
 {
 
     /**
-     * @var ErrorCollection|null
+     * @var Errors|null
      */
     private $errors;
 
     /**
-     * @return ErrorCollection
+     * @return Errors
      */
-    public function errors()
+    public function getErrors()
     {
         if (!$this->errors instanceof ErrorCollection) {
             $this->errors = new ErrorCollection();
@@ -49,9 +50,9 @@ trait ErrorsAwareTrait
      * @param ErrorInterface $error
      * @return $this
      */
-    public function addError(ErrorInterface $error)
+    protected function addError(ErrorInterface $error)
     {
-        $this->errors()->add($error);
+        $this->getErrors()->add($error);
 
         return $this;
     }
@@ -60,11 +61,11 @@ trait ErrorsAwareTrait
      * @param ErrorCollection|ErrorInterface[] $errors
      * @return $this
      */
-    public function addErrors($errors)
+    protected function addErrors($errors)
     {
         /** @var ErrorInterface $error */
         foreach ($errors as $error) {
-            $this->errors()->add($error);
+            $this->getErrors()->add($error);
         }
 
         return $this;

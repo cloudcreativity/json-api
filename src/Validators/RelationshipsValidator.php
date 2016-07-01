@@ -25,13 +25,23 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**
  * Class RelationshipsValidator
  * @package CloudCreativity\JsonApi
  */
-class RelationshipsValidator extends AbstractValidator implements RelationshipsValidatorInterface
+class RelationshipsValidator implements RelationshipsValidatorInterface
 {
+
+    use ErrorsAwareTrait,
+        CreatesPointersTrait;
+
+    /**
+     * @var ValidatorErrorFactoryInterface
+     */
+    private $errorFactory;
 
     /**
      * @var ValidatorFactoryInterface
@@ -55,14 +65,12 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      */
     public function __construct(ValidatorErrorFactoryInterface $errorFactory, ValidatorFactoryInterface $factory)
     {
-        parent::__construct($errorFactory);
+        $this->errorFactory = $errorFactory;
         $this->factory = $factory;
     }
 
     /**
-     * @param $key
-     * @param RelationshipValidatorInterface $validator
-     * @return $this
+     * @inheritdoc
      */
     public function add($key, RelationshipValidatorInterface $validator)
     {
@@ -72,8 +80,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
     }
 
     /**
-     * @param $key
-     * @return RelationshipValidatorInterface|null
+     * @inheritdoc
      */
     public function get($key)
     {
@@ -81,19 +88,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
     }
 
     /**
-     * Add a has-one relationship validator for the specified relationship key.
-     *
-     * @param string $key
-     *      the key of the relationship.
-     * @param string|string[]|null $expectedType
-     *      the expected type or types. If null, defaults to the key name.
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
-     * @param bool $allowEmpty
-     *      is an empty has-one relationship acceptable?
-     * @param AcceptRelatedResourceInterface|callable|null $acceptable
-     *      if a non-empty relationship that exists, is it acceptable?
-     * @return $this
+     * @inheritdoc
      */
     public function hasOne(
         $key,
@@ -118,19 +113,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
     }
 
     /**
-     * Add a has-many relationship validator for the specified relationship key.
-     *
-     * @param string $key
-     *      the key of the relationship.
-     * @param string|string[]|null $expectedType
-     *      the expected type or types. If null, defaults to the key name.
-     * @param bool $required
-     *      must the relationship exist as a member on the relationship object?
-     * @param bool $allowEmpty
-     *      is an empty has-many relationship acceptable?
-     * @param AcceptRelatedResourceInterface|callable|null $acceptable
-     *      if an identifier exists, is it acceptable within this relationship?
-     * @return $this
+     * @inheritdoc
      */
     public function hasMany(
         $key,
@@ -155,12 +138,9 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
     }
 
     /**
-     * Are the relationships on the supplied resource valid?
-     *
-     * @param ResourceInterface $resource
-     * @return bool
+     * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource)
+    public function isValid(ResourceInterface $resource, $record = null)
     {
         $relationships = $resource->relationships();
         $valid = true;
@@ -170,7 +150,7 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         }
 
         foreach ($relationships->keys() as $key) {
-            if (!$this->validateRelationship($key, $relationships, $resource)) {
+            if (!$this->validateRelationship($key, $relationships, $resource, $record)) {
                 $valid = false;
             }
         }
@@ -204,12 +184,14 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
      * @param $key
      * @param RelationshipsInterface $relationships
      * @param ResourceInterface $resource
+     * @param object|null $record
      * @return bool
      */
     protected function validateRelationship(
         $key,
         RelationshipsInterface $relationships,
-        ResourceInterface $resource
+        ResourceInterface $resource,
+        $record = null
     ) {
         if (!is_object($relationships->get($key))) {
             $this->addError($this->errorFactory->memberObjectExpected(
@@ -222,8 +204,8 @@ class RelationshipsValidator extends AbstractValidator implements RelationshipsV
         $validator = $this->get($key);
         $relationship = $relationships->rel($key);
 
-        if ($validator && !$validator->isValid($relationship, $key, $resource)) {
-            $this->addErrors($validator->errors());
+        if ($validator && !$validator->isValid($relationship, $record, $key, $resource)) {
+            $this->addErrors($validator->getErrors());
             return false;
         }
 

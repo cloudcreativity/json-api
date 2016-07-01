@@ -59,11 +59,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a validator for a document containing a resource in its data member.
-     *
-     * @param ResourceValidatorInterface $resource
-     *      the validator to use for the data member.
-     * @return DocumentValidatorInterface
+     * @inheritdoc
      */
     public function resourceDocument(ResourceValidatorInterface $resource)
     {
@@ -71,11 +67,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a validator for a document containing a relationship in its data member.
-     *
-     * @param RelationshipValidatorInterface $relationship
-     *      the validator to use for the data member.
-     * @return DocumentValidatorInterface
+     * @inheritdoc
      */
     public function relationshipDocument(RelationshipValidatorInterface $relationship)
     {
@@ -83,19 +75,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a validator for a resource object.
-     *
-     * @param $expectedType
-     *      the expected resource type.
-     * @param string|int|null $expectedId
-     *      the expected resource id, or null if none expected (create request).
-     * @param AttributesValidatorInterface|null $attributes
-     *      the validator to use for the attributes member.
-     * @param RelationshipsValidatorInterface|null $relationships
-     *      the validator to use for the relationships member.
-     * @param ResourceValidatorInterface|null $context
-     *      validates the whole resource once all of its constituent parts have been validated.
-     * @return ResourceValidatorInterface
+     * @inheritdoc
      */
     public function resource(
         $expectedType,
@@ -115,9 +95,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a validator for a relationships object.
-     *
-     * @return RelationshipsValidatorInterface
+     * @inheritdoc
      */
     public function relationships()
     {
@@ -125,15 +103,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a relationship validator for a has-one relationship.
-     *
-     * @param string|string[] $expectedType
-     *      the expected type or types
-     * @param bool $allowEmpty
-     *      is an empty has-one relationship acceptable?
-     * @param AcceptRelatedResourceInterface|callable|null $acceptable
-     *      if a non-empty relationship that exists, is it acceptable?
-     * @return RelationshipValidatorInterface
+     * @inheritdoc
      */
     public function hasOne(
         $expectedType,
@@ -150,15 +120,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
-     * Create a relationship validator for a has-many relationship.
-     *
-     * @param $expectedType
-     *      the expected type or types.
-     * @param bool $allowEmpty
-     *      is an empty has-many relationship acceptable?
-     * @param AcceptRelatedResourceInterface|callable|null $acceptable
-     *      if an identifier exists, is it acceptable within this relationship?
-     * @return RelationshipValidatorInterface
+     * @inheritdoc
      */
     public function hasMany(
         $expectedType,

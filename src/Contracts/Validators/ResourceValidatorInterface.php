@@ -30,7 +30,9 @@ interface ResourceValidatorInterface extends ErrorsAwareInterface
 
     /**
      * @param ResourceInterface $resource
+     * @param object|null $record
+     *      the domain object that the resource represents.
      * @return bool
      */
-    public function isValid(ResourceInterface $resource);
+    public function isValid(ResourceInterface $resource, $record = null);
 }

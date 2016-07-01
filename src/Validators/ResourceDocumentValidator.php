@@ -22,14 +22,24 @@ use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 
 /**
  * Class ResourceDocumentValidator
  * @package CloudCreativity\JsonApi
  */
-class ResourceDocumentValidator extends AbstractValidator implements DocumentValidatorInterface
+class ResourceDocumentValidator implements DocumentValidatorInterface
 {
+
+    use ErrorsAwareTrait,
+        CreatesPointersTrait;
+
+    /**
+     * @var ValidatorErrorFactoryInterface
+     */
+    private $errorFactory;
 
     /**
      * @var ResourceValidatorInterface
@@ -45,15 +55,14 @@ class ResourceDocumentValidator extends AbstractValidator implements DocumentVal
         ValidatorErrorFactoryInterface $errorFactory,
         ResourceValidatorInterface $validator
     ) {
-        parent::__construct($errorFactory);
+        $this->errorFactory = $errorFactory;
         $this->resourceValidator = $validator;
     }
 
     /**
-     * @param DocumentInterface $document
-     * @return bool
+     * @inheritdoc
      */
-    public function isValid(DocumentInterface $document)
+    public function isValid(DocumentInterface $document, $record = null)
     {
         $this->reset();
 
@@ -72,8 +81,8 @@ class ResourceDocumentValidator extends AbstractValidator implements DocumentVal
             return false;
         }
 
-        if (!$this->resourceValidator->isValid($document->resource())) {
-            $this->addErrors($this->resourceValidator->errors());
+        if (!$this->resourceValidator->isValid($document->resource(), $record)) {
+            $this->addErrors($this->resourceValidator->getErrors());
             return false;
         }
 

@@ -91,7 +91,9 @@ interface RelationshipsValidatorInterface extends ErrorsAwareInterface
      * Are the relationships on the supplied resource valid?
      *
      * @param ResourceInterface $resource
+     * @param object|null $record
+     *      the domain object that owns the relationships.
      * @return bool
      */
-    public function isValid(ResourceInterface $resource);
+    public function isValid(ResourceInterface $resource, $record = null);
 }

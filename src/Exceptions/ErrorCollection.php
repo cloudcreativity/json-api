@@ -79,6 +79,20 @@ class ErrorCollection extends BaseCollection
     }
 
     /**
+     * @param BaseCollection $errors
+     * @return $this
+     */
+    public function merge(BaseCollection $errors)
+    {
+        /** @var ErrorInterface $error */
+        foreach ($errors as $error) {
+            $this->add($error);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Generator
      */
     public function getIterator()

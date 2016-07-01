@@ -30,17 +30,11 @@ class HasOneValidator extends AbstractRelationshipValidator
 {
 
     /**
-     * Is the provided relationship valid?
-     *
-     * @param RelationshipInterface $relationship
-     * @param string|null $key
-     *      if a full resource is being validated, the key of the relationship.
-     * @param ResourceInterface|null $resource
-     *      if a full resource is being validated, the resource for context.
-     * @return bool
+     * @inheritdoc
      */
     public function isValid(
         RelationshipInterface $relationship,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {
@@ -72,7 +66,7 @@ class HasOneValidator extends AbstractRelationshipValidator
         }
 
         /** If an identifier has been provided, is it acceptable for the relationship? */
-        if ($identifier && !$this->validateAcceptable($identifier, $key, $resource)) {
+        if ($identifier && !$this->validateAcceptable($identifier, $record, $key, $resource)) {
             return false;
         }
 

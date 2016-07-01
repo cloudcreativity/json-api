@@ -33,6 +33,8 @@ interface AcceptRelatedResourceInterface
      *
      * @param ResourceIdentifierInterface $identifier
      *      the identifier being validated.
+     * @param object|null $record
+     *      the domain object that owns the relationship.
      * @param string|null $key
      *      if validating a resource's relationships, the key that is being validated.
      * @param ResourceInterface|null $resource
@@ -41,6 +43,7 @@ interface AcceptRelatedResourceInterface
      */
     public function accept(
         ResourceIdentifierInterface $identifier,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     );

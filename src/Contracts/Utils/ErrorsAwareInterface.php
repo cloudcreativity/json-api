@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Utils;
 
+use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Interface ErrorsAwareInterface
@@ -29,13 +29,7 @@ interface ErrorsAwareInterface
 {
 
     /**
-     * @param ErrorCollection|ErrorInterface[] $errors
-     * @return $this
-     */
-    public function addErrors($errors);
-
-    /**
      * @return ErrorCollection
      */
-    public function errors();
+    public function getErrors();
 }

@@ -98,8 +98,8 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_TYPE);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
     public function testDataTypeNotSupported()
@@ -119,9 +119,9 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/type', Keys::RELATIONSHIP_UNSUPPORTED_TYPE);
-        $this->assertDetailContains($validator->errors(), '/data/type', 'users');
-        $this->assertDetailContains($validator->errors(), '/data/type', 'posts');
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::RELATIONSHIP_UNSUPPORTED_TYPE);
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'users');
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'posts');
     }
 
     public function testDataIdRequired()
@@ -140,8 +140,8 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_ID);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
     }
 
     public function testDataEmptyNotAllowed()
@@ -151,8 +151,8 @@ JSON_API;
         $validator = $this->hasMany(false);
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
-        $this->assertDetailContains($validator->errors(), '/data', 'empty');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'empty');
     }
 
     public function testDataDoesNotExist()
@@ -172,8 +172,8 @@ JSON_API;
         $validator = $this->hasMany(false, false);
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_DOES_NOT_EXIST);
-        $this->assertDetailContains($validator->errors(), '/data', 'exist');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_DOES_NOT_EXIST);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'exist');
     }
 
     public function testDataAcceptable()
@@ -210,8 +210,8 @@ JSON_API;
         $validator = $this->hasMany(false, true, function () { return false; });
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
-        $this->assertDetailContains($validator->errors(), '/data', 'acceptable');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
     }
 
     public function testDataBelongsTo()
@@ -229,8 +229,8 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
-        $this->assertDetailContains($validator->errors(), '/data', 'has-many');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'has-many');
     }
 
     public function testDataEmptyBelongsTo()
@@ -240,8 +240,8 @@ JSON_API;
         $validator = $this->hasMany();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
-        $this->assertDetailContains($validator->errors(), '/data', 'has-many');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_HAS_MANY_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'has-many');
     }
 
     /**

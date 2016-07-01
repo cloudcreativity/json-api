@@ -18,11 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Validators\Helpers;
 
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class CreatesPointersTrait
  * @package CloudCreativity\JsonApi
+ * @deprecated use the Pointer class directly.
  */
 trait CreatesPointersTrait
 {
@@ -32,7 +33,7 @@ trait CreatesPointersTrait
      */
     protected function getPathToData()
     {
-        return '/' . DocumentInterface::KEYWORD_DATA;
+        return P::data();
     }
 
     /**
@@ -40,7 +41,7 @@ trait CreatesPointersTrait
      */
     protected function getPathToType()
     {
-        return sprintf('%s/%s', $this->getPathToData(), DocumentInterface::KEYWORD_TYPE);
+        return P::type();
     }
 
     /**
@@ -48,7 +49,7 @@ trait CreatesPointersTrait
      */
     protected function getPathToId()
     {
-        return sprintf('%s/%s', $this->getPathToData(), DocumentInterface::KEYWORD_ID);
+        return P::id();
     }
 
     /**
@@ -56,17 +57,16 @@ trait CreatesPointersTrait
      */
     protected function getPathToAttributes()
     {
-        return sprintf('%s/%s', $this->getPathToData(), DocumentInterface::KEYWORD_ATTRIBUTES);
+        return P::attributes();
     }
 
     /**
      * @param string $name
-     *
      * @return string
      */
     protected function getPathToAttribute($name)
     {
-        return sprintf('%s/%s', $this->getPathToAttributes(), $name);
+        return P::attribute($name);
     }
 
     /**
@@ -74,17 +74,16 @@ trait CreatesPointersTrait
      */
     protected function getPathToRelationships()
     {
-        return sprintf('%s/%s', $this->getPathToData(), DocumentInterface::KEYWORD_RELATIONSHIPS);
+        return P::relationships();
     }
 
     /**
      * @param string $name
-     *
      * @return string
      */
     protected function getPathToRelationship($name)
     {
-        return sprintf('%s/%s', $this->getPathToRelationships(), $name);
+        return P::relationship($name);
     }
 
     /**
@@ -93,26 +92,24 @@ trait CreatesPointersTrait
      */
     protected function getPathToRelationshipData($name)
     {
-        return sprintf('%s/%s', $this->getPathToRelationship($name), DocumentInterface::KEYWORD_DATA);
+        return P::relationshipData($name);
     }
 
     /**
      * @param string $name
-     *
      * @return string
      */
     protected function getPathToRelationshipType($name)
     {
-        return sprintf('%s/%s', $this->getPathToRelationshipData($name), DocumentInterface::KEYWORD_TYPE);
+        return P::relationshipType($name);
     }
 
     /**
      * @param string $name
-     *
      * @return string
      */
     protected function getPathToRelationshipId($name)
     {
-        return sprintf('%s/%s', $this->getPathToRelationshipData($name), DocumentInterface::KEYWORD_ID);
+        return P::relationshipId($name);
     }
 }

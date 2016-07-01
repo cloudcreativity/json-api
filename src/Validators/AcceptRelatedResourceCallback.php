@@ -44,24 +44,17 @@ class AcceptRelatedResourceCallback implements AcceptRelatedResourceInterface
     }
 
     /**
-     * Is the specified resource identifier acceptable?
-     *
-     * @param ResourceIdentifierInterface $identifier
-     *      the identifier being validated.
-     * @param string|null $key
-     *      if validating a resource's relationships, the key that is being validated.
-     * @param ResourceInterface|null $resource
-     *      if validating a resource's relationships, the resource for context.
-     * @return bool
+     * @inheritdoc
      */
     public function accept(
         ResourceIdentifierInterface $identifier,
+        $record = null,
         $key = null,
         ResourceInterface $resource = null
     ) {
         $callback = $this->callback;
 
-        return $callback($identifier, $key, $resource);
+        return $callback($identifier, $record, $key, $resource);
     }
 
 }

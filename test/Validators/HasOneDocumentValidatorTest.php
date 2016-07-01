@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
@@ -81,8 +82,8 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_DATA);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_DATA);
     }
 
     public function testDataNotRelationship()
@@ -92,8 +93,8 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_RELATIONSHIP_EXPECTED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_DATA);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_RELATIONSHIP_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_DATA);
     }
 
 
@@ -111,8 +112,8 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_TYPE);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
     public function testDataTypeNotSupported()
@@ -130,9 +131,9 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data/type', Keys::RELATIONSHIP_UNSUPPORTED_TYPE);
-        $this->assertDetailContains($validator->errors(), '/data/type', 'users');
-        $this->assertDetailContains($validator->errors(), '/data/type', 'posts');
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::RELATIONSHIP_UNSUPPORTED_TYPE);
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'users');
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'posts');
     }
 
     public function testDataIdRequired()
@@ -149,8 +150,8 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->errors(), '/data', DocumentInterface::KEYWORD_ID);
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
     }
 
     public function testDataEmptyNotAllowed()
@@ -160,8 +161,8 @@ JSON_API;
         $validator = $this->hasOne(false);
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
-        $this->assertDetailContains($validator->errors(), '/data', 'empty');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_EMPTY_NOT_ALLOWED);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'empty');
     }
 
     public function testDataDoesNotExist()
@@ -180,12 +181,12 @@ JSON_API;
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt(
-            $validator->errors(),
+            $validator->getErrors(),
             '/data',
             Keys::RELATIONSHIP_DOES_NOT_EXIST,
             Keys::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST
         );
-        $this->assertDetailContains($validator->errors(), '/data', 'exist');
+        $this->assertDetailContains($validator->getErrors(), '/data', 'exist');
     }
 
     public function testDataAcceptable()
@@ -220,8 +221,66 @@ JSON_API;
         $validator = $this->hasOne(false, true, function () { return false; });
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
-        $this->assertDetailContains($validator->errors(), '/data', 'acceptable');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
+    }
+
+    public function testValidImmutable()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "users",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $immutable = new AcceptImmutableRelationship('users', 123);
+        $document = $this->decode($content);
+        $validator = $this->hasOne(true, true, $immutable);
+
+        $this->assertTrue($validator->isValid($document));
+    }
+
+    public function testImmutable()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "users",
+        "id": "124"
+    }
+}
+JSON_API;
+
+        $immutable = new AcceptImmutableRelationship('users', 123);
+        $document = $this->decode($content);
+        $validator = $this->hasOne(true, true, $immutable);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
+    }
+
+    public function testImmutablePolymorph()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $immutable = new AcceptImmutableRelationship('users', '123');
+        $document = $this->decode($content);
+        $validator = $this->hasOne(true, true, $immutable, ['posts', 'users']);
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
     }
 
     public function testDataHasMany()
@@ -231,21 +290,21 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->errors(), '/data', Keys::RELATIONSHIP_HAS_ONE_EXPECTED);
-        $this->assertDetailContains($validator->errors(), '/data', 'has-one');
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_HAS_ONE_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', 'has-one');
     }
 
     /**
      * @param bool $allowEmpty
      * @param bool $exists
-     * @param callable|null $acceptable
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
      * @param string|string[] $expectedType
      * @return DocumentValidatorInterface
      */
     private function hasOne(
         $allowEmpty = true,
         $exists = true,
-        callable $acceptable = null,
+        $acceptable = null,
         $expectedType = 'users'
     ) {
         $this->store->method('exists')->willReturn($exists);

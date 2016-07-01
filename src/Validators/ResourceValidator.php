@@ -23,13 +23,23 @@ use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**
  * Class ResourceValidator
  * @package CloudCreativity\JsonApi
  */
-class ResourceValidator extends AbstractValidator implements ResourceValidatorInterface
+class ResourceValidator implements ResourceValidatorInterface
 {
+
+    use ErrorsAwareTrait,
+        CreatesPointersTrait;
+
+    /**
+     * @var ValidatorErrorFactoryInterface
+     */
+    private $errorFactory;
 
     /**
      * @var string
@@ -73,7 +83,7 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         RelationshipsValidatorInterface $relationships = null,
         ResourceValidatorInterface $context = null
     ) {
-        parent::__construct($errorFactory);
+        $this->errorFactory = $errorFactory;
         $this->expectedType = $expectedType;
         $this->expectedId = $expectedId;
         $this->attributes = $attributes;
@@ -82,10 +92,9 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
     }
 
     /**
-     * @param ResourceInterface $resource
-     * @return bool
+     * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource)
+    public function isValid(ResourceInterface $resource, $record = null)
     {
         $this->reset();
 
@@ -95,15 +104,15 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
             $valid = false;
         }
 
-        if (!$this->validateAttributes($resource)) {
+        if (!$this->validateAttributes($resource, $record)) {
             $valid = false;
         }
 
-        if (!$this->validateRelationships($resource)) {
+        if (!$this->validateRelationships($resource, $record)) {
             $valid = false;
         }
 
-        if ($valid && !$this->validateContext($resource)) {
+        if ($valid && !$this->validateContext($resource, $record)) {
             $valid = false;
         }
 
@@ -166,9 +175,10 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
     /**
      * @param ResourceInterface $resource
+     * @param object|null $record
      * @return bool
      */
-    protected function validateAttributes(ResourceInterface $resource)
+    protected function validateAttributes(ResourceInterface $resource, $record = null)
     {
         $raw = $resource->get(ResourceInterface::ATTRIBUTES);
 
@@ -182,13 +192,13 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         }
 
         /** Ok if no attributes validator or one that returns true for `isValid()` */
-        if (!$this->attributes || $this->attributes->isValid($resource)) {
+        if (!$this->attributes || $this->attributes->isValid($resource, $record)) {
             return true;
         }
 
         /** Ensure that at least one error message is added. */
-        if (0 < count($this->attributes->errors())) {
-            $this->addErrors($this->attributes->errors());
+        if (0 < count($this->attributes->getErrors())) {
+            $this->addErrors($this->attributes->getErrors());
         } else {
             $this->addError($this->errorFactory->resourceInvalidAttributes());
         }
@@ -198,9 +208,10 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
     /**
      * @param ResourceInterface $resource
+     * @param object|null $record
      * @return bool
      */
-    protected function validateRelationships(ResourceInterface $resource)
+    protected function validateRelationships(ResourceInterface $resource, $record = null)
     {
         $raw = $resource->get(ResourceInterface::RELATIONSHIPS);
 
@@ -214,13 +225,13 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
         }
 
         /** Ok if no relationships validator or one that returns true for `isValid()` */
-        if (!$this->relationships || $this->relationships->isValid($resource)) {
+        if (!$this->relationships || $this->relationships->isValid($resource, $record)) {
             return true;
         }
 
         /** Ensure there is at least one error message. */
-        if (0 < count($this->relationships->errors())) {
-            $this->addErrors($this->relationships->errors());
+        if (0 < count($this->relationships->getErrors())) {
+            $this->addErrors($this->relationships->getErrors());
         } else {
             $this->addError($this->errorFactory->resourceInvalidRelationships());
         }
@@ -230,15 +241,16 @@ class ResourceValidator extends AbstractValidator implements ResourceValidatorIn
 
     /**
      * @param ResourceInterface $resource
+     * @param object|null $record
      * @return bool
      */
-    protected function validateContext(ResourceInterface $resource)
+    protected function validateContext(ResourceInterface $resource, $record = null)
     {
-        if (!$this->context || $this->context->isValid($resource)) {
+        if (!$this->context || $this->context->isValid($resource, $record)) {
             return true;
         }
 
-        $this->addErrors($this->context->errors());
+        $this->addErrors($this->context->getErrors());
 
         return false;
     }
