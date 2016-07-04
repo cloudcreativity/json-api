@@ -19,7 +19,6 @@
 namespace CloudCreativity\JsonApi\Contracts\Utils;
 
 use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Interface ErrorsAwareInterface

@@ -22,8 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Document\Error;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class ValidatorErrorFactory
@@ -45,8 +44,6 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     const RELATIONSHIP_EMPTY_NOT_ALLOWED = 'validation:relationship-empty-not-allowed';
     const RELATIONSHIP_DOES_NOT_EXIST = 'validation:relationship-does-not-exist';
     const RELATIONSHIP_NOT_ACCEPTABLE = 'validation:relationship-not-acceptable';
-
-    use CreatesPointersTrait;
 
     /**
      * @var ErrorRepositoryInterface
@@ -99,7 +96,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         $error = $this->repository->errorWithPointer(
             self::RESOURCE_UNSUPPORTED_TYPE,
-            $this->getPathToType(),
+            P::type(),
             ['expected' => $expected, 'actual' => $actual]
         );
 
@@ -114,7 +111,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         $error = $this->repository->errorWithPointer(
             self::RESOURCE_UNSUPPORTED_ID,
-            $this->getPathToId(),
+            P::id(),
             ['expected' => $expected, 'actual' => $actual]
         );
 
@@ -129,7 +126,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RESOURCE_INVALID_ATTRIBUTES,
-            $this->getPathToAttributes()
+            P::attributes()
         );
     }
 
@@ -140,7 +137,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RESOURCE_INVALID_RELATIONSHIPS,
-            $this->getPathToRelationships()
+            P::relationships()
         );
     }
 
@@ -151,7 +148,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_UNSUPPORTED_TYPE,
-            $relationshipKey ? $this->getPathToRelationshipType($relationshipKey) : $this->getPathToType(),
+            $relationshipKey ? P::relationshipType($relationshipKey) : P::type(),
             ['expected' => $expected, 'actual' => $actual]
         );
     }
@@ -163,7 +160,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_HAS_ONE_EXPECTED,
-            $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData()
+            $relationshipKey ? P::relationship($relationshipKey) : P::data()
         );
     }
 
@@ -174,7 +171,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_HAS_MANY_EXPECTED,
-            $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData()
+            $relationshipKey ? P::relationship($relationshipKey) : P::data()
         );
     }
 
@@ -185,7 +182,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_EMPTY_NOT_ALLOWED,
-            $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData()
+            $relationshipKey ? P::relationship($relationshipKey) : P::data()
         );
     }
 
@@ -196,7 +193,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         $error = $this->repository->errorWithPointer(
             self::RELATIONSHIP_DOES_NOT_EXIST,
-            $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData(),
+            $relationshipKey ? P::relationship($relationshipKey) : P::data(),
             ['type' => $identifier->type(), 'id' => $identifier->id()]
         );
 
@@ -210,7 +207,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     {
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_NOT_ACCEPTABLE,
-            $relationshipKey ? $this->getPathToRelationship($relationshipKey) : $this->getPathToData(),
+            $relationshipKey ? P::relationship($relationshipKey) : P::data(),
             ['type' => $identifier->type(), 'id' => $identifier->id()]
         );
     }

@@ -20,13 +20,12 @@ namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class RelationshipsValidator
@@ -35,8 +34,7 @@ use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 class RelationshipsValidator implements RelationshipsValidatorInterface
 {
 
-    use ErrorsAwareTrait,
-        CreatesPointersTrait;
+    use ErrorsAwareTrait;
 
     /**
      * @var ValidatorErrorFactoryInterface
@@ -171,7 +169,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
             if (!$relationships->has($key)) {
                 $this->addError($this->errorFactory->memberRequired(
                     $key,
-                    $this->getPathToRelationships()
+                    P::relationships()
                 ));
                 $valid = false;
             }
@@ -196,7 +194,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
         if (!is_object($relationships->get($key))) {
             $this->addError($this->errorFactory->memberObjectExpected(
                 $key,
-                $this->getPathToRelationship($key)
+                P::relationship($key)
             ));
             return false;
         }

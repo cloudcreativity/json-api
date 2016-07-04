@@ -23,8 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
-use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class ResourceDocumentValidator
@@ -33,8 +32,7 @@ use CloudCreativity\JsonApi\Validators\ValidationKeys as Keys;
 class ResourceDocumentValidator implements DocumentValidatorInterface
 {
 
-    use ErrorsAwareTrait,
-        CreatesPointersTrait;
+    use ErrorsAwareTrait;
 
     /**
      * @var ValidatorErrorFactoryInterface
@@ -67,17 +65,14 @@ class ResourceDocumentValidator implements DocumentValidatorInterface
         $this->reset();
 
         if (!$document->has(DocumentInterface::DATA)) {
-            $this->addError($this->errorFactory->memberRequired(DocumentInterface::DATA, '/'));
+            $this->addError($this->errorFactory->memberRequired(DocumentInterface::DATA, P::root()));
             return false;
         }
 
         $data = $document->get(DocumentInterface::DATA);
 
         if (!is_object($data)) {
-            $this->addError($this->errorFactory->memberObjectExpected(
-                DocumentInterface::DATA,
-                $this->getPathToData()
-            ));
+            $this->addError($this->errorFactory->memberObjectExpected(DocumentInterface::DATA, P::data()));
             return false;
         }
 

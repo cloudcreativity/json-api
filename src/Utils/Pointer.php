@@ -30,9 +30,17 @@ final class Pointer
     /**
      * @return string
      */
+    public static function root()
+    {
+        return '/';
+    }
+
+    /**
+     * @return string
+     */
     public static function data()
     {
-        return '/' . Keys::KEYWORD_DATA;
+        return self::root() . Keys::KEYWORD_DATA;
     }
 
     /**

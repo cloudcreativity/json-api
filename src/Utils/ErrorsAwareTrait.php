@@ -39,8 +39,8 @@ trait ErrorsAwareTrait
      */
     public function getErrors()
     {
-        if (!$this->errors instanceof ErrorCollection) {
-            $this->errors = new ErrorCollection();
+        if (!$this->errors instanceof Errors) {
+            $this->errors = new Errors();
         }
 
         return $this->errors;

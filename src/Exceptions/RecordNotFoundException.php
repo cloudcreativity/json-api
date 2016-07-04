@@ -33,7 +33,7 @@ class RecordNotFoundException extends StoreException
      */
     public static function create(ResourceIdentifierInterface $identifier)
     {
-        $message = sprintf('Cannot find Reocrd %s:%s', $identifier->type(), $identifier->id());
+        $message = sprintf('Cannot find Record %s:%s', $identifier->type(), $identifier->id());
 
         return new self($message);
     }

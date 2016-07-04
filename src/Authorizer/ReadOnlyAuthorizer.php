@@ -81,5 +81,4 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
         return false;
     }
 
-
 }

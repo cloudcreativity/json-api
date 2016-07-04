@@ -23,7 +23,6 @@ use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 
 /**
  * Class RelationshipDocumentValidator
@@ -32,8 +31,7 @@ use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 class RelationshipDocumentValidator implements DocumentValidatorInterface
 {
 
-    use ErrorsAwareTrait,
-        CreatesPointersTrait;
+    use ErrorsAwareTrait;
 
     /**
      * @var ValidatorErrorFactoryInterface

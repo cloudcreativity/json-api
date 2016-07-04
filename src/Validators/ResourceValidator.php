@@ -24,7 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class ResourceValidator
@@ -33,8 +33,7 @@ use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 class ResourceValidator implements ResourceValidatorInterface
 {
 
-    use ErrorsAwareTrait,
-        CreatesPointersTrait;
+    use ErrorsAwareTrait;
 
     /**
      * @var ValidatorErrorFactoryInterface
@@ -127,10 +126,7 @@ class ResourceValidator implements ResourceValidatorInterface
     {
         /** Type is required */
         if (!$resource->has(ResourceInterface::TYPE)) {
-            $this->addError($this->errorFactory->memberRequired(
-                ResourceInterface::TYPE,
-                $this->getPathToData()
-            ));
+            $this->addError($this->errorFactory->memberRequired(ResourceInterface::TYPE, P::data()));
             return false;
         }
 
@@ -154,10 +150,7 @@ class ResourceValidator implements ResourceValidatorInterface
     {
         /** If expecting an id, one must be provided */
         if (!is_null($this->expectedId) && !$resource->has(ResourceInterface::ID)) {
-            $this->addError($this->errorFactory->memberRequired(
-                ResourceInterface::ID,
-                $this->getPathToData()
-            ));
+            $this->addError($this->errorFactory->memberRequired(ResourceInterface::ID, P::data()));
             return false;
         }
 
@@ -186,7 +179,7 @@ class ResourceValidator implements ResourceValidatorInterface
         if ($resource->has(ResourceInterface::ATTRIBUTES) && !is_object($raw)) {
             $this->addError($this->errorFactory->memberObjectExpected(
                 ResourceInterface::ATTRIBUTES,
-                $this->getPathToAttributes()
+                P::attributes()
             ));
             return false;
         }
@@ -219,7 +212,7 @@ class ResourceValidator implements ResourceValidatorInterface
         if ($resource->has(ResourceInterface::RELATIONSHIPS) && !is_object($raw)) {
             $this->addError($this->errorFactory->memberObjectExpected(
                 ResourceInterface::RELATIONSHIPS,
-                $this->getPathToRelationships()
+                P::relationships()
             ));
             return false;
         }

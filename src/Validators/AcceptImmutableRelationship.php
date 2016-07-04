@@ -64,5 +64,4 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
             $this->current->id() == $identifier->id();
     }
 
-
 }

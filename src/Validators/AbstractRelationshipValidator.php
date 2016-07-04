@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
-use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
+use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class AbstractRelationshipValidator
@@ -35,8 +35,7 @@ use CloudCreativity\JsonApi\Validators\Helpers\CreatesPointersTrait;
 abstract class AbstractRelationshipValidator implements RelationshipValidatorInterface
 {
 
-    use ErrorsAwareTrait,
-        CreatesPointersTrait;
+    use ErrorsAwareTrait;
 
     /**
      * @var ValidatorErrorFactoryInterface
@@ -121,7 +120,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
         if (!$relationship->has(RelationshipInterface::DATA)) {
             $this->addError($this->errorFactory->memberRequired(
                 RelationshipInterface::DATA,
-                $key ? $this->getPathToRelationship($key) : $this->getPathToData()
+                $key ? P::relationship($key) : P::data()
             ));
             return false;
         }
@@ -129,7 +128,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
         if (!$relationship->isHasOne() && !$relationship->isHasMany()) {
             $this->addError($this->errorFactory->memberRelationshipExpected(
                 RelationshipInterface::DATA,
-                $key ? $this->getPathToRelationship($key) : $this->getPathToData()
+                $key ? P::relationship($key) : P::data()
             ));
             return false;
         }
@@ -149,7 +148,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
         if (!$identifier->hasType()) {
             $this->addError($this->errorFactory->memberRequired(
                 ResourceIdentifierInterface::TYPE,
-                $key ? $this->getPathToRelationshipData($key) : $this->getPathToData()
+                $key ? P::relationshipData($key) : P::data()
             ));
             $valid = false;
         } elseif (!$this->isSupportedType($identifier->type())) {
@@ -164,7 +163,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
         if (!$identifier->hasId()) {
             $this->addError($this->errorFactory->memberRequired(
                 ResourceIdentifierInterface::ID,
-                $key ? $this->getPathToRelationshipId($key) : $this->getPathToData()
+                $key ? P::relationshipId($key) : P::data()
             ));
             $valid = false;
         }
