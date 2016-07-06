@@ -64,6 +64,23 @@ interface StandardObjectInterface extends Traversable, Countable
     public function setProperties(array $values);
 
     /**
+     * Set the key's value, if the key does not exist on the object.
+     *
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function add($key, $value);
+
+    /**
+     * Add many properties.
+     * 
+     * @param array $values
+     * @return $this
+     */
+    public function addProperties(array $values);
+
+    /**
      * Do all the key(s) exist?
      *
      * @param string|string[] $keys

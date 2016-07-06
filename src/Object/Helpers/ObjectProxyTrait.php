@@ -135,6 +135,37 @@ trait ObjectProxyTrait
     }
 
     /**
+     * Set the property if it does not already exist.
+     *
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function add($key, $value)
+    {
+        if (!$this->has($key)) {
+            $this->set($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add many properties.
+     *
+     * @param array $values
+     * @return $this
+     */
+    public function addProperties(array $values)
+    {
+        foreach ($values as $key => $value) {
+            $this->add($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string|string[] $keys
      * @return bool
      */

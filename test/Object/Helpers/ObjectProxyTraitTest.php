@@ -123,6 +123,25 @@ class ObjectProxyTraitTest extends TestCase
         $this->assertEquals('bazbat', $this->trait->get('bar'));
     }
 
+    public function testAdd()
+    {
+        $this->assertSame($this->trait, $this->trait->add('foo', 'bar'));
+        $this->assertSame('bar', $this->trait->get('foo'));
+        $this->trait->add('foo', 'foobar');
+        $this->assertSame('bar', $this->trait->get('foo'));
+    }
+
+    public function testAddProperties()
+    {
+        $this->trait->set('foo', 'bar');
+        $this->assertSame($this->trait, $this->trait->addProperties([
+            'foo' => 'foobar',
+            'baz' => 'bat',
+        ]));
+        $this->assertSame('bar', $this->trait->get('foo'));
+        $this->assertSame('bat', $this->trait->get('baz'));
+    }
+
     public function testGetMany()
     {
         $this->trait->setProxy($this->proxy);
