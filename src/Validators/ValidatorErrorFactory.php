@@ -21,7 +21,6 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
-use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
@@ -100,8 +99,9 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
             ['expected' => $expected, 'actual' => $actual]
         );
 
-        return Error::cast($error)
-            ->setStatus(self::STATUS_UNSUPPORTED_TYPE);
+        $error->setStatus(self::STATUS_UNSUPPORTED_TYPE);
+
+        return $error;
     }
 
     /**
@@ -115,8 +115,9 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
             ['expected' => $expected, 'actual' => $actual]
         );
 
-        return Error::cast($error)
-            ->setStatus(self::STATUS_UNSUPPORTED_ID);
+        $error->setStatus(self::STATUS_UNSUPPORTED_ID);
+
+        return $error;
     }
 
     /**
@@ -197,7 +198,9 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
             ['type' => $identifier->type(), 'id' => $identifier->id()]
         );
 
-        return Error::cast($error)->setStatus(self::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST);
+        $error->setStatus(self::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST);
+
+        return $error;
     }
 
     /**

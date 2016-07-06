@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Interface ErrorRepositoryInterface
@@ -29,10 +29,18 @@ interface ErrorRepositoryInterface extends ConfigurableInterface
 {
 
     /**
+     * Does an error exist in the repository for the supplied key?
+     *
+     * @param $key
+     * @return bool
+     */
+    public function exists($key);
+
+    /**
      * @param string $key
      * @param array $values
      *      values to substitute into error detail.
-     * @return ErrorInterface
+     * @return MutableErrorInterface
      */
     public function error($key, array $values = []);
 
@@ -41,7 +49,7 @@ interface ErrorRepositoryInterface extends ConfigurableInterface
      * @param $pointer
      * @param array $values
      *      values to substitute into error detail.
-     * @return ErrorInterface
+     * @return MutableErrorInterface
      */
     public function errorWithPointer($key, $pointer, array $values = []);
 
@@ -50,7 +58,7 @@ interface ErrorRepositoryInterface extends ConfigurableInterface
      * @param $parameter
      * @param array $values
      *      values to substitute into error detail.
-     * @return ErrorInterface
+     * @return MutableErrorInterface
      */
     public function errorWithParameter($key, $parameter, array $values = []);
 }

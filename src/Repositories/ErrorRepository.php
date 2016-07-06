@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorIdProviderInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Document\Error;
 
@@ -35,6 +36,11 @@ class ErrorRepository implements ErrorRepositoryInterface
     private $replacer;
 
     /**
+     * @var ErrorIdProviderInterface|null
+     */
+    private $idProvider;
+
+    /**
      * @var array
      */
     private $errors = [];
@@ -42,10 +48,14 @@ class ErrorRepository implements ErrorRepositoryInterface
     /**
      * ErrorRepository constructor.
      * @param ReplacerInterface|null $replacer
+     *      if provided, will be used to replace values into error detail.
+     * @param ErrorIdProviderInterface|null $idProvider
+     *      if provided, will be used to add an id to all errors created by the repository.
      */
-    public function __construct(ReplacerInterface $replacer = null)
+    public function __construct(ReplacerInterface $replacer = null, ErrorIdProviderInterface $idProvider = null)
     {
         $this->replacer = $replacer;
+        $this->idProvider = $idProvider;
     }
 
     /**
@@ -64,11 +74,17 @@ class ErrorRepository implements ErrorRepositoryInterface
     /**
      * @inheritdoc
      */
+    public function exists($key)
+    {
+        return isset($this->errors[$key]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function error($key, array $values = [])
     {
-        $errorArray = $this->template($key, $values);
-
-        return Error::create($errorArray);
+        return $this->make($key, $values);
     }
 
     /**
@@ -76,8 +92,7 @@ class ErrorRepository implements ErrorRepositoryInterface
      */
     public function errorWithPointer($key, $pointer, array $values = [])
     {
-        $errorArray = $this->template($key, $values);
-        $error = Error::create($errorArray);
+        $error = $this->make($key, $values);
         $error->setSourcePointer($pointer);
 
         return $error;
@@ -88,21 +103,10 @@ class ErrorRepository implements ErrorRepositoryInterface
      */
     public function errorWithParameter($key, $parameter, array $values = [])
     {
-        $errorArray = $this->template($key, $values);
-        $error = Error::create($errorArray);
+        $error = $this->make($key, $values);
         $error->setSourceParameter($parameter);
 
         return $error;
-    }
-
-    /**
-     * @param $key
-     * @param array $values
-     * @return array
-     */
-    protected function template($key, array $values = [])
-    {
-        return $this->replace($this->get($key), $values);
     }
 
     /**
@@ -115,14 +119,21 @@ class ErrorRepository implements ErrorRepositoryInterface
     }
 
     /**
-     * @param array $error
+     * @param $key
      * @param array $values
-     * @return array
+     * @return Error
      */
-    protected function replace(array $error, array $values)
+    protected function make($key, array $values)
     {
-        if (isset($error[Error::DETAIL]) && $this->replacer) {
-            $error[Error::DETAIL] = $this->replacer->replace($error[Error::DETAIL], $values);
+        $error = Error::create($this->get($key));
+
+        if ($this->idProvider && !$error->hasId()) {
+            $error->setId($this->idProvider->issueId($error));
+        }
+
+        if ($this->replacer && $error->hasDetail()) {
+            $detail = $this->replacer->replace($error->getDetail(), $values);
+            $error->setDetail($detail);
         }
 
         return $error;

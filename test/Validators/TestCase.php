@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorIdProviderInterface;
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase as BaseTestCase;
@@ -55,19 +56,27 @@ class TestCase extends BaseTestCase
     protected $factory;
 
     /**
+     * @var PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $idProvider;
+
+    /**
      * @return void
      */
     protected function setUp()
     {
         /** @var StoreInterface $store */
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        /** @var ErrorIdProviderInterface $idProvider */
+        $idProvider = $this->getMockBuilder(ErrorIdProviderInterface::class)->getMock();
         $config = require __DIR__ . '/../../config/validation.php';
 
-        $this->errorRepository = new ErrorRepository(new Replacer());
+        $this->errorRepository = new ErrorRepository(new Replacer(), $idProvider);
         $this->errorRepository->configure($config);
         $this->errorFactory = new ValidatorErrorFactory($this->errorRepository);
         $this->factory = new ValidatorFactory($this->errorFactory, $store);
         $this->store = $store;
+        $this->idProvider = $idProvider;
     }
 
     /**
@@ -79,7 +88,7 @@ class TestCase extends BaseTestCase
     protected function assertErrorAt(ErrorCollection $errors, $pointer, $errorKey, $status = null)
     {
         $error = $this->findErrorAt($errors, $pointer);
-        $expected = Error::cast($this->errorRepository->error($errorKey));
+        $expected = $this->errorRepository->error($errorKey);
 
         if ($status) {
             $expected->setStatus($status);
@@ -104,7 +113,7 @@ class TestCase extends BaseTestCase
     /**
      * @param ErrorCollection $errors
      * @param $pointer
-     * @return ErrorInterface|null
+     * @return ErrorInterface
      */
     protected function findErrorAt(ErrorCollection $errors, $pointer)
     {

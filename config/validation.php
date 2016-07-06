@@ -1,6 +1,6 @@
 <?php
 
-use CloudCreativity\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface as Error;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as V;
 
 return [

@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Document;
 
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
@@ -27,19 +27,8 @@ use Neomerx\JsonApi\Contracts\Document\LinkInterface;
  * Class Error
  * @package CloudCreativity\JsonApi
  */
-class Error implements ErrorInterface
+class Error implements MutableErrorInterface
 {
-
-    /** Keywords for array exchanging */
-    const ID = DocumentInterface::KEYWORD_ERRORS_ID;
-    const STATUS = DocumentInterface::KEYWORD_ERRORS_STATUS;
-    const CODE = DocumentInterface::KEYWORD_ERRORS_CODE;
-    const TITLE = DocumentInterface::KEYWORD_ERRORS_TITLE;
-    const DETAIL = DocumentInterface::KEYWORD_ERRORS_DETAIL;
-    const META = DocumentInterface::KEYWORD_ERRORS_META;
-    const SOURCE = DocumentInterface::KEYWORD_ERRORS_SOURCE;
-    const LINKS = DocumentInterface::KEYWORD_ERRORS_LINKS;
-    const LINKS_ABOUT = DocumentInterface::KEYWORD_ERRORS_ABOUT;
 
     /**
      * @var int|string|null
@@ -150,8 +139,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param string|int|null $id
-     * @return $this
+     * @inheritdoc
      */
     public function setId($id)
     {
@@ -173,8 +161,15 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param array|null $links
-     * @return $this
+     * @inheritdoc
+     */
+    public function hasId()
+    {
+        return !empty($this->id);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setLinks(array $links = null)
     {
@@ -188,8 +183,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param array|null $links
-     * @return $this
+     * @inheritdoc
      */
     public function addLinks(array $links = null)
     {
@@ -206,9 +200,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param $key
-     * @param LinkInterface $link
-     * @return $this
+     * @inheritdoc
      */
     public function addLink($key, LinkInterface $link)
     {
@@ -218,8 +210,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param LinkInterface $link
-     * @return $this
+     * @inheritdoc
      */
     public function setAboutLink(LinkInterface $link)
     {
@@ -237,8 +228,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param string|int|null $status
-     * @return $this
+     * @inheritdoc
      */
     public function setStatus($status)
     {
@@ -256,17 +246,24 @@ class Error implements ErrorInterface
      */
     public function getStatus()
     {
-        return !is_null($this->status) ? (string) $this->status : null;
+        return $this->hasStatus() ? (string) $this->status : null;
     }
 
     /**
-     * @param string|null $code
-     * @return $this
+     * @inheritdoc
+     */
+    public function hasStatus()
+    {
+        return !empty($this->status);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setCode($code)
     {
-        if (!is_string($code) && !is_null($code)) {
-            throw new InvalidArgumentException('Expecting error code to be a string or null.');
+        if (!is_string($code) && !is_int($code) && !is_null($code)) {
+            throw new InvalidArgumentException('Expecting error code to be a string, integer or null.');
         }
 
         $this->code = $code;
@@ -279,12 +276,19 @@ class Error implements ErrorInterface
      */
     public function getCode()
     {
-        return !empty($this->code) ? $this->code : null;
+        return $this->hasCode() ? $this->code : null;
     }
 
     /**
-     * @param string|null $title
-     * @return $this
+     * @inheritdoc
+     */
+    public function hasCode()
+    {
+        return !empty($this->code);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setTitle($title)
     {
@@ -302,12 +306,19 @@ class Error implements ErrorInterface
      */
     public function getTitle()
     {
-        return !empty($this->title) ? $this->title : null;
+        return $this->hasTitle() ? $this->title : null;
     }
 
     /**
-     * @param string|null $detail
-     * @return $this
+     * @inheritdoc
+     */
+    public function hasTitle()
+    {
+        return !empty($this->title);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setDetail($detail)
     {
@@ -325,12 +336,19 @@ class Error implements ErrorInterface
      */
     public function getDetail()
     {
-        return !empty($this->detail) ? $this->detail : null;
+        return $this->hasDetail() ? $this->detail : null;
     }
 
     /**
-     * @param array|null $source
-     * @return $this
+     * @return bool
+     */
+    public function hasDetail()
+    {
+        return !empty($this->detail);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setSource(array $source = null)
     {
@@ -367,8 +385,23 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param string|null $parameter
-     * @return $this
+     * @inheritdoc
+     */
+    public function getSourcePointer()
+    {
+        return $this->hasSourcePointer() ? $this->source[self::SOURCE_POINTER] : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasSourcePointer()
+    {
+        return isset($this->source[self::SOURCE_POINTER]);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setSourceParameter($parameter)
     {
@@ -386,8 +419,23 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param array|null $meta
-     * @return $this
+     * @inheritdoc
+     */
+    public function getSourceParameter()
+    {
+        return $this->hasSourceParameter() ? $this->source[self::SOURCE_PARAMETER] : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasSourceParameter()
+    {
+        return isset($this->source[self::SOURCE_PARAMETER]);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setMeta(array $meta = null)
     {
@@ -397,8 +445,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param array $meta
-     * @return $this
+     * @inheritdoc
      */
     public function addMeta(array $meta)
     {
@@ -416,8 +463,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param ErrorInterface $error
-     * @return $this
+     * @inheritdoc
      */
     public function merge(ErrorInterface $error)
     {
@@ -465,8 +511,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * @param array $input
-     * @return $this
+     * @inheritdoc
      */
     public function exchangeArray(array $input)
     {
