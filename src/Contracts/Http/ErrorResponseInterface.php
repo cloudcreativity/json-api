@@ -18,7 +18,6 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
@@ -29,7 +28,7 @@ interface ErrorResponseInterface
 {
 
     /**
-     * @return ErrorInterface|ErrorInterface[]|ErrorCollection
+     * @return ErrorCollection
      */
     public function getErrors();
 

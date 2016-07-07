@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
-use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection as Errors;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -31,7 +31,7 @@ class ErrorResponse implements ErrorResponseInterface
 {
 
     /**
-     * @var ErrorInterface|ErrorInterface[]|ErrorCollection
+     * @var Errors
      */
     private $errors;
 
@@ -53,7 +53,7 @@ class ErrorResponse implements ErrorResponseInterface
      */
     public function __construct($errors, $defaultHttpCode = null, array $headers = [])
     {
-        $this->errors = $errors;
+        $this->errors = Errors::cast($errors);
         $this->defaultHttpCode = $defaultHttpCode;
         $this->headers = $headers;
     }
@@ -71,9 +71,7 @@ class ErrorResponse implements ErrorResponseInterface
      */
     public function getHttpCode()
     {
-        $errors = MutableErrorCollection::cast($this->errors);
-
-        return $errors->getHttpStatus($this->defaultHttpCode);
+        return $this->errors->getHttpStatus($this->defaultHttpCode);
     }
 
     /**

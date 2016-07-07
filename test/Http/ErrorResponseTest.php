@@ -3,7 +3,6 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Document\Error;
-use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
@@ -47,7 +46,7 @@ final class ErrorResponseTest extends TestCase
         $response = new ErrorResponse([$a, $b]);
 
         $this->assertEquals(500, $response->getHttpCode());
-        $this->assertSame([$a, $b], $response->getErrors());
+        $this->assertSame([$a, $b], $response->getErrors()->getArrayCopy());
     }
 
     public function testHeaders()
