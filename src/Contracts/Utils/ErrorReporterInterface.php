@@ -16,35 +16,26 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Utils;
 
 use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
 use Exception;
 
 /**
- * Interface ExceptionHandlerInterface
+ * Interface ErrorReporterInterface
  * @package CloudCreativity\JsonApi
  */
-interface ExceptionHandlerInterface
+interface ErrorReporterInterface
 {
 
     /**
-     * Convert the exception to a JSON API error response.
+     * Report/log a JSON API error response that will be sent to a client.
      *
-     * @param Exception $e
-     * @return ErrorResponseInterface
-     */
-    public function response(Exception $e);
-
-    /**
-     * Report or log a JSON API error response.
-     *
-     * @param Exception $e
-     *      the exception that occurred.
      * @param ErrorResponseInterface $response
      *      the error response that will be sent to the client.
+     * @param Exception $e
+     *      the exception that generated the response, or null if not generated from an exception.
      * @return void
      */
-    public function report(Exception $e, ErrorResponseInterface $response);
-
+    public function report(ErrorResponseInterface $response, Exception $e = null);
 }
