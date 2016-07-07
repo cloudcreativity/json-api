@@ -19,14 +19,14 @@
 namespace CloudCreativity\JsonApi\Contracts\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Interface AuthorizerInterface
  * @package CloudCreativity\JsonApi
  */
-interface AuthorizerInterface
+interface AuthorizerInterface extends ErrorsAwareInterface
 {
 
     /**
@@ -37,14 +37,9 @@ interface AuthorizerInterface
      *
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canReadMany(
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canReadMany(EncodingParametersInterface $parameters);
 
     /**
      * Can the client create the provided resource?
@@ -53,15 +48,9 @@ interface AuthorizerInterface
      *      the resource provided by the client.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canCreate(
-        ResourceInterface $resource,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified record?
@@ -70,15 +59,9 @@ interface AuthorizerInterface
      *      the record that the client is trying to read.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canRead(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canRead($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client update the specified record?
@@ -87,15 +70,9 @@ interface AuthorizerInterface
      *      the record that the client is trying to update.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canUpdate(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canUpdate($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client delete the specified record?
@@ -104,15 +81,9 @@ interface AuthorizerInterface
      *      the record that the client is trying to delete.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canDelete(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canDelete($record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the related resource?
@@ -120,16 +91,9 @@ interface AuthorizerInterface
      * @param $relationshipKey
      * @param $record
      * @param EncodingParametersInterface $parameters
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canReadRelatedResource(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canReadRelatedResource($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified resource relationship?
@@ -140,16 +104,9 @@ interface AuthorizerInterface
      *      the record to which the relationship relates.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      */
-    public function canReadRelationship(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
     /**
      * Can the client modified the specified resource relationship?
@@ -158,16 +115,9 @@ interface AuthorizerInterface
      * @param object $record
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
-     * @param ErrorCollection $errors
-     *      the errors that will be returned to the client if the request is denied.
      * @return bool
      * @see http://jsonapi.org/format/#crud-updating-relationships
      */
-    public function canModifyRelationship(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    );
+    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
 
 }

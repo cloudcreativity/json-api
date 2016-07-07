@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Class AbstractAuthorizer
@@ -29,40 +29,30 @@ use Neomerx\JsonApi\Exceptions\ErrorCollection;
 abstract class AbstractAuthorizer implements AuthorizerInterface
 {
 
+    use ErrorsAwareTrait;
+
     /**
      * @inheritdoc
      */
-    public function canReadRelatedResource(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
-        return $this->canRead($record, $parameters, $errors);
+    public function canReadRelatedResource($relationshipKey, $record, EncodingParametersInterface $parameters)
+    {
+        return $this->canRead($record, $parameters);
     }
 
     /**
      * @inheritdoc
      */
-    public function canReadRelationship(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
-        return $this->canReadRelatedResource($relationshipKey, $record, $parameters, $errors);
+    public function canReadRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
+    {
+        return $this->canReadRelatedResource($relationshipKey, $record, $parameters);
     }
 
     /**
      * @inheritdoc
      */
-    public function canModifyRelationship(
-        $relationshipKey,
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
-        return $this->canUpdate($record, $parameters, $errors);
+    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
+    {
+        return $this->canUpdate($record, $parameters);
     }
 
 }

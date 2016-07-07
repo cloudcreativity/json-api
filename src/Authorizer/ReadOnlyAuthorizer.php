@@ -20,7 +20,6 @@ namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Class ReadOnlyAuthorizer
@@ -32,7 +31,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canReadMany(EncodingParametersInterface $parameters, ErrorCollection $errors)
+    public function canReadMany(EncodingParametersInterface $parameters)
     {
         return true;
     }
@@ -40,44 +39,32 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canCreate(
-        ResourceInterface $resource,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
+    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters)
+    {
         return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function canRead(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
+    public function canRead($record, EncodingParametersInterface $parameters)
+    {
         return true;
     }
 
     /**
      * @inheritdoc
      */
-    public function canUpdate(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
+    public function canUpdate($record, EncodingParametersInterface $parameters)
+    {
         return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function canDelete(
-        $record,
-        EncodingParametersInterface $parameters,
-        ErrorCollection $errors
-    ) {
+    public function canDelete($record, EncodingParametersInterface $parameters)
+    {
         return false;
     }
 
