@@ -49,13 +49,10 @@ class ErrorRepository implements ErrorRepositoryInterface
      * ErrorRepository constructor.
      * @param ReplacerInterface|null $replacer
      *      if provided, will be used to replace values into error detail.
-     * @param ErrorIdProviderInterface|null $idProvider
-     *      if provided, will be used to add an id to all errors created by the repository.
      */
-    public function __construct(ReplacerInterface $replacer = null, ErrorIdProviderInterface $idProvider = null)
+    public function __construct(ReplacerInterface $replacer = null)
     {
         $this->replacer = $replacer;
-        $this->idProvider = $idProvider;
     }
 
     /**
@@ -126,10 +123,6 @@ class ErrorRepository implements ErrorRepositoryInterface
     protected function make($key, array $values)
     {
         $error = Error::create($this->get($key));
-
-        if ($this->idProvider && !$error->hasId()) {
-            $error->setId($this->idProvider->issueId($error));
-        }
 
         if ($this->replacer && $error->hasDetail()) {
             $detail = $this->replacer->replace($error->getDetail(), $values);

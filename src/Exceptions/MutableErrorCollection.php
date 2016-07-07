@@ -18,29 +18,29 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Document\Error;
-use Generator;
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection as BaseCollection;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
- * Class ErrorCollection
+ * Class MutableErrorCollection
  * @package CloudCreativity\JsonApi
  */
-class ErrorCollection extends BaseCollection
+class MutableErrorCollection extends ErrorCollection
 {
 
     /**
-     * @param ErrorInterface|ErrorInterface[]|ErrorCollection|BaseCollection $errors
-     * @return ErrorCollection
+     * @param ErrorInterface|ErrorInterface[]|MutableErrorCollection|ErrorCollection $errors
+     * @return MutableErrorCollection
      */
     public static function cast($errors)
     {
         if ($errors instanceof self) {
             return $errors;
-        } elseif ($errors instanceof BaseCollection) {
+        } elseif ($errors instanceof ErrorCollection) {
             $errors = $errors->getArrayCopy();
         } elseif($errors instanceof ErrorInterface) {
             $errors = [$errors];
@@ -79,10 +79,21 @@ class ErrorCollection extends BaseCollection
     }
 
     /**
-     * @param BaseCollection $errors
+     * @param ErrorInterface $error
      * @return $this
      */
-    public function merge(BaseCollection $errors)
+    public function add(ErrorInterface $error)
+    {
+        $error = Error::cast($error);
+
+        return parent::add($error);
+    }
+
+    /**
+     * @param ErrorCollection $errors
+     * @return $this
+     */
+    public function merge(ErrorCollection $errors)
     {
         /** @var ErrorInterface $error */
         foreach ($errors as $error) {
@@ -93,17 +104,6 @@ class ErrorCollection extends BaseCollection
     }
 
     /**
-     * @return Generator
-     */
-    public function getIterator()
-    {
-        /** @var ErrorInterface $error */
-        foreach ($this->getArrayCopy() as $error) {
-            yield Error::cast($error);
-        }
-    }
-
-    /**
      * Get the most applicable HTTP status code.
      *
      * From the spec:
@@ -111,16 +111,17 @@ class ErrorCollection extends BaseCollection
      * code SHOULD be used in the response. For instance, 400 Bad Request might be appropriate for multiple
      * 4xx errors or 500 Internal Server Error might be appropriate for multiple 5xx errors.
      *
-     * @param string|int $default
-     *      the default to use if an error status cannot be resolved.
+     * @param string|int|null $default
+     *      the default to use if an error status cannot be resolved. Defaults to 400 Bad Request
      * @return string|int
      */
-    public function getHttpStatus($default = JsonApiException::DEFAULT_HTTP_CODE)
+    public function getHttpStatus($default = null)
     {
+        $default = $default ?: JsonApiException::DEFAULT_HTTP_CODE;
         $request = null;
         $internal = null;
 
-        /** @var Error $error */
+        /** @var MutableErrorInterface $error */
         foreach ($this as $error) {
 
             $status = $error->getStatus();

@@ -19,8 +19,6 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorIdProviderInterface;
-use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase as BaseTestCase;
 use CloudCreativity\JsonApi\Utils\Replacer;
@@ -56,27 +54,19 @@ class TestCase extends BaseTestCase
     protected $factory;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $idProvider;
-
-    /**
      * @return void
      */
     protected function setUp()
     {
         /** @var StoreInterface $store */
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
-        /** @var ErrorIdProviderInterface $idProvider */
-        $idProvider = $this->getMockBuilder(ErrorIdProviderInterface::class)->getMock();
         $config = require __DIR__ . '/../../config/validation.php';
 
-        $this->errorRepository = new ErrorRepository(new Replacer(), $idProvider);
+        $this->errorRepository = new ErrorRepository(new Replacer());
         $this->errorRepository->configure($config);
         $this->errorFactory = new ValidatorErrorFactory($this->errorRepository);
         $this->factory = new ValidatorFactory($this->errorFactory, $store);
         $this->store = $store;
-        $this->idProvider = $idProvider;
     }
 
     /**

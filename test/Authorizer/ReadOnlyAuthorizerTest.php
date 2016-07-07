@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Authorizer;
 
-use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Object\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
@@ -37,7 +37,7 @@ final class ReadOnlyAuthorizerTest extends TestCase
         $parameters = $this->getMockBuilder(EncodingParametersInterface::class)->getMock();
         $authorizer = new ReadOnlyAuthorizer();
         $record = new StandardObject();
-        $errors = new ErrorCollection();
+        $errors = new MutableErrorCollection();
 
         $this->assertTrue($authorizer->canReadMany($parameters, $errors));
         $this->assertTrue($authorizer->canRead($record, $parameters, $errors));

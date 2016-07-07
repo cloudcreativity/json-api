@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
-use CloudCreativity\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Class AbstractAuthorizer

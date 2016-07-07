@@ -21,13 +21,13 @@ namespace CloudCreativity\JsonApi\Exceptions;
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Document\Error as BaseError;
-use Neomerx\JsonApi\Exceptions\ErrorCollection as BaseCollection;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Class ErrorCollectionTest
  * @package CloudCreativity\JsonApi
  */
-final class ErrorCollectionTest extends TestCase
+final class MutableErrorCollectionTest extends TestCase
 {
 
     public function testIterator()
@@ -37,9 +37,9 @@ final class ErrorCollectionTest extends TestCase
         $c = new Error(null, null, 400);
 
         $expected = [Error::cast($a), Error::cast($b), $c];
-        $errors = new ErrorCollection([$a, $b, $c]);
+        $errors = new MutableErrorCollection([$a, $b, $c]);
 
-        $this->assertSame([$a, $b, $c], $errors->getArrayCopy());
+        $this->assertEquals($expected, $errors->getArrayCopy());
         $this->assertEquals($expected, iterator_to_array($errors));
     }
 
@@ -49,42 +49,42 @@ final class ErrorCollectionTest extends TestCase
         $b = new Error(null, null, 400);
         $c = new BaseError(null, null, 500);
 
-        $merge = new BaseCollection();
+        $merge = new ErrorCollection();
         $merge->add($a)->add($b);
 
-        $errors = new ErrorCollection([$c]);
-        $expected = [$c, $a, $b];
+        $errors = new MutableErrorCollection([$c]);
+        $expected = [Error::cast($c), Error::cast($a), $b];
 
-        $this->assertSame($errors, $errors->merge($merge));
-        $this->assertSame($expected, $errors->getArrayCopy());
+        $this->assertEquals($errors, $errors->merge($merge));
+        $this->assertEquals($expected, $errors->getArrayCopy());
     }
 
     public function testCastReturnsSame()
     {
-        $errors = new ErrorCollection();
-        $this->assertSame($errors, ErrorCollection::cast($errors));
+        $errors = new MutableErrorCollection();
+        $this->assertSame($errors, MutableErrorCollection::cast($errors));
     }
 
     public function testCastError()
     {
         $error = new BaseError(null, null, 422);
-        $expected = new ErrorCollection([$error]);
-        $this->assertEquals($expected, ErrorCollection::cast($error));
+        $expected = new MutableErrorCollection([$error]);
+        $this->assertEquals($expected, MutableErrorCollection::cast($error));
     }
 
     public function testCastBaseCollection()
     {
         $error = new Error(null, null, 422);
-        $expected = new ErrorCollection([$error]);
-        $base = new BaseCollection();
+        $expected = new MutableErrorCollection([$error]);
+        $base = new ErrorCollection();
         $base->add($error);
-        $this->assertEquals($expected, ErrorCollection::cast($base));
+        $this->assertEquals($expected, MutableErrorCollection::cast($base));
     }
 
     public function testCastArray()
     {
         $arr = [new Error(null, null, 500)];
-        $expected = new ErrorCollection($arr);
-        $this->assertEquals($expected, ErrorCollection::cast($arr));
+        $expected = new MutableErrorCollection($arr);
+        $this->assertEquals($expected, MutableErrorCollection::cast($arr));
     }
 }

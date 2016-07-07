@@ -16,23 +16,30 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Utils;
+namespace CloudCreativity\JsonApi\Contracts\Http;
 
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
- * Interface ErrorIdProviderInterface
+ * Interface ErrorResponseInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorIdProviderInterface
+interface ErrorResponseInterface
 {
 
     /**
-     * Issue an id for the supplied error.
-     *
-     * @param ErrorInterface $error
-     * @return string|int|null
-     *      the error id, as a string or integer, or null if none is to be allocated.
+     * @return ErrorInterface|ErrorInterface[]|ErrorCollection
      */
-    public function issueId(ErrorInterface $error);
+    public function getErrors();
+
+    /**
+     * @return int
+     */
+    public function getHttpCode();
+
+    /**
+     * @return array
+     */
+    public function getHeaders();
 }

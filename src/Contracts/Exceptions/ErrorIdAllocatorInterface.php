@@ -16,19 +16,23 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Utils;
+namespace CloudCreativity\JsonApi\Contracts\Exceptions;
 
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 
 /**
- * Interface ErrorsAwareInterface
+ * Interface ErrorIdProviderInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorsAwareInterface
+interface ErrorIdAllocatorInterface
 {
 
     /**
-     * @return ErrorCollection
+     * Assign an id to the provided error.
+     *
+     * @param MutableErrorInterface $error
+     * @return void
      */
-    public function getErrors();
+    public function assignId(MutableErrorInterface $error);
+
 }

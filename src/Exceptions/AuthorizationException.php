@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Exceptions;
 
 use Exception;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection as BaseErrorCollection;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -34,13 +34,13 @@ class AuthorizationException extends JsonApiException
 
     /**
      * AuthorizationException constructor.
-     * @param ErrorInterface|ErrorInterface[]|BaseErrorCollection $errors
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
      * @param int $defaultHttpCode
      * @param Exception|null $previous
      */
     public function __construct($errors, $defaultHttpCode = self::HTTP_CODE_FORBIDDEN, Exception $previous = null)
     {
-        $errors = ErrorCollection::cast($errors);
+        $errors = MutableErrorCollection::cast($errors);
 
         parent::__construct($errors, $errors->getHttpStatus($defaultHttpCode), $previous);
     }

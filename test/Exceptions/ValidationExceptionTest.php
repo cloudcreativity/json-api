@@ -28,43 +28,16 @@ use CloudCreativity\JsonApi\TestCase;
 final class ValidationExceptionTest extends TestCase
 {
 
-    public function testResolveErrorStatusNoStatus()
+    public function testDefaultStatus()
     {
-        $ex = new ValidationException(new Error());
-        $this->assertEquals(ValidationException::DEFAULT_HTTP_CODE, $ex->getHttpCode());
+        $ex = new ValidationException([]);
+        $this->assertSame(ValidationException::HTTP_CODE_BAD_REQUEST, $ex->getHttpCode());
     }
 
-    public function testResolveErrorStatusUsesDefaultWithMultiple()
+    public function testErrorStatus()
     {
-        $ex = new ValidationException([new Error(), new Error()], 499);
-        $this->assertEquals(499, $ex->getHttpCode());
-    }
-
-    public function testResolveErrorStatusUsesErrorStatus()
-    {
-        $ex = new ValidationException([new Error(), new Error(null, null, 422)]);
-        $this->assertEquals(422, $ex->getHttpCode());
-    }
-
-    public function testResolveErrorStatus4xx()
-    {
-        $ex = new ValidationException([new Error(null, null, 422), new Error(null, null, 415)]);
-        $this->assertEquals(400, $ex->getHttpCode());
-    }
-
-    public function testResolveErrorStatus5xx()
-    {
-        $ex = new ValidationException([new Error(null, null, 501), new Error(null, null, 503)]);
-        $this->assertEquals(500, $ex->getHttpCode());
-    }
-
-    public function testResolveErrorStatusMixed()
-    {
-        $a = new Error(null, null, 422);
-        $b = new Error(null, null, 501);
-        $ex = new ValidationException([$a, $b]);
-
-        $this->assertEquals(500, $ex->getHttpCode());
-        $this->assertSame([$a, $b], $ex->getErrors()->getArrayCopy());
+        $err = new Error(null, null, 401);
+        $ex = new ValidationException($err);
+        $this->assertEquals(401, $ex->getHttpCode());
     }
 }

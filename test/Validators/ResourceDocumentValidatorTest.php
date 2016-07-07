@@ -520,28 +520,6 @@ JSON_API;
         $this->assertFalse($validator->isValid($document));
     }
 
-    public function testIdAllocated()
-    {
-        $expected = '123';
-        $this->idProvider->method('issueId')->willReturn($expected);
-
-        $content = <<<JSON_API
-{
-    "data": {
-        "type": "posts",
-        "id": "99"
-    }
-}
-JSON_API;
-
-        $document = $this->decode($content);
-        $validator = $this->validator('1');
-
-        $validator->isValid($document);
-        $error = $this->findErrorAt($validator->getErrors(), '/data/id');
-        $this->assertSame($expected, $error->getId());
-    }
-
     /**
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
