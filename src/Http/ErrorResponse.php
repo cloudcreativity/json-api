@@ -22,7 +22,6 @@ use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Class ErrorResponse
@@ -37,9 +36,9 @@ class ErrorResponse implements ErrorResponseInterface
     private $errors;
 
     /**
-     * @var int|null
+     * @var int
      */
-    private $httpCode;
+    private $defaultHttpCode;
 
     /**
      * @var array
@@ -47,25 +46,15 @@ class ErrorResponse implements ErrorResponseInterface
     private $headers;
 
     /**
-     * @param JsonApiException $ex
-     * @param array $headers
-     * @return ErrorResponse
-     */
-    public static function create(JsonApiException $ex, array $headers = [])
-    {
-        return new self($ex->getErrors(), $ex->getHttpCode(), $headers);
-    }
-
-    /**
      * ErrorResponse constructor.
      * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
-     * @param int|null $httpCode
+     * @param int|null $defaultHttpCode
      * @param array $headers
      */
-    public function __construct($errors, $httpCode = null, array $headers = [])
+    public function __construct($errors, $defaultHttpCode = null, array $headers = [])
     {
         $this->errors = $errors;
-        $this->httpCode = $httpCode;
+        $this->defaultHttpCode = $defaultHttpCode;
         $this->headers = $headers;
     }
 
@@ -82,13 +71,9 @@ class ErrorResponse implements ErrorResponseInterface
      */
     public function getHttpCode()
     {
-        if ($this->httpCode) {
-            return $this->httpCode;
-        }
-
         $errors = MutableErrorCollection::cast($this->errors);
 
-        return $errors->getHttpStatus($this->httpCode);
+        return $errors->getHttpStatus($this->defaultHttpCode);
     }
 
     /**

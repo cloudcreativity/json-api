@@ -57,16 +57,4 @@ final class ErrorResponseTest extends TestCase
         $this->assertEquals($headers, $response->getHeaders());
     }
 
-    public function testCreate()
-    {
-        $error = new Error('123', null, 422);
-        $ex = new JsonApiException([$error], 403);
-        $headers = ['X-Custom' => 'Foobar'];
-        $response = ErrorResponse::create($ex, $headers);
-
-        $this->assertInstanceOf(ErrorResponse::class, $response);
-        /** @var ErrorResponse $response */
-        $this->assertSame($ex->getErrors(), $response->getErrors());
-        $this->assertEquals($ex->getHttpCode(), $response->getHttpCode());
-    }
 }
