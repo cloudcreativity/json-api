@@ -552,7 +552,7 @@ class Error implements MutableErrorInterface
 
         // Source
         if (array_key_exists(self::SOURCE, $input)) {
-            $this->setSource($input[self::SOURCE]);
+            $this->setSource((array) $input[self::SOURCE]);
         }
 
         // Source Pointer

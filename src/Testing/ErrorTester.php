@@ -19,9 +19,9 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Document\Error;
-use Exception;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface as Keys;
 use PHPUnit_Framework_Assert as PHPUnit;
+use stdClass;
 
 /**
  * Class ErrorTester
@@ -31,7 +31,7 @@ class ErrorTester
 {
 
     /**
-     * @var Error
+     * @var stdClass
      */
     private $error;
 
@@ -41,37 +41,19 @@ class ErrorTester
     private $index;
 
     /**
-     * @param array $error
-     *      the error read out of the error response, as an array.
-     * @param int $index
-     *      the index within the error collection at which this error exists.
-     * @return ErrorTester
-     */
-    public static function create(array $error, $index = 0)
-    {
-        try {
-            $error = Error::create($error);
-        } catch (Exception $ex) {
-            PHPUnit::fail(sprintf('Invalid error at index %d', $index));
-        }
-
-        return new self($error, $index);
-    }
-
-    /**
      * ErrorTester constructor.
-     * @param ErrorInterface $error
+     * @param stdClass $error
      * @param int $index
      *      the index within the error collection at which this error exists.
      */
-    public function __construct(ErrorInterface $error, $index = 0)
+    public function __construct(stdClass $error, $index = 0)
     {
-        $this->error = Error::cast($error);
+        $this->error = $error;
         $this->index = $index;
     }
 
     /**
-     * @return Error
+     * @return stdClass
      */
     public function getError()
     {
@@ -87,6 +69,15 @@ class ErrorTester
     }
 
     /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return isset($this->error->{Keys::KEYWORD_ERRORS_CODE}) ?
+            $this->error->{Keys::KEYWORD_ERRORS_CODE} : null;
+    }
+
+    /**
      * Assert that the error code equals the expected code.
      *
      * @param $expected
@@ -96,9 +87,18 @@ class ErrorTester
     public function assertCode($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid code at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->error->getCode(), $message);
+        PHPUnit::assertEquals($expected, $this->getCode(), $message);
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return isset($this->error->{Keys::KEYWORD_ERRORS_STATUS}) ?
+            $this->error->{Keys::KEYWORD_ERRORS_STATUS} : null;
     }
 
     /**
@@ -111,9 +111,44 @@ class ErrorTester
     public function assertStatus($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid status at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->error->getStatus(), $message);
+        PHPUnit::assertEquals($expected, $this->getStatus(), $message);
 
         return $this;
+    }
+
+    /**
+     * @return stdClass|null
+     */
+    public function getSource()
+    {
+        $source = isset($this->error->{Keys::KEYWORD_ERRORS_SOURCE}) ?
+            $this->error->{Keys::KEYWORD_ERRORS_SOURCE} : null;
+
+        if (!is_null($source) && !$source instanceof stdClass) {
+            PHPUnit::fail(sprintf('Invalid error source at index %d', $this->index));
+        }
+
+        return $source;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourcePointer()
+    {
+        $source = $this->getSource() ?: new stdClass();
+
+        return isset($source->{Error::SOURCE_POINTER}) ? $source->{Error::SOURCE_POINTER} : null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceParameter()
+    {
+        $source = $this->getSource() ?: new stdClass();
+
+        return isset($source->{Error::SOURCE_PARAMETER}) ? $source->{Error::SOURCE_PARAMETER} : null;
     }
 
     /**
@@ -126,7 +161,7 @@ class ErrorTester
     public function assertPointer($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid source pointer at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->error->getSourcePointer(), $message);
+        PHPUnit::assertEquals($expected, $this->getSourcePointer(), $message);
 
         return $this;
     }
@@ -141,7 +176,7 @@ class ErrorTester
     public function assertParameter($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid source parameter at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->error->getSourceParameter(), $message);
+        PHPUnit::assertEquals($expected, $this->getSourceParameter(), $message);
 
         return $this;
     }

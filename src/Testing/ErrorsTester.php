@@ -19,7 +19,6 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use Generator;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use PHPUnit_Framework_Assert as PHPUnit;
 
 /**
@@ -50,10 +49,11 @@ class ErrorsTester extends AbstractTraversableTester
     {
         foreach ($this->errors as $index => $error) {
 
-            $tester = ($error instanceof ErrorInterface) ?
-                new ErrorTester($error, $index) : ErrorTester::create((array) $error, $index);
+            if (!is_object($error)) {
+                PHPUnit::fail(sprintf('Encountered an error that is not an object at index %d', $index));
+            }
 
-            yield $index => $tester;
+            yield $index => new ErrorTester($error);
         }
     }
 
@@ -74,6 +74,20 @@ class ErrorsTester extends AbstractTraversableTester
     }
 
     /**
+     * Assert that there is only one error in the collection, and return a tester for that error.
+     *
+     * @param string|null $message
+     * @return ErrorTester
+     */
+    public function assertOne($message = '')
+    {
+        $message = $message ?: 'Expecting only one error in the error collection.';
+        PHPUnit::assertSame(1, $this->count(), $message);
+
+        return current($this->getArrayCopy());
+    }
+
+    /**
      * Assert that the supplied code(s) exist somewhere in the error collection.
      *
      * @param string|string[] $codes
@@ -82,7 +96,7 @@ class ErrorsTester extends AbstractTraversableTester
     public function assertCodes($codes)
     {
         $actual = $this->map(function (ErrorTester $error) {
-            return $error->getError()->getCode();
+            return $error->getCode();
         });
 
         foreach ((array) $codes as $expected) {
@@ -103,7 +117,7 @@ class ErrorsTester extends AbstractTraversableTester
     public function assertStatuses($statuses)
     {
         $actual = $this->map(function (ErrorTester $error) {
-            return $error->getError()->getStatus();
+            return $error->getStatus();
         });
 
         foreach ((array) $statuses as $expected) {
@@ -125,7 +139,7 @@ class ErrorsTester extends AbstractTraversableTester
     public function assertPointers($pointers)
     {
         $actual = $this->map(function (ErrorTester $error) {
-            return $error->getError()->getSourcePointer();
+            return $error->getSourcePointer();
         });
 
         foreach ((array) $pointers as $expected) {
@@ -147,7 +161,7 @@ class ErrorsTester extends AbstractTraversableTester
     public function assertParameters($parameters)
     {
         $actual = $this->map(function (ErrorTester $error) {
-            return $error->getError()->getSourceParameter();
+            return $error->getSourceParameter();
         });
 
         foreach ((array) $parameters as $expected) {
