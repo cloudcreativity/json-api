@@ -59,8 +59,8 @@ abstract class AbstractHydrator implements HydratorInterface
      */
     public function hydrate(ResourceInterface $resource, $record)
     {
-        $this->hydrateAttributes($resource->attributes(), $record);
-        $this->hydrateRelationships($resource->relationships(), $record);
+        $this->hydrateAttributes($resource->getAttributes(), $record);
+        $this->hydrateRelationships($resource->getRelationships(), $record);
 
         return $record;
     }
@@ -94,7 +94,7 @@ abstract class AbstractHydrator implements HydratorInterface
     protected function hydrateRelationships(RelationshipsInterface $relationships, $record)
     {
         /** @var RelationshipInterface $relationship */
-        foreach ($relationships->all() as $key => $relationship) {
+        foreach ($relationships->getAll() as $key => $relationship) {
             $method = $this->methodForRelationship($key);
 
             if (empty($method) || !method_exists($this, $method)) {

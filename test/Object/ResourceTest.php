@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ class ResourceTest extends TestCase
     protected function setUp()
     {
         $data = new stdClass();
-        $data->{Resource::TYPE} = static::TYPE;
-        $data->{Resource::ID} = static::ID;
+        $data->{Resource::TYPE} = self::TYPE;
+        $data->{Resource::ID} = self::ID;
         $data->{Resource::ATTRIBUTES} = new stdClass();
         $data->{Resource::ATTRIBUTES}->foo = 'bar';
         $data->{Resource::RELATIONSHIPS} = new stdClass();
@@ -51,13 +51,13 @@ class ResourceTest extends TestCase
     public function testGetType()
     {
         $object = new Resource($this->data);
-        $this->assertSame(static::TYPE, $object->type());
+        $this->assertSame(self::TYPE, $object->getType());
     }
 
     public function testGetId()
     {
         $object = new Resource($this->data);
-        $this->assertSame(static::ID, $object->id());
+        $this->assertSame(self::ID, $object->getId());
     }
 
     public function testHasId()
@@ -73,7 +73,7 @@ class ResourceTest extends TestCase
         $expected = ResourceIdentifier::create(self::TYPE, self::ID);
 
         $object = new Resource($this->data);
-        $this->assertEquals($expected, $object->identifier());
+        $this->assertEquals($expected, $object->getIdentifier());
     }
 
     public function testGetAttributes()
@@ -81,14 +81,14 @@ class ResourceTest extends TestCase
         $object = new Resource($this->data);
         $expected = new StandardObject($this->data->{Resource::ATTRIBUTES});
 
-        $this->assertEquals($expected, $object->attributes());
+        $this->assertEquals($expected, $object->getAttributes());
     }
 
     public function testGetEmptyAttributes()
     {
         unset($this->data->{Resource::ATTRIBUTES});
         $object = new Resource($this->data);
-        $this->assertEquals(new StandardObject(), $object->attributes());
+        $this->assertEquals(new StandardObject(), $object->getAttributes());
     }
 
     public function testHasAttributes()
@@ -104,7 +104,7 @@ class ResourceTest extends TestCase
         $expected = new Relationships($this->data->{Resource::RELATIONSHIPS});
         $object = new Resource($this->data);
 
-        $this->assertEquals($expected, $object->relationships());
+        $this->assertEquals($expected, $object->getRelationships());
     }
 
     public function testHasRelationships()
@@ -119,7 +119,7 @@ class ResourceTest extends TestCase
     {
         $expected = new StandardObject($this->data->{Resource::META});
         $object = new Resource($this->data);
-        $this->assertEquals($expected, $object->meta());
+        $this->assertEquals($expected, $object->getMeta());
     }
 
     public function testHasMeta()

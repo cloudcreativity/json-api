@@ -91,7 +91,7 @@ JSON_API;
         $expected->user_id = "123";
         $expected->tag_ids = ["456", "789"];
 
-        $this->hydrator->hydrate($document->resource(), $record);
+        $this->hydrator->hydrate($document->getResource(), $record);
         $this->assertEquals($expected, $record);
     }
 
@@ -110,7 +110,7 @@ JSON_API;
         $record->user_id = "123";
 
         $document = $this->decode($content);
-        $this->hydrator->hydrateRelationship('user', $document->relationship(), $record);
+        $this->hydrator->hydrateRelationship('user', $document->getRelationship(), $record);
         $this->assertEquals("999", $record->user_id);
     }
 
@@ -127,6 +127,6 @@ JSON_API;
 
         $document = $this->decode($content);
         $this->setExpectedException(HydratorException::class);
-        $this->hydrator->hydrateRelationship('foo', $document->relationship(), new stdClass());
+        $this->hydrator->hydrateRelationship('foo', $document->getRelationship(), new stdClass());
     }
 }

@@ -140,7 +140,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
      */
     public function isValid(ResourceInterface $resource, $record = null)
     {
-        $relationships = $resource->relationships();
+        $relationships = $resource->getRelationships();
         $valid = true;
 
         if (!$this->validateRequired($relationships)) {
@@ -200,7 +200,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
         }
 
         $validator = $this->get($key);
-        $relationship = $relationships->rel($key);
+        $relationship = $relationships->getRelationship($key);
 
         if ($validator && !$validator->isValid($relationship, $record, $key, $resource)) {
             $this->addErrors($validator->getErrors());

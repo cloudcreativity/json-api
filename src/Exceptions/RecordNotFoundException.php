@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Exceptions;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use Exception;
 
 /**
  * Class RecordNotFoundException
@@ -28,13 +29,29 @@ class RecordNotFoundException extends StoreException
 {
 
     /**
+     * @var ResourceIdentifierInterface $identifier
+     */
+    private $identifier;
+
+    /**
      * @param ResourceIdentifierInterface $identifier
      * @return RecordNotFoundException
      */
-    public static function create(ResourceIdentifierInterface $identifier)
-    {
-        $message = sprintf('Cannot find Record %s:%s', $identifier->type(), $identifier->id());
+    public function __construct(
+        ResourceIdentifierInterface $identifier,
+        $code = 0,
+        Exception $previous = null
+    ) {
+        $message = sprintf('Cannot find Record %s:%s', $identifier->getType(), $identifier->getId());
+        parent::__construct($message, $code, $previous);
+        $this->identifier = $identifier;
+    }
 
-        return new self($message);
+    /**
+     * @return ResourceIdentifierInterface
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
 }

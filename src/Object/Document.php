@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,36 +35,9 @@ class Document extends StandardObject implements DocumentInterface
     use MetaMemberTrait;
 
     /**
-     * @return StandardObjectInterface
-     * @deprecated use `data()`
+     * @inheritdoc
      */
     public function getData()
-    {
-        return $this->data();
-    }
-
-    /**
-     * @return ResourceInterface
-     * @deprecated use `resource()`
-     */
-    public function getResourceObject()
-    {
-        return $this->resource();
-    }
-
-    /**
-     * @return Relationship
-     * @deprecated use `relationship()`
-     */
-    public function getRelationship()
-    {
-        return $this->relationship();
-    }
-
-    /**
-     * @return StandardObjectInterface
-     */
-    public function data()
     {
         if (!$this->has(self::DATA)) {
             throw new DocumentException('Data member is not present.');
@@ -80,26 +53,19 @@ class Document extends StandardObject implements DocumentInterface
     }
 
     /**
-     * Get the data member as a resource object.
-     *
-     * @return ResourceInterface
-     * @throws DocumentException
-     *      if the data member is not an object or is not present.
+     * @inheritdoc
      */
-    public function resource()
+    public function getResource()
     {
-        /** @var StandardObject $data */
-        $data = $this->data();
+        $data = $this->getData();
 
         return new Resource($data->getProxy());
     }
 
     /**
-     * Get the document as a relationship.
-     *
-     * @return RelationshipInterface
+     * @inheritdoc
      */
-    public function relationship()
+    public function getRelationship()
     {
         return new Relationship($this->getProxy());
     }

@@ -76,7 +76,7 @@ class ResourceDocumentValidator implements DocumentValidatorInterface
             return false;
         }
 
-        if (!$this->resourceValidator->isValid($document->resource(), $record)) {
+        if (!$this->resourceValidator->isValid($document->getResource(), $record)) {
             $this->addErrors($this->resourceValidator->getErrors());
             return false;
         }

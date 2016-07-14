@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,25 +29,23 @@ interface ResourceIdentifierCollectionInterface extends IteratorAggregate, Count
 {
 
     /**
+     * Does the collection contain the supplied identifier?
+     *
      * @param ResourceIdentifierInterface $identifier
      * @return bool
      */
     public function has(ResourceIdentifierInterface $identifier);
 
     /**
-     * @return ResourceIdentifierInterface[]
-     * @deprecated use `all()`
-     */
-    public function getAll();
-
-    /**
      * Get the collection as an array.
      *
      * @return ResourceIdentifierInterface[]
      */
-    public function all();
+    public function getAll();
 
     /**
+     * Is the collection empty?
+     *
      * @return bool
      */
     public function isEmpty();
@@ -68,17 +66,11 @@ interface ResourceIdentifierCollectionInterface extends IteratorAggregate, Count
     public function isOnly($typeOrTypes);
 
     /**
-     * @return array
-     * @deprecated use `ids()`
-     */
-    public function getIds();
-
-    /**
      * Get an array of the ids of each identifier in the collection.
      *
      * @return array
      */
-    public function ids();
+    public function getIds();
 
     /**
      * Map the collection to an array of type keys and id values.

@@ -60,7 +60,7 @@ final class TestHydrator extends AbstractHydrator
      */
     protected function hydrateUserRelationship(RelationshipInterface $relationship, $record)
     {
-        $record->user_id = $relationship->hasOne()->id();
+        $record->user_id = $relationship->getIdentifier()->getId();
     }
 
     /**
@@ -69,7 +69,7 @@ final class TestHydrator extends AbstractHydrator
      */
     protected function hydrateTagsRelationship(RelationshipInterface $relationship, $record)
     {
-        $record->tag_ids = $relationship->hasMany()->ids();
+        $record->tag_ids = $relationship->getIdentifiers()->getIds();
     }
 
 }

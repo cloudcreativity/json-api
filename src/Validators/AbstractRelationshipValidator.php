@@ -145,21 +145,24 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     {
         $valid = true;
 
+        /** Must have a type */
         if (!$identifier->hasType()) {
             $this->addError($this->errorFactory->memberRequired(
                 ResourceIdentifierInterface::TYPE,
                 $key ? P::relationshipData($key) : P::data()
             ));
             $valid = false;
-        } elseif (!$this->isSupportedType($identifier->type())) {
+        } /** Check type is valid for this relationship */
+        elseif (!$this->isSupportedType($identifier->getType())) {
             $this->addError($this->errorFactory->relationshipUnsupportedType(
                 $this->expectedTypes,
-                $identifier->type(),
+                $identifier->getType(),
                 $key
             ));
             $valid = false;
         }
 
+        /** Must have an id */
         if (!$identifier->hasId()) {
             $this->addError($this->errorFactory->memberRequired(
                 ResourceIdentifierInterface::ID,

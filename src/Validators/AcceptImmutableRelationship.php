@@ -60,8 +60,8 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
             return true;
         }
 
-        return $this->current->type() == $identifier->type() &&
-            $this->current->id() == $identifier->id();
+        return $this->current->getType() == $identifier->getType() &&
+            $this->current->getId() == $identifier->getId();
     }
 
 }

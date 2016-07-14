@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ class ResourceIdentifierTest extends TestCase
 
         $identifier = ResourceIdentifier::create(self::TYPE, self::ID);
 
-        $this->assertSame(self::TYPE, $identifier->type());
+        $this->assertSame(self::TYPE, $identifier->getType());
         $this->assertTrue($identifier->hasType());
 
-        $this->assertSame(self::ID, $identifier->id());
+        $this->assertSame(self::ID, $identifier->getId());
         $this->assertTrue($identifier->hasId());
 
         return $identifier;
@@ -89,7 +89,7 @@ class ResourceIdentifierTest extends TestCase
     {
         $identifier = new ResourceIdentifier();
 
-        $this->assertEquals(new StandardObject(), $identifier->meta());
+        $this->assertEquals(new StandardObject(), $identifier->getMeta());
 
         $meta = new stdClass();
         $meta->foo = 'bar';
@@ -97,6 +97,6 @@ class ResourceIdentifierTest extends TestCase
 
         $identifier->set(ResourceIdentifier::META, $meta);
 
-        $this->assertEquals($expected, $identifier->meta());
+        $this->assertEquals($expected, $identifier->getMeta());
     }
 }

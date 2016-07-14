@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ class ResourceIdentifierCollectionTest extends TestCase
     /**
      * @var ResourceIdentifier
      */
-    protected $a;
+    private $a;
 
     /**
      * @var ResourceIdentifier
      */
-    protected $b;
+    private $b;
 
     protected function setUp()
     {
@@ -46,7 +46,7 @@ class ResourceIdentifierCollectionTest extends TestCase
     public function testConstruct()
     {
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
-        $this->assertSame([$this->a, $this->b], $collection->all());
+        $this->assertSame([$this->a, $this->b], $collection->getAll());
 
         return $collection;
     }
@@ -56,7 +56,7 @@ class ResourceIdentifierCollectionTest extends TestCase
      */
     public function testIterator(ResourceIdentifierCollection $collection)
     {
-        $expected = $collection->all();
+        $expected = $collection->getAll();
         $this->assertEquals($expected, iterator_to_array($collection));
     }
 
@@ -74,7 +74,7 @@ class ResourceIdentifierCollectionTest extends TestCase
     public function testClear(ResourceIdentifierCollection $collection)
     {
         $this->assertSame($collection, $collection->clear());
-        $this->assertEmpty($collection->all());
+        $this->assertEmpty($collection->getAll());
     }
 
     public function testIsEmpty()
@@ -91,7 +91,7 @@ class ResourceIdentifierCollectionTest extends TestCase
 
         $this->assertSame($collection, $collection->add($this->a));
         $collection->add($this->b);
-        $this->assertSame([$this->a, $this->b], $collection->all());
+        $this->assertSame([$this->a, $this->b], $collection->getAll());
 
         return $collection;
     }
@@ -101,11 +101,9 @@ class ResourceIdentifierCollectionTest extends TestCase
      */
     public function testAddIgnoresDuplicates(ResourceIdentifierCollection $collection)
     {
-        $expected = $collection->all();
-
+        $expected = $collection->getAll();
         $collection->add($this->a)->add($this->b);
-
-        $this->assertEquals($expected, $collection->all());
+        $this->assertEquals($expected, $collection->getAll());
     }
 
     public function testHas()
@@ -131,26 +129,26 @@ class ResourceIdentifierCollectionTest extends TestCase
     {
         $collection = new ResourceIdentifierCollection();
 
-        $this->assertTrue($collection->isOnly($this->a->type()));
+        $this->assertTrue($collection->isOnly($this->a->getType()));
         $collection->add($this->a);
-        $this->assertTrue($collection->isOnly($this->a->type()));
+        $this->assertTrue($collection->isOnly($this->a->getType()));
 
         $collection->add($this->b);
-        $this->assertFalse($collection->isOnly($this->a->type()));
-        $this->assertFalse($collection->isOnly($this->b->type()));
+        $this->assertFalse($collection->isOnly($this->a->getType()));
+        $this->assertFalse($collection->isOnly($this->b->getType()));
 
         $this->assertTrue($collection->isOnly([
-            $this->a->type(),
-            $this->b->type(),
+            $this->a->getType(),
+            $this->b->getType(),
         ]));
     }
 
     public function testGetIds()
     {
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
-        $expected = [$this->a->id(), $this->b->id()];
+        $expected = [$this->a->getId(), $this->b->getId()];
 
-        $this->assertEquals($expected, $collection->ids());
+        $this->assertEquals($expected, $collection->getIds());
     }
 
     public function testMap()
@@ -158,11 +156,11 @@ class ResourceIdentifierCollectionTest extends TestCase
         $collection = new ResourceIdentifierCollection([$this->a, $this->b]);
 
         $expected = [
-            $this->a->type() => [
-                $this->a->id(),
+            $this->a->getType() => [
+                $this->a->getId(),
             ],
-            $this->b->type() => [
-                $this->b->id(),
+            $this->b->getType() => [
+                $this->b->getId(),
             ],
         ];
 
@@ -180,13 +178,13 @@ class ResourceIdentifierCollectionTest extends TestCase
         $b = 'Alias-B';
 
         $map = [
-            $this->a->type() => $a,
-            $this->b->type() => $b,
+            $this->a->getType() => $a,
+            $this->b->getType() => $b,
         ];
 
         $expected = [
-            $a => [$this->a->id()],
-            $b => [$this->b->id()],
+            $a => [$this->a->getId()],
+            $b => [$this->b->getId()],
         ];
 
         $this->assertEquals($expected, $collection->map($map));

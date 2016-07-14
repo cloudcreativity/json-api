@@ -46,7 +46,7 @@ trait IdentifiableTrait
      * @throws DocumentException
      *      if the type member is not present, or is not a string, or is an empty string.
      */
-    public function type()
+    public function getType()
     {
         if (!$this->has(DocumentInterface::KEYWORD_TYPE)) {
             throw new DocumentException('Type member not present.');
@@ -74,7 +74,7 @@ trait IdentifiableTrait
      * @throws DocumentException
      *      if the id member is not present, or is not a string/int, or is an empty string.
      */
-    public function id()
+    public function getId()
     {
         if (!$this->has(DocumentInterface::KEYWORD_ID)) {
             throw new DocumentException('Id member not present.');
@@ -101,21 +101,4 @@ trait IdentifiableTrait
         return $this->has(DocumentInterface::KEYWORD_ID);
     }
 
-    /**
-     * @return string
-     * @deprecated use `type()`
-     */
-    public function getType()
-    {
-        return $this->type();
-    }
-
-    /**
-     * @return int|string
-     * @deprecated use `id()`
-     */
-    public function getId()
-    {
-        return $this->id();
-    }
 }

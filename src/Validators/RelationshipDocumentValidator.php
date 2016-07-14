@@ -63,7 +63,7 @@ class RelationshipDocumentValidator implements DocumentValidatorInterface
     {
         $this->reset();
 
-        if (!$this->relationshipValidator->isValid($document->relationship(), $record)) {
+        if (!$this->relationshipValidator->isValid($document->getRelationship(), $record)) {
             $this->addErrors($this->relationshipValidator->getErrors());
             return false;
         }

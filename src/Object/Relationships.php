@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,34 +31,19 @@ class Relationships extends StandardObject implements RelationshipsInterface
 {
 
     /**
-     * @return Generator
+     * @inheritdoc
      */
-    public function all()
+    public function getAll()
     {
         foreach ($this->keys() as $key) {
-            yield $key => $this->rel($key);
+            yield $key => $this->getRelationship($key);
         }
     }
 
     /**
-     * Shorthand for `relationship()`
-     *
-     * @param $key
-     * @return RelationshipInterface
-     * @throws DocumentException
+     * @inheritdoc
      */
-    public function rel($key)
-    {
-        return $this->relationship($key);
-    }
-
-    /**
-     * @param $key
-     * @return RelationshipInterface
-     * @throws DocumentException
-     *      if the key is not present, or is not an object.
-     */
-    public function relationship($key)
+    public function getRelationship($key)
     {
         if (!$this->has($key)) {
             throw new DocumentException("Relationship member '$key' is not present.");

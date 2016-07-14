@@ -48,7 +48,7 @@ class HasOneValidator extends AbstractRelationshipValidator
             return false;
         }
 
-        $identifier = $relationship->hasOne();
+        $identifier = $relationship->getIdentifier();
 
         /** If there's an identifier, it must be a valid identifier object. */
         if ($identifier && !$this->validateIdentifier($identifier, $key)) {

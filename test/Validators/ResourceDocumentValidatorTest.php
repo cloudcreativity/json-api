@@ -448,10 +448,18 @@ JSON_API;
 
         $context = function (ResourceInterface $resource, $obj) use (&$called, $record) {
             $this->assertSame($record, $obj);
-            $this->assertEquals('posts', $resource->type());
-            $this->assertEquals('123', $resource->id());
-            $this->assertEquals('My first post', $resource->attributes()->get('title'));
-            $this->assertEquals('users', $resource->relationships()->rel('user')->data()->type());
+            $this->assertEquals('posts', $resource->getType());
+            $this->assertEquals('123', $resource->getId());
+            $this->assertEquals('My first post', $resource
+                ->getAttributes()
+                ->get('title')
+            );
+            $this->assertEquals('users', $resource
+                ->getRelationships()
+                ->getRelationship('user')
+                ->getData()
+                ->getType()
+            );
             $called = true;
             return true;
         };

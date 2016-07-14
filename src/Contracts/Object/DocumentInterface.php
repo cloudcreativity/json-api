@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,11 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInter
  * Interface DocumentInterface
  * @package CloudCreativity\JsonApi
  */
-interface DocumentInterface extends StandardObjectInterface
+interface DocumentInterface extends StandardObjectInterface, MetaMemberInterface
 {
 
     const DATA = NeomerxDocumentInterface::KEYWORD_DATA;
     const META = NeomerxDocumentInterface::KEYWORD_META;
-
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `data()`
-     */
-    public function getData();
 
     /**
      * Get the data member of the document as a standard object.
@@ -44,13 +38,7 @@ interface DocumentInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the data member is not an object, or is not present.
      */
-    public function data();
-
-    /**
-     * @return ResourceInterface
-     * @deprecated use `resource()`
-     */
-    public function getResourceObject();
+    public function getData();
 
     /**
      * Get the data member as a resource object.
@@ -59,33 +47,13 @@ interface DocumentInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the data member is not an object or is not present.
      */
-    public function resource();
-
-    /**
-     * @return RelationshipInterface
-     * @deprecated use `relationship()`
-     */
-    public function getRelationship();
+    public function getResource();
 
     /**
      * Get the document as a relationship.
      *
      * @return RelationshipInterface
      */
-    public function relationship();
+    public function getRelationship();
 
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `meta()`
-     */
-    public function getMeta();
-
-    /**
-     * Get the meta member of the document.
-     *
-     * @return StandardObjectInterface
-     * @throws DocumentException
-     *      if the meta member is present and is not an object.
-     */
-    public function meta();
 }

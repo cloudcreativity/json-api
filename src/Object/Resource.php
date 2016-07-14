@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,66 +37,17 @@ class Resource extends StandardObject implements ResourceInterface
         MetaMemberTrait;
 
     /**
-     * @return ResourceIdentifierInterface
-     * @deprecated use `identifier()`
+     * @inheritdoc
      */
     public function getIdentifier()
     {
-        return $this->identifier();
+        return ResourceIdentifier::create($this->getType(), $this->getId());
     }
 
     /**
-     * @return StandardObjectInterface
-     * @deprecated use `attributes()`
+     * @inheritdoc
      */
     public function getAttributes()
-    {
-        return $this->attributes();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasAttributes()
-    {
-        return $this->has(self::ATTRIBUTES);
-    }
-
-    /**
-     * @return RelationshipsInterface
-     * @deprecated use `relationships()`
-     */
-    public function getRelationships()
-    {
-        return $this->relationships();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasRelationships()
-    {
-        return $this->has(self::RELATIONSHIPS);
-    }
-
-    /**
-     * Get the type and id members as a resource identifier object.
-     *
-     * @return ResourceIdentifierInterface
-     * @throws DocumentException
-     *      if the type and/or id members are not valid.
-     */
-    public function identifier()
-    {
-        return ResourceIdentifier::create($this->type(), $this->id());
-    }
-
-    /**
-     * @return StandardObjectInterface
-     * @throws DocumentException
-     *      if the attributes member is present and is not an object.
-     */
-    public function attributes()
     {
         $attributes = $this->get(self::ATTRIBUTES);
 
@@ -108,11 +59,17 @@ class Resource extends StandardObject implements ResourceInterface
     }
 
     /**
-     * @return RelationshipsInterface
-     * @throws DocumentException
-     *      if the relationships member is present and is not an object.
+     * @inheritdoc
      */
-    public function relationships()
+    public function hasAttributes()
+    {
+        return $this->has(self::ATTRIBUTES);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRelationships()
     {
         $relationships = $this->get(self::RELATIONSHIPS);
 
@@ -121,6 +78,14 @@ class Resource extends StandardObject implements ResourceInterface
         }
 
         return new Relationships($relationships);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasRelationships()
+    {
+        return $this->has(self::RELATIONSHIPS);
     }
 
 }

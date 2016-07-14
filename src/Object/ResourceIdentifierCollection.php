@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Object;
 use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use InvalidArgumentException;
 
 /**
  * Class ResourceIdentifierCollection
@@ -73,7 +74,7 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
         foreach ($identifiers as $identifier) {
 
             if (!$identifier instanceof ResourceIdentifierInterface) {
-                throw new \InvalidArgumentException('Expecting only identifier objects.');
+                throw new InvalidArgumentException('Expecting only identifier objects.');
             }
 
             $this->add($identifier);
@@ -94,15 +95,6 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
     }
 
     /**
-     * @return array
-     * @deprecated use `all()`
-     */
-    public function getAll()
-    {
-        return $this->all();
-    }
-
-    /**
      * @return $this
      */
     public function clear()
@@ -117,7 +109,7 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->all());
+        return new ArrayIterator($this->getAll());
     }
 
     /**
@@ -170,15 +162,6 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
     }
 
     /**
-     * @return array
-     * @deprecated use `ids()`
-     */
-    public function getIds()
-    {
-        return $this->ids();
-    }
-
-    /**
      * @param array|null $typeMap
      * @return array
      */
@@ -206,7 +189,7 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
      *
      * @return ResourceIdentifierInterface[]
      */
-    public function all()
+    public function getAll()
     {
         return $this->stack;
     }
@@ -216,13 +199,13 @@ class ResourceIdentifierCollection implements ResourceIdentifierCollectionInterf
      *
      * @return array
      */
-    public function ids()
+    public function getIds()
     {
         $ids = [];
 
         /** @var ResourceIdentifierInterface $identifier */
         foreach ($this as $identifier) {
-            $ids[] = $identifier->id();
+            $ids[] = $identifier->getId();
         }
 
         return $ids;

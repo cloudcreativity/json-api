@@ -202,8 +202,8 @@ JSON_API;
 
         $document = $this->decode($content);
         $validator = $this->hasOne(false, true, function (ResourceIdentifierInterface $identifier) {
-            $this->assertEquals("users", $identifier->type());
-            $this->assertEquals("99", $identifier->id());
+            $this->assertEquals("users", $identifier->getType());
+            $this->assertEquals("99", $identifier->getId());
             return true;
         });
 

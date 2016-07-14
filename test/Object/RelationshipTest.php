@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class RelationshipTest extends TestCase
         $object = new Relationship($input);
         $expected = new ResourceIdentifier($this->belongsTo);
 
-        $this->assertEquals($expected, $object->data());
+        $this->assertEquals($expected, $object->getData());
         $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
     }
@@ -68,7 +68,7 @@ class RelationshipTest extends TestCase
 
         $object = new Relationship($input);
 
-        $this->assertNull($object->data());
+        $this->assertNull($object->getData());
         $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
     }
@@ -81,7 +81,7 @@ class RelationshipTest extends TestCase
         $object = new Relationship($input);
         $expected = ResourceIdentifierCollection::create($this->hasMany);
 
-        $this->assertEquals($expected, $object->data());
+        $this->assertEquals($expected, $object->getData());
         $this->assertTrue($object->isHasMany());
         $this->assertFalse($object->isHasOne());
     }
@@ -93,7 +93,7 @@ class RelationshipTest extends TestCase
 
         $object = new Relationship($input);
 
-        $this->assertEquals(new ResourceIdentifierCollection(), $object->data());
+        $this->assertEquals(new ResourceIdentifierCollection(), $object->getData());
         $this->assertTrue($object->isHasMany());
         $this->assertFalse($object->isHasOne());
     }
@@ -103,7 +103,7 @@ class RelationshipTest extends TestCase
         $object = new Relationship();
 
         $this->assertFalse($object->hasMeta());
-        $this->assertEquals(new StandardObject(), $object->meta());
+        $this->assertEquals(new StandardObject(), $object->getMeta());
 
         $input = new stdClass();
         $input->meta = new stdClass();
@@ -112,6 +112,6 @@ class RelationshipTest extends TestCase
         $object->setProxy($input);
 
         $this->assertTrue($object->hasMeta());
-        $this->assertEquals(new StandardObject($input->meta), $object->meta());
+        $this->assertEquals(new StandardObject($input->meta), $object->getMeta());
     }
 }

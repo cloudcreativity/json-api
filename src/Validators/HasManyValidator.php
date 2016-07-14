@@ -49,7 +49,7 @@ class HasManyValidator extends AbstractRelationshipValidator
             return false;
         }
 
-        $identifiers = $relationship->hasMany();
+        $identifiers = $relationship->getIdentifiers();
 
         if (!$this->validateEmpty($identifiers, $key)) {
             return false;

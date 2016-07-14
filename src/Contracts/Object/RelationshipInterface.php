@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,11 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInter
  * Interface RelationshipInterface
  * @package CloudCreativity\JsonApi
  */
-interface RelationshipInterface extends StandardObjectInterface
+interface RelationshipInterface extends StandardObjectInterface, MetaMemberInterface
 {
 
     const DATA = NeomerxDocumentInterface::KEYWORD_DATA;
     const META = NeomerxDocumentInterface::KEYWORD_META;
-
-    /**
-     * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
-     * @deprecated use `data()`
-     */
-    public function getData();
 
     /**
      * Get the data member as a correctly casted object.
@@ -47,7 +41,7 @@ interface RelationshipInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the value for the data member is not a valid relationship value.
      */
-    public function data();
+    public function getData();
 
     /**
      * Get the data member as a has-one relationship.
@@ -56,7 +50,14 @@ interface RelationshipInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the data member is not a resource identifier or null.
      */
-    public function hasOne();
+    public function getIdentifier();
+
+    /**
+     * Is this a has-one relationship?
+     *
+     * @return bool
+     */
+    public function isHasOne();
 
     /**
      * Get the data member as a has-many relationship.
@@ -65,39 +66,13 @@ interface RelationshipInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the data member is not an array.
      */
-    public function hasMany();
+    public function getIdentifiers();
 
     /**
-     * @return bool
-     * @deprecated use `isHasOne` instead
-     */
-    public function isBelongsTo();
-
-    /**
-     * @return bool
-     */
-    public function isHasOne();
-
-    /**
+     * Is this a has-many relationship?
+     *
      * @return bool
      */
     public function isHasMany();
 
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `meta()`
-     */
-    public function getMeta();
-
-    /**
-     * @return StandardObjectInterface
-     * @throws DocumentException
-     *      if the meta member is present and is not an object.
-     */
-    public function meta();
-
-    /**
-     * @return bool
-     */
-    public function hasMeta();
 }

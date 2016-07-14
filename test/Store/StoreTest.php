@@ -118,7 +118,7 @@ final class StoreTest extends TestCase
      */
     private function willExist(ResourceIdentifier $identifier, $exists = true)
     {
-        $mock = $this->adapter($identifier->type());
+        $mock = $this->adapter($identifier->getType());
         $mock->method('exists')->with($identifier)->willReturn($exists);
 
         return $mock;

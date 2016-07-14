@@ -195,7 +195,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         $error = $this->repository->errorWithPointer(
             self::RELATIONSHIP_DOES_NOT_EXIST,
             $relationshipKey ? P::relationship($relationshipKey) : P::data(),
-            ['type' => $identifier->type(), 'id' => $identifier->id()]
+            ['type' => $identifier->getType(), 'id' => $identifier->getId()]
         );
 
         $error->setStatus(self::STATUS_RELATED_RESOURCE_DOES_NOT_EXIST);
@@ -211,7 +211,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         return $this->repository->errorWithPointer(
             self::RELATIONSHIP_NOT_ACCEPTABLE,
             $relationshipKey ? P::relationship($relationshipKey) : P::data(),
-            ['type' => $identifier->type(), 'id' => $identifier->id()]
+            ['type' => $identifier->getType(), 'id' => $identifier->getId()]
         );
     }
 

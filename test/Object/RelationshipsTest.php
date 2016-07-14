@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,10 @@ class RelationshipsTest extends TestCase
     const KEY_A = 'foo';
     const KEY_B = 'bar';
 
-    protected $data;
+    /**
+     * @var stdClass
+     */
+    private $data;
 
     protected function setUp()
     {
@@ -46,18 +49,18 @@ class RelationshipsTest extends TestCase
         $b->{Relationship::DATA} = null;
 
         $this->data = new stdClass();
-        $this->data->{static::KEY_A} = $a;
-        $this->data->{static::KEY_B} = $b;
+        $this->data->{self::KEY_A} = $a;
+        $this->data->{self::KEY_B} = $b;
     }
 
     public function testGet()
     {
         $object = new Relationships($this->data);
-        $a = new Relationship($this->data->{static::KEY_A});
-        $b = new Relationship($this->data->{static::KEY_B});
+        $a = new Relationship($this->data->{self::KEY_A});
+        $b = new Relationship($this->data->{self::KEY_B});
 
-        $this->assertEquals($a, $object->relationship(static::KEY_A));
-        $this->assertEquals($b, $object->relationship(static::KEY_B));
+        $this->assertEquals($a, $object->getRelationship(self::KEY_A));
+        $this->assertEquals($b, $object->getRelationship(self::KEY_B));
 
         return $object;
     }
@@ -68,11 +71,11 @@ class RelationshipsTest extends TestCase
     public function testAll(Relationships $object)
     {
         $expected = [
-            static::KEY_A => $object->relationship(static::KEY_A),
-            static::KEY_B => $object->relationship(static::KEY_B),
+            self::KEY_A => $object->getRelationship(self::KEY_A),
+            self::KEY_B => $object->getRelationship(self::KEY_B),
         ];
 
-        $this->assertEquals($expected, iterator_to_array($object->all()));
+        $this->assertEquals($expected, iterator_to_array($object->getAll()));
     }
 
 }

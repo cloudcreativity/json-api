@@ -18,32 +18,27 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use IteratorAggregate;
-use Traversable;
-
 /**
- * Interface RelationshipsInterface
+ * Interface MetaMemberInterface
  * @package CloudCreativity\JsonApi
  */
-interface RelationshipsInterface extends StandardObjectInterface, IteratorAggregate
+interface MetaMemberInterface
 {
 
     /**
-     * Get a traversable object of keys to relationship objects.
+     * Get the meta member of the object.
      *
-     * This iterator will return all keys with values cast to `RelationshipInterface` objects.
-     *
-     * @return Traversable
+     * @return StandardObjectInterface
+     * @throws DocumentException
+     *      if the meta member is present and is not an object.
      */
-    public function getAll();
+    public function getMeta();
 
     /**
-     * @param $key
-     * @return RelationshipInterface
-     * @throws DocumentException
-     *      if the key is not present, or is not an object.
+     * Does the object have meta?
+     *
+     * @return bool
      */
-    public function getRelationship($key);
+    public function hasMeta();
 
 }

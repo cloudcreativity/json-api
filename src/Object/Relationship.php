@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,25 +34,36 @@ class Relationship extends StandardObject implements RelationshipInterface
     use MetaMemberTrait;
 
     /**
-     * @return ResourceIdentifierCollectionInterface|ResourceIdentifierInterface|null
-     * @deprecated use `data()`
+     * @inheritdoc
      */
     public function getData()
     {
-        return $this->data();
+        if ($this->isHasOne()) {
+            return $this->getIdentifier();
+        } elseif ($this->isHasMany()) {
+            return $this->getIdentifiers();
+        }
+
+        throw new DocumentException('No data member or data member is not a valid relationship.');
     }
 
+
     /**
-     * @return bool
-     * @deprecated use `isHasOne()`
+     * @inheritdoc
      */
-    public function isBelongsTo()
+    public function getIdentifier()
     {
-        return $this->isHasOne();
+        if (!$this->isHasOne()) {
+            throw new DocumentException('No data member or data member is not a valid has-one relationship.');
+        }
+
+        $data = $this->get(self::DATA);
+
+        return ($data) ? new ResourceIdentifier($data) : null;
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function isHasOne()
     {
@@ -66,60 +77,9 @@ class Relationship extends StandardObject implements RelationshipInterface
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
-    public function isHasMany()
-    {
-        return is_array($this->get(self::DATA));
-    }
-
-    /**
-     * Get the data member as a correctly casted object.
-     *
-     * If this is a has-one relationship, a ResourceIdentifierInterface object or null will be returned. If it is
-     * a has-many relationship, a ResourceIdentifierCollectionInterface will be returned.
-     *
-     * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
-     * @throws DocumentException
-     *      if the value for the data member is not a valid relationship value.
-     */
-    public function data()
-    {
-        if ($this->isHasOne()) {
-            return $this->hasOne();
-        } elseif ($this->isHasMany()) {
-            return $this->hasMany();
-        }
-
-        throw new DocumentException('No data member or data member is not a valid relationship.');
-    }
-
-    /**
-     * Get the data member as a has-one relationship.
-     *
-     * @return ResourceIdentifierInterface|null
-     * @throws DocumentException
-     *      if the data member is not a resource identifier or null.
-     */
-    public function hasOne()
-    {
-        if (!$this->isHasOne()) {
-            throw new DocumentException('No data member or data member is not a valid has-one relationship.');
-        }
-
-        $data = $this->get(self::DATA);
-
-        return ($data) ? new ResourceIdentifier($data) : null;
-    }
-
-    /**
-     * Get the data member as a has-many relationship.
-     *
-     * @return ResourceIdentifierCollectionInterface
-     * @throws DocumentException
-     *      if the data member is not an array.
-     */
-    public function hasMany()
+    public function getIdentifiers()
     {
         if (!$this->isHasMany()) {
             throw new DocumentException('No data member of data member is not a valid has-many relationship.');
@@ -128,4 +88,11 @@ class Relationship extends StandardObject implements RelationshipInterface
         return ResourceIdentifierCollection::create($this->get(self::DATA));
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isHasMany()
+    {
+        return is_array($this->get(self::DATA));
+    }
 }

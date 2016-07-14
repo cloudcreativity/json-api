@@ -131,10 +131,10 @@ class ResourceValidator implements ResourceValidatorInterface
         }
 
         /** Must be the expected type */
-        if ($this->expectedType !== $resource->type()) {
+        if ($this->expectedType !== $resource->getType()) {
             $this->addError($this->errorFactory->resourceUnsupportedType(
                 $this->expectedType,
-                $resource->type()
+                $resource->getType()
             ));
             return false;
         }
@@ -155,10 +155,10 @@ class ResourceValidator implements ResourceValidatorInterface
         }
 
         /** If expecting an id, must match the one we're expecting */
-        if (!is_null($this->expectedId) && $this->expectedId != $resource->id()) {
+        if (!is_null($this->expectedId) && $this->expectedId != $resource->getId()) {
             $this->addError($this->errorFactory->resourceUnsupportedId(
                 $this->expectedId,
-                $resource->id()
+                $resource->getId()
             ));
             return false;
         }

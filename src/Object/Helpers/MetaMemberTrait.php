@@ -50,7 +50,7 @@ trait MetaMemberTrait
      * @throws DocumentException
      *      if the meta member is present and is not an object or null.
      */
-    public function meta()
+    public function getMeta()
     {
         $meta = $this->get(DocumentInterface::KEYWORD_META);
 
@@ -69,12 +69,4 @@ trait MetaMemberTrait
         return $this->has(DocumentInterface::KEYWORD_META);
     }
 
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `meta()`
-     */
-    public function getMeta()
-    {
-        return $this->meta();
-    }
 }

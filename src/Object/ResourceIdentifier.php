@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     public function isType($typeOrTypes)
     {
         $types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
-        $type = $this->get(static::TYPE);
+        $type = $this->get(self::TYPE);
 
         foreach ($types as $check) {
 
@@ -73,7 +73,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
      */
     public function mapType(array $map)
     {
-        $type = $this->type();
+        $type = $this->getType();
 
         if (array_key_exists($type, $map)) {
             return $map[$type];

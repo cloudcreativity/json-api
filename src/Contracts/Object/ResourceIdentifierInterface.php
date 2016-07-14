@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInter
  * Interface ResourceIdentifierInterface
  * @package CloudCreativity\JsonApi
  */
-interface ResourceIdentifierInterface extends StandardObjectInterface
+interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMemberInterface
 {
 
     const TYPE = NeomerxDocumentInterface::KEYWORD_TYPE;
@@ -33,17 +33,11 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
     const META = NeomerxDocumentInterface::KEYWORD_META;
 
     /**
-     * @return string|int
-     * @deprecated use `type()`
-     */
-    public function getType();
-
-    /**
      * @return string
      * @throws DocumentException
      *      if the type member is not present, or is not a string, or is an empty string.
      */
-    public function type();
+    public function getType();
 
     /**
      * @return bool
@@ -70,16 +64,10 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
 
     /**
      * @return string|int
-     * @deprecated use `id()`
-     */
-    public function getId();
-
-    /**
-     * @return string|int
      * @throws DocumentException
      *      if the id member is not present, or is not a string/int, or is an empty string.
      */
-    public function id();
+    public function getId();
 
     /**
      * @return bool
@@ -93,16 +81,4 @@ interface ResourceIdentifierInterface extends StandardObjectInterface
      */
     public function isComplete();
 
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `meta()`
-     */
-    public function getMeta();
-
-    /**
-     * @return StandardObjectInterface
-     * @throws DocumentException
-     *      if the meta member is present and is not an object.
-     */
-    public function meta();
 }

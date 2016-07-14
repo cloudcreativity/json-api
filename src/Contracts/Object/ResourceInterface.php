@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInter
  * Interface ResourceObjectInterface
  * @package CloudCreativity\JsonApi
  */
-interface ResourceInterface extends StandardObjectInterface
+interface ResourceInterface extends StandardObjectInterface, MetaMemberInterface
 {
 
     const TYPE = NeomerxDocumentInterface::KEYWORD_TYPE;
@@ -41,37 +41,19 @@ interface ResourceInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if no type is set, is empty or is not a string.
      */
-    public function type();
-
-    /**
-     * @return string
-     * @deprecated use `type()`
-     */
     public function getType();
-
-    /**
-     * @return string|int
-     * @deprecated use `id()`
-     */
-    public function getId();
 
     /**
      * @return string|int
      * @throws DocumentException
      *      if no id is set, is not a string or integer, or is an empty string.
      */
-    public function id();
+    public function getId();
 
     /**
      * @return bool
      */
     public function hasId();
-
-    /**
-     * @return ResourceIdentifierInterface
-     * @deprecated use `identifier()`
-     */
-    public function getIdentifier();
 
     /**
      * Get the type and id members as a resource identifier object.
@@ -80,20 +62,14 @@ interface ResourceInterface extends StandardObjectInterface
      * @throws DocumentException
      *      if the type and/or id members are not valid.
      */
-    public function identifier();
-
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `attributes`
-     */
-    public function getAttributes();
+    public function getIdentifier();
 
     /**
      * @return StandardObjectInterface
      * @throws DocumentException
      *      if the attributes member is present and is not an object.
      */
-    public function attributes();
+    public function getAttributes();
 
     /**
      * @return bool
@@ -102,38 +78,14 @@ interface ResourceInterface extends StandardObjectInterface
 
     /**
      * @return RelationshipsInterface
-     * @deprecated use `relationships()`
-     */
-    public function getRelationships();
-
-    /**
-     * @return RelationshipsInterface
      * @throws DocumentException
      *      if the relationships member is present and is not an object.
      */
-    public function relationships();
+    public function getRelationships();
 
     /**
      * @return bool
      */
     public function hasRelationships();
-
-    /**
-     * @return StandardObjectInterface
-     * @deprecated use `meta()`
-     */
-    public function getMeta();
-
-    /**
-     * @return StandardObjectInterface
-     * @throws DocumentException
-     *      if the meta member is present and is not an object.
-     */
-    public function meta();
-
-    /**
-     * @return bool
-     */
-    public function hasMeta();
 
 }

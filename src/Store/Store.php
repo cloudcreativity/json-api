@@ -46,7 +46,7 @@ class Store implements StoreInterface
     public function exists(ResourceIdentifierInterface $identifier)
     {
         return $this
-            ->adapterFor($identifier->type())
+            ->adapterFor($identifier->getType())
             ->exists($identifier);
     }
 
@@ -58,7 +58,7 @@ class Store implements StoreInterface
     public function find(ResourceIdentifierInterface $identifier)
     {
         return $this
-            ->adapterFor($identifier->type())
+            ->adapterFor($identifier->getType())
             ->find($identifier);
     }
 
@@ -74,7 +74,7 @@ class Store implements StoreInterface
         $record = $this->find($identifier);
 
         if (!$record) {
-            throw RecordNotFoundException::create($identifier);
+            throw new RecordNotFoundException($identifier);
         }
 
         return $record;
