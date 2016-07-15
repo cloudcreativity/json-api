@@ -19,9 +19,6 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 

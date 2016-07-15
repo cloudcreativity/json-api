@@ -18,10 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
-use Generator;
 
 /**
  * Class Relationships

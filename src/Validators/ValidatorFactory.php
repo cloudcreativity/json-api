@@ -19,14 +19,13 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 
 /**
  * Class ValidatorFactory

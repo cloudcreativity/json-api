@@ -18,6 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
+
 /**
  * Interface MetaMemberInterface
  * @package CloudCreativity\JsonApi

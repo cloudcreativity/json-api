@@ -18,10 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
