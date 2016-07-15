@@ -46,7 +46,7 @@ interface RelationshipInterface extends StandardObjectInterface, MetaMemberInter
     /**
      * Get the data member as a resource identifier (has-one relationship).
      *
-     * @return ResourceIdentifierInterface|null
+     * @return ResourceIdentifierInterface
      * @throws DocumentException
      *      if the data member is not a resource identifier.
      */
