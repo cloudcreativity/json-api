@@ -19,7 +19,6 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorIdProviderInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Document\Error;
 
@@ -34,11 +33,6 @@ class ErrorRepository implements ErrorRepositoryInterface
      * @var ReplacerInterface|null
      */
     private $replacer;
-
-    /**
-     * @var ErrorIdProviderInterface|null
-     */
-    private $idProvider;
 
     /**
      * @var array
