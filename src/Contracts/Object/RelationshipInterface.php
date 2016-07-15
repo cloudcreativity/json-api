@@ -44,13 +44,20 @@ interface RelationshipInterface extends StandardObjectInterface, MetaMemberInter
     public function getData();
 
     /**
-     * Get the data member as a has-one relationship.
+     * Get the data member as a resource identifier (has-one relationship).
      *
      * @return ResourceIdentifierInterface|null
      * @throws DocumentException
-     *      if the data member is not a resource identifier or null.
+     *      if the data member is not a resource identifier.
      */
     public function getIdentifier();
+
+    /**
+     * Is the data member a resource identifier?
+     *
+     * @return bool
+     */
+    public function hasIdentifier();
 
     /**
      * Is this a has-one relationship?

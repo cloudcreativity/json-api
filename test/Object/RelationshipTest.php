@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\Exceptions\DocumentException;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
@@ -48,7 +49,7 @@ class RelationshipTest extends TestCase
         $this->hasMany = [$a, $b];
     }
 
-    public function testBelongsTo()
+    public function testHasOne()
     {
         $input = new stdClass();
         $input->{Relationship::DATA} = $this->belongsTo;
@@ -57,11 +58,13 @@ class RelationshipTest extends TestCase
         $expected = new ResourceIdentifier($this->belongsTo);
 
         $this->assertEquals($expected, $object->getData());
+        $this->assertEquals($expected, $object->getIdentifier());
         $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
+        $this->assertTrue($object->hasIdentifier());
     }
 
-    public function testEmptyBelongsTo()
+    public function testEmptyHasOne()
     {
         $input = new stdClass();
         $input->{Relationship::DATA} = null;
@@ -71,6 +74,10 @@ class RelationshipTest extends TestCase
         $this->assertNull($object->getData());
         $this->assertTrue($object->isHasOne());
         $this->assertFalse($object->isHasMany());
+        $this->assertFalse($object->hasIdentifier());
+
+        $this->setExpectedException(DocumentException::class);
+        $object->getIdentifier();
     }
 
     public function testHasMany()

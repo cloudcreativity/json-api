@@ -36,13 +36,13 @@ class Relationship extends StandardObject implements RelationshipInterface
      */
     public function getData()
     {
-        if ($this->isHasOne()) {
-            return $this->getIdentifier();
-        } elseif ($this->isHasMany()) {
+        if ($this->isHasMany()) {
             return $this->getIdentifiers();
+        } elseif (!$this->isHasOne()) {
+            throw new DocumentException('No data member or data member is not a valid relationship.');
         }
 
-        throw new DocumentException('No data member or data member is not a valid relationship.');
+        return $this->hasIdentifier() ? $this->getIdentifier() : null;
     }
 
 
@@ -57,7 +57,21 @@ class Relationship extends StandardObject implements RelationshipInterface
 
         $data = $this->get(self::DATA);
 
-        return ($data) ? new ResourceIdentifier($data) : null;
+        if (!$data) {
+            throw new DocumentException('No resource identifier - relationship is empty.');
+        }
+
+        return new ResourceIdentifier($data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasIdentifier()
+    {
+        $data = $this->get(self::DATA);
+
+        return is_object($data);
     }
 
     /**
