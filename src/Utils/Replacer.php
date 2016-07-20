@@ -65,7 +65,7 @@ class Replacer implements ReplacerInterface
      */
     protected function parseValue($value)
     {
-        if(is_object($value)) {
+        if (is_object($value)) {
             return '<object>';
         } elseif (is_null($value)) {
             return 'null';

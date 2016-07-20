@@ -21,8 +21,8 @@ namespace CloudCreativity\JsonApi\Http;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 
 /**
  * Class Api

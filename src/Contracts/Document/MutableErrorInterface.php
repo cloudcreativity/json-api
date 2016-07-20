@@ -188,7 +188,7 @@ interface MutableErrorInterface extends ErrorInterface
 
     /**
      * Get the error source parameter.
-     * 
+     *
      * @return string|null
      */
     public function getSourceParameter();

@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 
 /**
  * Interface DocumentValidatorInterface
