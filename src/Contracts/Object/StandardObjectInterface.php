@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2016 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
+use Countable;
+use Traversable;
+
 /**
  * Interface StandardObjectInterface
  * @package CloudCreativity\JsonApi
  */
-interface StandardObjectInterface extends \Traversable, \Countable
+interface StandardObjectInterface extends Traversable, Countable
 {
 
     /**
@@ -33,19 +36,19 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function get($key, $default = null);
 
     /**
-     * @param array $keys
+     * @param string|string[] $keys
      * @param $default
      * @return array
      */
-    public function getProperties(array $keys, $default = null);
+    public function getProperties($keys, $default = null);
 
     /**
      * Get properties if they exist.
      *
-     * @param array $keys
+     * @param string|string[] $keys
      * @return array
      */
-    public function getMany(array $keys);
+    public function getMany($keys);
 
     /**
      * @param $key
@@ -61,46 +64,66 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function setProperties(array $values);
 
     /**
+     * Set the key's value, if the key does not exist on the object.
+     *
      * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function add($key, $value);
+
+    /**
+     * Add many properties.
+     *
+     * @param array $values
+     * @return $this
+     */
+    public function addProperties(array $values);
+
+    /**
+     * Do all the key(s) exist?
+     *
+     * @param string|string[] $keys
      * @return bool
      */
-    public function has($key);
+    public function has($keys);
 
     /**
      * Whether the object has all of the specified keys.
      *
      * @param array $keys
      * @return bool
+     * @deprecated use `has()`
      */
     public function hasAll(array $keys);
 
     /**
      * Whether the object has any (at least one) of the specified keys.
      *
-     * @param array $keys
+     * @param string|string[] $keys
      * @return bool
      */
-    public function hasAny(array $keys);
+    public function hasAny($keys);
 
     /**
-     * @param $key
+     * @param string $key
      * @return $this
      */
     public function remove($key);
 
     /**
-     * @param array $keys
+     * @param string|string[] $keys
      * @return $this
      */
-    public function removeProperties(array $keys);
+    public function removeProperties($keys);
 
     /**
      * Reduce this object so that it only has the supplied allowed keys.
      *
-     * @param array $keys
+     * @param string|string[] $keys
      * @return $this
      */
-    public function reduce(array $keys);
+    public function reduce($keys);
 
     /**
      * Get a list of the object's keys.
@@ -127,6 +150,15 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function mapKeys(array $map);
 
     /**
+     * Apply the transform to the value for the supplied key(s), if it exists.
+     *
+     * @param string|string[] $keys
+     * @param callable $transform
+     * @return $this
+     */
+    public function transform($keys, callable $transform);
+
+    /**
      * Recursively iterate through the object's keys and apply the transform to each key.
      *
      * @param callable $transform
@@ -135,13 +167,12 @@ interface StandardObjectInterface extends \Traversable, \Countable
     public function transformKeys(callable $transform);
 
     /**
-     * Apply the converter to the value for the supplied key, if it exists.
-     *
-     * @param $key
+     * @param $keys
      * @param callable $converter
-     * @return $this
+     * @return mixed
+     * @deprecated use `transform()`
      */
-    public function convertValue($key, callable $converter);
+    public function convertValue($keys, callable $converter);
 
     /**
      * Apply the converter to multiple keys that exist.
@@ -149,6 +180,7 @@ interface StandardObjectInterface extends \Traversable, \Countable
      * @param array $keys
      * @param callable $converter
      * @return $this
+     * @deprecated use `transform()`
      */
     public function convertValues(array $keys, callable $converter);
 
@@ -158,4 +190,12 @@ interface StandardObjectInterface extends \Traversable, \Countable
      * @return array
      */
     public function toArray();
+
+    /**
+     * Get the supplied key's value as a standard object.
+     *
+     * @param $key
+     * @return StandardObjectInterface
+     */
+    public function asObject($key);
 }

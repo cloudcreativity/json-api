@@ -19,19 +19,21 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
+use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
+use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;
 use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory;
-use Neomerx\JsonApi\Parameters\Headers\AcceptHeader;
-use Neomerx\JsonApi\Parameters\Headers\Header;
+use Neomerx\JsonApi\Http\Headers\AcceptHeader;
+use Neomerx\JsonApi\Http\Headers\Header;
 
 /**
  * Class CodecMatcherRepositoryTest
  * @package CloudCreativity\JsonApi
  */
-class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
+class CodecMatcherRepositoryTest extends TestCase
 {
 
     const A = 'application/vnd.api+json';
@@ -48,7 +50,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
             ],
         ],
         'decoders' => [
-            'application/vnd.api+json' => ObjectDecoder::class,
+            'application/vnd.api+json',
             'application/json' => ArrayDecoder::class,
         ],
 	];
@@ -75,7 +77,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->encoderB = $factory->createEncoder($schemas, new EncoderOptions(JSON_BIGINT_AS_STRING, $urlPrefix));
         $this->encoderC = $factory->createEncoder($schemas, new EncoderOptions(JSON_PRETTY_PRINT, $urlPrefix, 123));
 
-        $this->decoderA = new ObjectDecoder();
+        $this->decoderA = new DocumentDecoder();
         $this->decoderB = new ArrayDecoder();
 
         $this->repository = new CodecMatcherRepository($factory);
@@ -136,7 +138,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testDecoderA()
     {
         $codecMatcher = $this->repository->getCodecMatcher();
-        $codecMatcher->findDecoder(Header::parse(static::A, Header::HEADER_CONTENT_TYPE));
+        $codecMatcher->matchDecoder(Header::parse(static::A, Header::HEADER_CONTENT_TYPE));
 
         $this->assertEquals($this->decoderA, $codecMatcher->getDecoder());
         $this->assertEquals(static::A, $codecMatcher->getDecoderHeaderMatchedType()->getMediaType());
@@ -149,7 +151,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testDecoderB()
     {
         $codecMatcher = $this->repository->getCodecMatcher();
-        $codecMatcher->findDecoder(Header::parse(static::B, Header::HEADER_CONTENT_TYPE));
+        $codecMatcher->matchDecoder(Header::parse(static::B, Header::HEADER_CONTENT_TYPE));
 
         $this->assertEquals($this->decoderB, $codecMatcher->getDecoder());
         $this->assertEquals(static::B, $codecMatcher->getDecoderHeaderMatchedType()->getMediaType());
@@ -162,7 +164,7 @@ class CodecMatcherRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testDecoderC()
     {
         $codecMatcher = $this->repository->getCodecMatcher();
-        $codecMatcher->findDecoder(Header::parse(static::C, Header::HEADER_CONTENT_TYPE));
+        $codecMatcher->matchDecoder(Header::parse(static::C, Header::HEADER_CONTENT_TYPE));
 
         $this->assertNull($codecMatcher->getDecoder());
         $this->assertNull($codecMatcher->getDecoderHeaderMatchedType());

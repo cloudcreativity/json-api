@@ -18,13 +18,18 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use ArrayIterator;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\JsonApi\Object\Helpers\ObjectProxyTrait;
+use IteratorAggregate;
+use OutOfBoundsException;
+use Traversable;
 
 /**
  * Class StandardObject
  * @package CloudCreativity\JsonApi
  */
-class StandardObject implements \IteratorAggregate, StandardObjectInterface
+class StandardObject implements IteratorAggregate, StandardObjectInterface
 {
 
     use ObjectProxyTrait;
@@ -46,7 +51,7 @@ class StandardObject implements \IteratorAggregate, StandardObjectInterface
     public function __get($key)
     {
         if (!$this->has($key)) {
-            throw new \OutOfBoundsException(sprintf('Key "%s" does not exist.', $key));
+            throw new OutOfBoundsException(sprintf('Key "%s" does not exist.', $key));
         }
 
         return $this->get($key);
@@ -79,15 +84,15 @@ class StandardObject implements \IteratorAggregate, StandardObjectInterface
     }
 
     /**
-     * @return \Traversable
+     * @return Traversable
      */
     public function getIterator()
     {
-        if ($this->getProxy() instanceof \Traversable) {
+        if ($this->getProxy() instanceof Traversable) {
             return $this->getProxy();
         }
 
-        return new \ArrayIterator($this->toArray());
+        return new ArrayIterator($this->toArray());
     }
 
     /**

@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
-use CloudCreativity\JsonApi\Contracts\Stdlib\ConfigurableInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 

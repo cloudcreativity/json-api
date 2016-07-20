@@ -19,14 +19,15 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
+use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use Generator;
 use Neomerx\JsonApi\Codec\CodecMatcher;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
-use Neomerx\JsonApi\Contracts\Parameters\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
-use Neomerx\JsonApi\Parameters\Headers\MediaType;
+use Neomerx\JsonApi\Http\Headers\MediaType;
 use RuntimeException;
 
 /**
@@ -49,7 +50,10 @@ use RuntimeException;
  *          ],
  *      ],
  *      'decoders' => [
- *          'application/vnd.api+json' => ObjectDecoder::class,
+ *          // Defaults to using DocumentDecoder
+ *          'application/vnd.api+json',
+ *          // Specified decoder class
+ *          'application/json' => ArrayDecoder::class,
  *      ],
  * ]
  * ```
@@ -244,6 +248,11 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     private function getDecoders()
     {
         foreach ($this->decoders as $mediaType => $decoderClass) {
+
+            if (is_numeric($mediaType)) {
+                $mediaType = $decoderClass;
+                $decoderClass = DocumentDecoder::class;
+            }
 
             $closure = function () use ($decoderClass) {
 
