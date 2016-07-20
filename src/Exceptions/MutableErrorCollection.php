@@ -42,7 +42,7 @@ class MutableErrorCollection extends ErrorCollection
             return $errors;
         } elseif ($errors instanceof ErrorCollection) {
             $errors = $errors->getArrayCopy();
-        } elseif($errors instanceof ErrorInterface) {
+        } elseif ($errors instanceof ErrorInterface) {
             $errors = [$errors];
         } elseif (!is_array($errors)) {
             throw new InvalidArgumentException('Expecting an error collection or an array of error objects.');

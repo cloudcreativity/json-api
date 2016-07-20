@@ -74,7 +74,7 @@ interface StandardObjectInterface extends Traversable, Countable
 
     /**
      * Add many properties.
-     * 
+     *
      * @param array $values
      * @return $this
      */

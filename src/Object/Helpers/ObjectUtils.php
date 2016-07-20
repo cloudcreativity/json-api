@@ -34,7 +34,7 @@ class ObjectUtils
      */
     public static function toArray($data)
     {
-        if  (!is_object($data) && !is_array($data)) {
+        if (!is_object($data) && !is_array($data)) {
             throw new InvalidArgumentException('Expecting an object or array to convert to an array.');
         }
 

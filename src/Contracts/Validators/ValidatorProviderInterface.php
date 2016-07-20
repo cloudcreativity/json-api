@@ -52,7 +52,7 @@ interface ValidatorProviderInterface
 
     /**
      * Get a validator for filtering resources.
-     * 
+     *
      * @return FilterValidatorInterface
      */
     public function filterResources();

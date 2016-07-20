@@ -65,7 +65,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     /**
      * HasOneValidator constructor.
      * @param ValidatorErrorFactoryInterface $errorFactory
-     * @param StoreInterface $store;
+     * @param StoreInterface $store
      * @param $expectedType
      * @param bool $allowEmpty
      * @param AcceptRelatedResourceInterface|null $acceptable
