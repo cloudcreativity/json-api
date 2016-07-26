@@ -51,6 +51,20 @@ abstract class AbstractTraversableTester implements IteratorAggregate, Countable
     }
 
     /**
+     * @param Closure $closure
+     * @param mixed $carry
+     * @return mixed
+     */
+    public function reduce(Closure $closure, $carry = null)
+    {
+        foreach ($this as $key => $value) {
+            $carry = $closure($carry, $value, $key);
+        }
+
+        return $carry;
+    }
+
+    /**
      * @return array
      */
     public function getArrayCopy()

@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- Testers for a resource and multiple resources (resource collections). These tester can be obtained via
+methods on the document tester.
+
 ## [0.5.0] - 2016-07-20
 
 This is a substantial refactoring, based on using this package in production environments. We also updated 
