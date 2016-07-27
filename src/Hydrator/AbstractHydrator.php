@@ -59,8 +59,10 @@ abstract class AbstractHydrator implements HydratorInterface
      */
     public function hydrate(ResourceInterface $resource, $record)
     {
+        $this->hydrating($resource, $record);
         $this->hydrateAttributes($resource->getAttributes(), $record);
         $this->hydrateRelationships($resource->getRelationships(), $record);
+        $this->hydrated($resource, $record);
 
         return $record;
     }
@@ -103,5 +105,31 @@ abstract class AbstractHydrator implements HydratorInterface
 
             call_user_func([$this, $method], $relationship, $record);
         }
+    }
+
+    /**
+     * Called before any hydration occurs.
+     *
+     * Child classes can overload this method if they need to do any logic pre-hydration.
+     *
+     * @param ResourceInterface $resource
+     * @param $record
+     * @return void
+     */
+    protected function hydrating(ResourceInterface $resource, $record)
+    {
+    }
+
+    /**
+     * Called after hydration has occurred.
+     *
+     * Child classes can overload this method if they need to do any logic post-hydration.
+     *
+     * @param ResourceInterface $resource
+     * @param $record
+     * @return void
+     */
+    protected function hydrated(ResourceInterface $resource, $record)
+    {
     }
 }

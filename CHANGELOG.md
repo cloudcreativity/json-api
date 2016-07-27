@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. This projec
 
 - Testers for a resource and multiple resources (resource collections). These tester can be obtained via
 methods on the document tester.
+- Hydration hooks in `AbstractHydrator` so that it is easier to implement pre- and post-hydration logic.
 
 ## [0.5.0] - 2016-07-20
 
