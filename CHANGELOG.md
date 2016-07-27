@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.5.1] - 2016-07-27
+
+### Added
+
+- Testers for a resource and multiple resources (resource collections). These tester can be obtained via
+methods on the document tester.
+- Hydration hooks in `AbstractHydrator` so that it is easier to implement pre- and post-hydration logic.
+
 ## [0.5.0] - 2016-07-20
 
 This is a substantial refactoring, based on using this package in production environments. We also updated 

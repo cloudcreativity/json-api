@@ -65,6 +65,84 @@ class DocumentTester
     }
 
     /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return isset($this->document->{Keys::KEYWORD_DATA}) ?
+            $this->document->{Keys::KEYWORD_DATA} : null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIncluded()
+    {
+        return isset($this->document->{Keys::KEYWORD_INCLUDED}) ?
+            $this->document->{Keys::KEYWORD_INCLUDED} : null;
+    }
+
+    /**
+     * Assert that the document has a data member.
+     *
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertData($message = null)
+    {
+        $message = $message ?: 'Document does not have a data member.';
+        PHPUnit::assertObjectHasAttribute(Keys::KEYWORD_DATA, $this->document, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the data member is an object and return a resource tester.
+     *
+     * @param string|null $message
+     * @return ResourceTester
+     */
+    public function assertResource($message = null)
+    {
+        $message = $message ?: 'Document does not have a resource in its data member.';
+        $resource = $this->getData();
+
+        PHPUnit::assertInternalType('object', $resource, $message);
+
+        return new ResourceTester($resource);
+    }
+
+    /**
+     * Assert that the data member is a collection, and return it as a resource collection tester.
+     *
+     * @param string|null $message
+     * @return ResourcesTester
+     */
+    public function assertResourceCollection($message = null)
+    {
+        $message = $message ?: 'Document does not have a resource collection in its data member.';
+        $collection = $this->getData();
+
+        PHPUnit::assertInternalType('array', $collection, $message);
+
+        return new ResourcesTester($collection);
+    }
+
+    /**
+     * Assert that the included member is an array, and return it as a resource collection tester.
+     *
+     * @param string|null $message
+     * @return ResourcesTester
+     */
+    public function assertIncluded($message = null)
+    {
+        $message = $message ?: 'Document does not contain an included member.';
+        PHPUnit::assertObjectHasAttribute(Keys::KEYWORD_INCLUDED, $this->document, $message);
+
+        return new ResourcesTester((array) $this->document->{Keys::KEYWORD_INCLUDED});
+    }
+
+    /**
      * Assert that the document has an errors key, and return an errors tester.
      *
      * @param string|null $message
