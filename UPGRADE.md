@@ -2,6 +2,17 @@
 
 This file provides notes on how to upgrade between versions.
 
+## v0.5 to v0.6
+
+The following changes are unlikely to affect most applications. Only applications that have extended validator 
+classes provided by this package or created their own implementations may be affected:
+
+- `AcceptRelatedResourceInterface` may now return an `ErrorInterface` or `ErrorCollection` object instead of
+a boolean. You'll need to update any validators that consume this interface to support these return types in
+addition to a `boolean`.
+- `ValidatorErrorFactoryInterface::relationshipNotAcceptable()` now takes a third argument (the custom 
+error) and must return an `ErrorCollection` instance.
+
 ## v0.4 to v0.5
 
 We decided to refactor the package, so there are a substantial amount of changes between these two versions. We

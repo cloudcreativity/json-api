@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- An acceptable relationship callback or class implementing `AcceptRelatedResourceInterface` can now return
+an error or error collection instead of a boolean. This allows a custom error message to be returned.
+
 ## [0.5.1] - 2016-07-27
 
 ### Added
