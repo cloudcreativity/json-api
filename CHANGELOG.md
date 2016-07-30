@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+### Fixed
+
+- Bug in resources tester that prevented normalization of ids if an integer was passed for ids.
+
 ## [0.5.1] - 2016-07-27
 
 ### Added
