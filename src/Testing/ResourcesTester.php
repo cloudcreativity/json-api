@@ -193,9 +193,7 @@ class ResourcesTester extends AbstractTraversableTester
     private function normalizeIdentifiers(array $identifiers)
     {
         return array_map(function ($ids) {
-            if (is_string($ids)) {
-                $ids = array ($ids);
-            }
+            $ids = (array) $ids;
             sort($ids);
             return $ids;
         }, $identifiers);
