@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
+use CloudCreativity\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
@@ -223,6 +225,34 @@ JSON_API;
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);
         $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
+    }
+
+    public function testDataAcceptableReturnsError()
+    {
+        $content = '{"data": {"type": "users", "id": "99"}}';
+        $document = $this->decode($content);
+        $validator = $this->hasOne(false, true, function () {
+            $error = new Error();
+            $error->setDetail('Foobar');
+            return $error;
+        });
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertDetailIs($validator->getErrors(), '/data', 'Foobar');
+    }
+
+    public function testDataAcceptableReturnsErrors()
+    {
+        $content = '{"data": {"type": "users", "id": "99"}}';
+        $document = $this->decode($content);
+        $validator = $this->hasOne(false, true, function () {
+            $error = new Error();
+            $error->setDetail('Foobar');
+            return new MutableErrorCollection([$error]);
+        });
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertDetailIs($validator->getErrors(), '/data', 'Foobar');
     }
 
     public function testValidImmutable()

@@ -103,6 +103,18 @@ class TestCase extends BaseTestCase
     /**
      * @param ErrorCollection $errors
      * @param $pointer
+     * @param $expected
+     */
+    protected function assertDetailIs(ErrorCollection $errors, $pointer, $expected)
+    {
+        $error = $this->findErrorAt($errors, $pointer);
+
+        $this->assertEquals($expected, $error->getDetail(), "Invalid detail for error: $pointer");
+    }
+
+    /**
+     * @param ErrorCollection $errors
+     * @param $pointer
      * @return ErrorInterface
      */
     protected function findErrorAt(ErrorCollection $errors, $pointer)

@@ -20,6 +20,8 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Interface AcceptRelatedResourceInterface
@@ -39,7 +41,7 @@ interface AcceptRelatedResourceInterface
      *      if validating a resource's relationships, the key that is being validated.
      * @param ResourceInterface|null $resource
      *      if validating a resource's relationships, the resource for context.
-     * @return bool
+     * @return bool|ErrorInterface|ErrorCollection
      */
     public function accept(
         ResourceIdentifierInterface $identifier,

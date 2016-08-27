@@ -202,14 +202,18 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
         $key = null,
         ResourceInterface $resource = null
     ) {
-        if ($this->acceptable && !$this->acceptable->accept($identifier, $record, $key, $resource)) {
-            $this->addError($this->errorFactory->relationshipNotAcceptable(
+        $result = ($this->acceptable) ? $this->acceptable->accept($identifier, $record, $key, $resource) : true;
+
+        if (true !== $result) {
+            $this->addErrors($this->errorFactory->relationshipNotAcceptable(
                 $identifier,
-                $key
+                $key,
+                !is_bool($result) ? $result : null
             ));
             return false;
         }
 
         return true;
     }
+
 }

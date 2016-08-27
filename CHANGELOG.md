@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file. This projec
 - Added a `RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
 'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
 integration required.
+- An acceptable relationship callback or class implementing `AcceptRelatedResourceInterface` can now return
+an error or error collection instead of a boolean. This allows a custom error message to be returned.
 
 ## [0.5.2] - 2016-08-09
 
