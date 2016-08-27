@@ -37,5 +37,10 @@
         "psr-4": {
             "CloudCreativity\\JsonApi\\": "test/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-feature/v0.6": "0.6.x-dev"
+        }
     }
 }

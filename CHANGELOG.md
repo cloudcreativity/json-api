@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+- Added a `RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
+'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
+integration required.
+
 ## [0.5.2] - 2016-08-09
 
 ### Fixed
