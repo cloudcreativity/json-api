@@ -579,24 +579,6 @@ JSON_API;
     }
 
     /**
-     * @param bool $exists
-     * @return $this
-     */
-    private function willExist($exists = true)
-    {
-        $this->store->method('exists')->willReturn($exists);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    private function willNotExist()
-    {
-        return $this->willExist(false);
-    }
-
-    /**
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships

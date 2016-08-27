@@ -48,6 +48,20 @@ JSON_API;
         $validator = $this->hasMany(false);
 
         $this->assertTrue($validator->isValid($document));
+
+        return $document;
+    }
+
+
+    /**
+     * @param Document $document
+     * @depends testValid
+     */
+    public function testValidWithDefaultValidator(Document $document)
+    {
+        $validator = $this->factory->relationshipDocument();
+
+        $this->willExist()->assertTrue($validator->isValid($document));
     }
 
     public function testValidPolymorph()
@@ -257,7 +271,7 @@ JSON_API;
         callable $acceptable = null,
         $expectedType = 'users'
     ) {
-        $this->store->method('exists')->willReturn($exists);
+        $this->willExist($exists);
         $validator = $this->factory->hasMany($expectedType, $allowEmpty, $acceptable);
 
         return $this->factory->relationshipDocument($validator);

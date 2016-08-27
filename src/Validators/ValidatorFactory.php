@@ -68,9 +68,12 @@ class ValidatorFactory implements ValidatorFactoryInterface
     /**
      * @inheritdoc
      */
-    public function relationshipDocument(RelationshipValidatorInterface $relationship)
+    public function relationshipDocument(RelationshipValidatorInterface $relationship = null)
     {
-        return new RelationshipDocumentValidator($this->validationErrors, $relationship);
+        return new RelationshipDocumentValidator(
+            $this->validationErrors,
+            $relationship ?: $this->relationship()
+        );
     }
 
     /**

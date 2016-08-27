@@ -10,6 +10,14 @@ This file provides notes on how to upgrade between versions.
 this class and overloading the constructor, you will need to update your constructor to ensure the parent constructor
 is called.
 
+### Validation: Factory
+
+If you are implementing the `ValidatorFactoryInterface`, you need to make the following changes:
+
+- The argument for `relationshipDocument()` is now optional.
+- You need to add the `relationship()` method and return a validator that validates either a has-one or a has-many
+relationship. Use the new `RelationshipValidator` class if needed.
+
 ### Validation: Relationships
 
 The following changes are unlikely to affect most applications. Only applications that have extended validator 

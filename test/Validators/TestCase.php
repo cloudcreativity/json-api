@@ -70,6 +70,24 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * @param bool $exists
+     * @return $this
+     */
+    protected function willExist($exists = true)
+    {
+        $this->store->method('exists')->willReturn($exists);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function willNotExist()
+    {
+        return $this->willExist(false);
+    }
+
+    /**
      * @param ErrorCollection $errors
      * @param $pointer
      * @param $errorKey

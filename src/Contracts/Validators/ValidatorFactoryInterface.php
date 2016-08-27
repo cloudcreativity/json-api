@@ -37,11 +37,11 @@ interface ValidatorFactoryInterface
     /**
      * Create a validator for a document containing a relationship in its data member.
      *
-     * @param RelationshipValidatorInterface $relationship
+     * @param RelationshipValidatorInterface|null $relationship
      *      the validator to use for the data member.
      * @return DocumentValidatorInterface
      */
-    public function relationshipDocument(RelationshipValidatorInterface $relationship);
+    public function relationshipDocument(RelationshipValidatorInterface $relationship = null);
 
     /**
      * Create a validator for a resource object.

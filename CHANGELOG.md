@@ -21,6 +21,8 @@ an error or error collection instead of a boolean. This allows a custom error me
 relationship key, prepends `hydrate` and appends `Relationship`.
 - `AbstractAuthorizer` now uses the new `ErrorCreatorTrait` instead of the `ErrorsAwareTrait`, so that authorizers can
 load authorization errors from the error repository.
+- Validator factory can now make a generic relationship validator, plus the relationship validator argument is now
+optional when creating a relationship document validator.
 
 ## [0.5.2] - 2016-08-09
 
