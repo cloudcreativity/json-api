@@ -124,7 +124,7 @@ JSON_API;
         $document = $this->decode($content);
         $validator = $this->validator('1');
 
-        $this->assertTrue($validator->isValid($document));
+        $this->willExist()->assertTrue($validator->isValid($document));
     }
 
     public function testDataRequired()
@@ -331,10 +331,60 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator(null, null, $this->relationships());
+        $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::MEMBER_OBJECT_EXPECTED);
+    }
+
+    public function testDataRelationshipNoData()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": {}
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
+    }
+
+    public function testDataRelationshipInvalidData()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My first post"
+        },
+        "relationships": {
+            "user": {
+                "data": false
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::MEMBER_RELATIONSHIP_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
     }
 
     public function testDataNonExistingRelationship()
@@ -359,9 +409,9 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $relationships = $this->relationships(false)->hasOne('user', 'users');
-        $validator = $this->validator(null, null, $relationships);
+        $validator = $this->validator();
 
+        $this->willNotExist();
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::RELATIONSHIP_DOES_NOT_EXIST);
     }
@@ -467,7 +517,7 @@ JSON_API;
         $document = $this->decode($content);
         $validator = $this->validator("123", null, null, $context);
 
-        $this->assertTrue($validator->isValid($document, $record));
+        $this->willExist()->assertTrue($validator->isValid($document, $record));
 
         if (!$called) {
             $this->fail('Context validator was not called.');
@@ -529,6 +579,24 @@ JSON_API;
     }
 
     /**
+     * @param bool $exists
+     * @return $this
+     */
+    private function willExist($exists = true)
+    {
+        $this->store->method('exists')->willReturn($exists);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    private function willNotExist()
+    {
+        return $this->willExist(false);
+    }
+
+    /**
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
@@ -568,7 +636,7 @@ JSON_API;
      */
     private function relationships($exists = true)
     {
-        $this->store->method('exists')->willReturn($exists);
+        $this->willExist($exists);
         return $this->factory->relationships();
     }
 }

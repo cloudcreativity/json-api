@@ -22,10 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
 /**
- * Class HasOneValidator
+ * Class RelationshipValidator
  * @package CloudCreativity\JsonApi
  */
-class HasOneValidator extends AbstractRelationshipValidator
+class RelationshipValidator extends AbstractRelationshipValidator
 {
 
     /**
@@ -39,11 +39,16 @@ class HasOneValidator extends AbstractRelationshipValidator
     ) {
         $this->reset();
 
+        /** Check that it is a valid relationship object. */
         if (!$this->validateRelationship($relationship, $key)) {
             return false;
         }
 
-        return $this->validateHasOne($relationship, $record, $key, $resource);
+        if ($relationship->isHasOne()) {
+            return $this->validateHasOne($relationship, $record, $key, $resource);
+        }
+
+        return $this->validateHasMany($relationship, $record, $key, $resource);
     }
 
 }

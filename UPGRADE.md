@@ -20,6 +20,9 @@ a boolean. You'll need to update any validators that consume this interface to s
 addition to a `boolean`.
 - `ValidatorErrorFactoryInterface::relationshipNotAcceptable()` now takes a third argument (the custom 
 error) and must return an `ErrorCollection` instance.
+- Internal methods within `AbstractRelationshipValidator`, `HasOneValidator` and `HasManyValidator` have been 
+re-organised to move all the validation logic into the abstract class. You will need to make changes to any validators
+that extend these classes.
 
 ## v0.4 to v0.5
 

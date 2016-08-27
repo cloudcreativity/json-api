@@ -74,6 +74,22 @@ interface ValidatorFactoryInterface
     public function relationships();
 
     /**
+     * Create a validator for a relationship object.
+     *
+     * This validator will validate for either a has-one or a has-many relationship: i.e. that the
+     * relationship is structurally correct according to the JSON API spec.
+     *
+     * @param string|string[]|null
+     *      the expected type or types, or null to allow any expected types.
+     * @param bool $allowEmpty
+     *      is an empty relationship acceptable?
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
+     *      if a non-empty relationship that exists, is it acceptable?
+     * @return RelationshipValidatorInterface
+     */
+    public function relationship($expectedType = null, $allowEmpty = true, $acceptable = null);
+
+    /**
      * Create a relationship validator for a has-one relationship.
      *
      * @param string|string[] $expectedType

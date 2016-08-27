@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
@@ -48,7 +49,8 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     private $store;
 
     /**
-     * @var string[]
+     * @var string[]|null
+     *      if null, any types are supported.
      */
     private $expectedTypes;
 
@@ -66,7 +68,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * HasOneValidator constructor.
      * @param ValidatorErrorFactoryInterface $errorFactory
      * @param StoreInterface $store
-     * @param $expectedType
+     * @param string|string[]|null $expectedType
      * @param bool $allowEmpty
      * @param AcceptRelatedResourceInterface|null $acceptable
      */
@@ -79,7 +81,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     ) {
         $this->errorFactory = $errorFactory;
         $this->store = $store;
-        $this->expectedTypes = (array) $expectedType;
+        $this->expectedTypes = !is_null($expectedType) ? (array) $expectedType : null;
         $this->allowEmpty = $allowEmpty;
         $this->acceptable = $acceptable;
     }
@@ -107,10 +109,16 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      */
     protected function isSupportedType($type)
     {
+        if (!is_array($this->expectedTypes)) {
+            return true;
+        }
+
         return in_array($type, $this->expectedTypes, true);
     }
 
     /**
+     * Validate that a data member exists and it is either a has-one or a has-many relationship.
+     *
      * @param RelationshipInterface $relationship
      * @param string|null $key
      * @return bool
@@ -130,6 +138,83 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
                 RelationshipInterface::DATA,
                 $key ? P::relationship($key) : P::data()
             ));
+            return false;
+        }
+
+        if (!$this->validateEmpty($relationship, $key)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is this a valid has-one relationship?
+     *
+     * @param RelationshipInterface $relationship
+     * @param null $record
+     * @param null $key
+     * @param ResourceInterface|null $resource
+     * @return bool
+     */
+    protected function validateHasOne(
+        RelationshipInterface $relationship,
+        $record = null,
+        $key = null,
+        ResourceInterface $resource = null
+    ) {
+        if (!$relationship->isHasOne()) {
+            $this->addError($this->errorFactory->relationshipHasOneExpected($key));
+            return false;
+        }
+
+        $identifier = $relationship->getData();
+
+        if (!$identifier) {
+            return true;
+        }
+
+        /** Validate the identifier */
+        if (!$this->validateIdentifier($identifier, $key)) {
+            return false;
+        }
+
+        /** If an identifier has been provided, the resource it references must exist. */
+        if (!$this->validateExists($identifier, $key)) {
+            return false;
+        }
+
+        /** If an identifier has been provided, is it acceptable for the relationship? */
+        if (!$this->validateAcceptable($identifier, $record, $key, $resource)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is this a valid has-many relationship?
+     *
+     * @param RelationshipInterface $relationship
+     * @param null $record
+     * @param null $key
+     * @param ResourceInterface|null $resource
+     * @return bool
+     */
+    protected function validateHasMany(
+        RelationshipInterface $relationship,
+        $record = null,
+        $key = null,
+        ResourceInterface $resource = null
+    ) {
+        if (!$relationship->isHasMany()) {
+            $this->addError($this->errorFactory->relationshipHasManyExpected($key));
+            return false;
+        }
+
+        $identifiers = $relationship->getIdentifiers();
+
+        if (!$this->validateIdentifiers($identifiers, $record, $key, $resource)) {
             return false;
         }
 
@@ -175,6 +260,38 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     }
 
     /**
+     * @param ResourceIdentifierCollectionInterface $identifiers
+     * @param object|null $record
+     * @param string|null $key
+     * @param ResourceInterface $resource
+     * @return bool
+     */
+    protected function validateIdentifiers(
+        ResourceIdentifierCollectionInterface $identifiers,
+        $record = null,
+        $key = null,
+        ResourceInterface $resource = null
+    ) {
+        /** @var ResourceIdentifierInterface $identifier */
+        foreach ($identifiers as $identifier) {
+
+            if (!$this->validateIdentifier($identifier, $key) || !$this->validateExists($identifier, $key)) {
+                return false;
+            }
+        }
+
+        /** @var ResourceIdentifierInterface $identifier */
+        foreach ($identifiers as $identifier) {
+
+            if (!$this->validateAcceptable($identifier, $record, $key, $resource)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param ResourceIdentifierInterface $identifier
      * @param string|null
      * @return bool
@@ -210,6 +327,27 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
                 $key,
                 !is_bool($result) ? $result : null
             ));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param RelationshipInterface $relationship
+     * @param string|null $key
+     * @return bool
+     */
+    private function validateEmpty(RelationshipInterface $relationship, $key = null)
+    {
+        if ($relationship->isHasOne()) {
+            $empty = !$relationship->hasIdentifier();
+        } else {
+            $empty = $relationship->getIdentifiers()->isEmpty();
+        }
+
+        if ($empty && !$this->isEmptyAllowed()) {
+            $this->addError($this->errorFactory->relationshipEmptyNotAllowed($key));
             return false;
         }
 

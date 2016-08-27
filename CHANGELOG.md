@@ -11,9 +11,11 @@ integration required.
 - A new trait `ErrorCreatorTrait` is now available. This allows an object to construct the errors it contains either
 directly from error objects or by using string keys that load errors from the error repository. The recommended 
 approach is to always load errors via an error repository.
+- New validator - `RelationshipValidator` - that validates that a relationships object is either a has-one or a has-many
+relationship. I.e. that it is a valid relationship object according to the JSON API spec.
 
 ### Changed
-- An acceptable relationship callback or class implementing `AcceptRelatedResourceInterface` can now return
+- An acceptable relationship callback or class implementing `AceptRelatedResourceInterface` can now return
 an error or error collection instead of a boolean. This allows a custom error message to be returned.
 - `AbstractHydrator::methodForRelationship()` is no longer abstract. The default implementation camel cases a 
 relationship key, prepends `hydrate` and appends `Relationship`.
