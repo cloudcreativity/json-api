@@ -14,7 +14,9 @@ is called.
 
 If you are implementing the `ValidatorFactoryInterface`, you need to make the following changes:
 
+- The argument for `resourceDocument` is now optional.
 - The argument for `relationshipDocument()` is now optional.
+- The `$expectedType` argument for `resource()` is now optional. 
 - You need to add the `relationship()` method and return a validator that validates either a has-one or a has-many
 relationship. Use the new `RelationshipValidator` class if needed.
 

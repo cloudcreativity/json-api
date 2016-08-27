@@ -23,6 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -78,9 +79,22 @@ JSON_API;
             ->hasMany('tags', null, false);
 
         $document = $this->decode($content);
-        $validator = $this->validator(null, null, $relationships);
+        $validator = $this->validator('posts', null, null, $relationships);
 
         $this->assertTrue($validator->isValid($document));
+
+        return $document;
+    }
+
+    /**
+     * @param Document $document
+     * @depends testCreate
+     */
+    public function testValidWithDefaultValidator(Document $document)
+    {
+        $validator = $this->factory->resourceDocument();
+
+        $this->willExist()->assertTrue($validator->isValid($document));
     }
 
     /**
@@ -122,7 +136,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1');
+        $validator = $this->validator('posts', '1');
 
         $this->willExist()->assertTrue($validator->isValid($document));
     }
@@ -174,6 +188,26 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
+    public function testDataTypeEmpty()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "",
+        "attributes": {
+            "title": "My First Blog"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::RESOURCE_UNSUPPORTED_TYPE);
+    }
+
     public function testDataTypeNotSupported()
     {
         $content = <<<JSON_API
@@ -201,6 +235,25 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data/type', 'posts');
     }
 
+    public function testDataTypeAcceptAny()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "people",
+        "attributes": {
+            "name": "John Doe"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator(null);
+
+        $this->assertTrue($validator->isValid($document));
+    }
+
     public function testDataIdRequired()
     {
         $content = <<<JSON_API
@@ -215,7 +268,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1');
+        $validator = $this->validator('posts', '1');
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
@@ -237,7 +290,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1');
+        $validator = $this->validator('posts', '1');
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt(
@@ -263,7 +316,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1');
+        $validator = $this->validator('posts', '1');
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/attributes', Keys::MEMBER_OBJECT_EXPECTED);
@@ -285,7 +338,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1', $this->attributes(false));
+        $validator = $this->validator('posts', '1', $this->attributes(false));
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/attributes', Keys::RESOURCE_INVALID_ATTRIBUTES);
@@ -307,7 +360,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('1');
+        $validator = $this->validator('posts', '1');
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/relationships', Keys::MEMBER_OBJECT_EXPECTED);
@@ -436,7 +489,7 @@ JSON_API;
 
         $document = $this->decode($content);
         $relationships = $this->relationships()->hasOne('user', 'users', true);
-        $validator = $this->validator(null, null, $relationships);
+        $validator = $this->validator('posts', null, null, $relationships);
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/relationships', Keys::MEMBER_REQUIRED);
@@ -465,7 +518,7 @@ JSON_API;
 
         $document = $this->decode($content);
         $relationships = $this->relationships()->hasMany('tags', 'tags', true);
-        $validator = $this->validator(null, null, $relationships);
+        $validator = $this->validator('posts', null, null, $relationships);
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data/relationships', Keys::MEMBER_REQUIRED);
@@ -515,7 +568,7 @@ JSON_API;
         };
 
         $document = $this->decode($content);
-        $validator = $this->validator("123", null, null, $context);
+        $validator = $this->validator('posts', '123', null, null, $context);
 
         $this->willExist()->assertTrue($validator->isValid($document, $record));
 
@@ -549,7 +602,7 @@ JSON_API;
         };
 
         $document = $this->decode($content);
-        $validator = $this->validator(null, null, null, $context);
+        $validator = $this->validator('posts', null, null, null, $context);
 
         $this->assertFalse($validator->isValid($document));
         $this->assertEquals($expected, $this->findErrorAt($validator->getErrors(), '/data/foo'));
@@ -571,7 +624,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $validator = $this->validator('123', null, null, function () {
+        $validator = $this->validator('posts', '123', null, null, function () {
             $this->fail('Context validator should not be called.');
         });
 
@@ -579,6 +632,7 @@ JSON_API;
     }
 
     /**
+     * @param $resourceType
      * @param $id
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
@@ -586,6 +640,7 @@ JSON_API;
      * @return DocumentValidatorInterface
      */
     private function validator(
+        $resourceType = 'posts',
         $id = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,
@@ -593,7 +648,7 @@ JSON_API;
     ) {
         $context = $context ? new TestContextValidator($context) : null;
 
-        $resource = $this->factory->resource('posts', $id, $attributes, $relationships, $context);
+        $resource = $this->factory->resource($resourceType, $id, $attributes, $relationships, $context);
         $validator = $this->factory->resourceDocument($resource);
 
         return $validator;

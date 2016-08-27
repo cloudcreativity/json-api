@@ -28,11 +28,11 @@ interface ValidatorFactoryInterface
     /**
      * Create a validator for a document containing a resource in its data member.
      *
-     * @param ResourceValidatorInterface $resource
+     * @param ResourceValidatorInterface|null $resource
      *      the validator to use for the data member.
      * @return DocumentValidatorInterface
      */
-    public function resourceDocument(ResourceValidatorInterface $resource);
+    public function resourceDocument(ResourceValidatorInterface $resource = null);
 
     /**
      * Create a validator for a document containing a relationship in its data member.
@@ -46,8 +46,8 @@ interface ValidatorFactoryInterface
     /**
      * Create a validator for a resource object.
      *
-     * @param $expectedType
-     *      the expected resource type.
+     * @param $expectedType|null
+     *      the expected resource type or null to accept any type
      * @param string|int|null $expectedId
      *      the expected resource id, or null if none expected (create request).
      * @param AttributesValidatorInterface|null $attributes
@@ -59,7 +59,7 @@ interface ValidatorFactoryInterface
      * @return ResourceValidatorInterface
      */
     public function resource(
-        $expectedType,
+        $expectedType = null,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,

@@ -60,9 +60,12 @@ class ValidatorFactory implements ValidatorFactoryInterface
     /**
      * @inheritdoc
      */
-    public function resourceDocument(ResourceValidatorInterface $resource)
+    public function resourceDocument(ResourceValidatorInterface $resource = null)
     {
-        return new ResourceDocumentValidator($this->validationErrors, $resource);
+        return new ResourceDocumentValidator(
+            $this->validationErrors,
+            $resource ?: $this->resource()
+        );
     }
 
     /**
@@ -80,7 +83,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
      * @inheritdoc
      */
     public function resource(
-        $expectedType,
+        $expectedType = null,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,
