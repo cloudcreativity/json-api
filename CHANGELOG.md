@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file. This projec
 integration required.
 - An acceptable relationship callback or class implementing `AcceptRelatedResourceInterface` can now return
 an error or error collection instead of a boolean. This allows a custom error message to be returned.
+- `AbstractHydrator::methodForRelationship()` is no longer abstract. The default implementation camel cases a 
+relationship key, prepends `hydrate` and appends `Relationship`.
 
 ## [0.5.2] - 2016-08-09
 

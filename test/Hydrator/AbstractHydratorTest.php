@@ -59,7 +59,7 @@ final class AbstractHydratorTest extends TestCase
                     "id": "123"
                 }
             },
-            "tags": {
+            "latest-tags": {
                 "data": [
                     {
                         "type": "tags",

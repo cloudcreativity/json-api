@@ -40,17 +40,6 @@ abstract class AbstractHydrator implements HydratorInterface
     abstract protected function hydrateAttributes(StandardObjectInterface $attributes, $record);
 
     /**
-     * Return the method name to call for hydrating the specific relationship.
-     *
-     * If this method returns an empty value, or a value that is not callable, hydration
-     * of the the relationship will be skipped.
-     *
-     * @param $key
-     * @return string|null
-     */
-    abstract protected function methodForRelationship($key);
-
-    /**
      * Transfer data from a resource to a record.
      *
      * @param ResourceInterface $resource
@@ -131,5 +120,21 @@ abstract class AbstractHydrator implements HydratorInterface
      */
     protected function hydrated(ResourceInterface $resource, $record)
     {
+    }
+
+    /**
+     * Return the method name to call for hydrating the specific relationship.
+     *
+     * If this method returns an empty value, or a value that is not callable, hydration
+     * of the the relationship will be skipped.
+     *
+     * @param $key
+     * @return string|null
+     */
+    protected function methodForRelationship($key)
+    {
+        $key = ucwords(str_replace(['_', '-'], ' ', $key));
+
+        return sprintf('hydrate%sRelationship', str_replace(' ', '', $key));
     }
 }
