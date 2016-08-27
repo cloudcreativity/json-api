@@ -21,12 +21,16 @@ an error or error collection instead of a boolean. This allows a custom error me
 relationship key, prepends `hydrate` and appends `Relationship`.
 - `AbstractAuthorizer` now uses the new `ErrorCreatorTrait` instead of the `ErrorsAwareTrait`, so that authorizers can
 load authorization errors from the error repository.
+- Improved `ValidatorProviderInterface` so that a provider receives the URL arguments from a request. This means that
+a validator provider can now be used for multiple resource types if required.
 - Can now construct generic validators to check a document is valid according to the JSON API spec without knowing
 any *business logic* - i.e. that the document is semantically correct. The validator factory can now make:
   - a generic resource validator, plus the resource validator argument is now optional
   when creating a resource document validator; and
   - a generic relationship validator, plus the relationship validator argument is now optional when creating a 
   relationship document validator.
+- A generic validator provider is now available that will validate any request against the JSON API spec using these
+  default validators.
 
 ## [0.5.2] - 2016-08-09
 

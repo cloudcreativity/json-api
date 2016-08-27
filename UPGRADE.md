@@ -20,6 +20,18 @@ If you are implementing the `ValidatorFactoryInterface`, you need to make the fo
 - You need to add the `relationship()` method and return a validator that validates either a has-one or a has-many
 relationship. Use the new `RelationshipValidator` class if needed.
 
+### Validation: Providers
+
+The method signatures on `ValidatorProviderInterface` have changed and a new method `resource()` has been added. Refer
+to the interface for details.
+
+If you are implementing this interface you will need to update your method signatures.
+
+Note that the interface now requires the resource type to be provided in the method signatures. This is so that the
+method signatures match the information that would be known from a request (they can be obtained from the URL). This 
+does not stop you implementing a validator provider for each resource type, however it means that a validator 
+provider can be used across multiple resource types if needed.
+
 ### Validation: Relationships
 
 The following changes are unlikely to affect most applications. Only applications that have extended validator 
