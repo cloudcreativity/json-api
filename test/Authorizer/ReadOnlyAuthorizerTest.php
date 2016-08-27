@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Authorizer;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Object\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
@@ -35,7 +36,7 @@ final class ReadOnlyAuthorizerTest extends TestCase
     {
         /** @var EncodingParametersInterface $parameters */
         $parameters = $this->getMockBuilder(EncodingParametersInterface::class)->getMock();
-        $authorizer = new ReadOnlyAuthorizer();
+        $authorizer = new ReadOnlyAuthorizer(new ErrorRepository());
         $record = new StandardObject();
         $errors = new MutableErrorCollection();
 

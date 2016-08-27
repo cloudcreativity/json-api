@@ -84,9 +84,9 @@ class MutableErrorCollection extends ErrorCollection
      */
     public function add(ErrorInterface $error)
     {
-        $error = Error::cast($error);
+        parent::add(Error::cast($error));
 
-        return parent::add($error);
+        return $this;
     }
 
     /**

@@ -4,24 +4,30 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Unreleased]
 
+### Added
 - Added a `RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
 'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
 integration required.
+- A new trait `ErrorCreatorTrait` is now available. This allows an object to construct the errors it contains either
+directly from error objects or by using string keys that load errors from the error repository. The recommended 
+approach is to always load errors via an error repository.
+
+### Changed
 - An acceptable relationship callback or class implementing `AcceptRelatedResourceInterface` can now return
 an error or error collection instead of a boolean. This allows a custom error message to be returned.
 - `AbstractHydrator::methodForRelationship()` is no longer abstract. The default implementation camel cases a 
 relationship key, prepends `hydrate` and appends `Relationship`.
+- `AbstractAuthorizer` now uses the new `ErrorCreatorTrait` instead of the `ErrorsAwareTrait`, so that authorizers can
+load authorization errors from the error repository.
 
 ## [0.5.2] - 2016-08-09
 
 ### Fixed
-
 - Bug in resources tester that prevented normalization of ids if an integer was passed for ids.
 
 ## [0.5.1] - 2016-07-27
 
 ### Added
-
 - Testers for a resource and multiple resources (resource collections). These tester can be obtained via
 methods on the document tester.
 - Hydration hooks in `AbstractHydrator` so that it is easier to implement pre- and post-hydration logic.

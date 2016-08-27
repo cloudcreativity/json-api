@@ -4,6 +4,14 @@ This file provides notes on how to upgrade between versions.
 
 ## v0.5 to v0.6
 
+### Authorizers
+
+`AbstractAuthorizer` now has an `ErrorRepositoryInterface` instance injected via its constructor. If you are extending
+this class and overloading the constructor, you will need to update your constructor to ensure the parent constructor
+is called.
+
+### Validation: Relationships
+
 The following changes are unlikely to affect most applications. Only applications that have extended validator 
 classes provided by this package or created their own implementations may be affected:
 

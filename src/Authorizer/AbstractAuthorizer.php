@@ -19,7 +19,8 @@
 namespace CloudCreativity\JsonApi\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
-use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use CloudCreativity\JsonApi\Utils\ErrorCreatorTrait;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -29,7 +30,21 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 abstract class AbstractAuthorizer implements AuthorizerInterface
 {
 
-    use ErrorsAwareTrait;
+    use ErrorCreatorTrait;
+
+    /**
+     * @var ErrorRepositoryInterface
+     */
+    private $errorRepository;
+
+    /**
+     * AbstractAuthorizer constructor.
+     * @param ErrorRepositoryInterface $errorRepository
+     */
+    public function __construct(ErrorRepositoryInterface $errorRepository)
+    {
+        $this->errorRepository = $errorRepository;
+    }
 
     /**
      * @inheritdoc
@@ -53,6 +68,14 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
     public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
     {
         return $this->canUpdate($record, $parameters);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getErrorRepository()
+    {
+        return $this->errorRepository;
     }
 
 }
