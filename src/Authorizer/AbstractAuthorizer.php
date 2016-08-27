@@ -65,14 +65,6 @@ abstract class AbstractAuthorizer implements AuthorizerInterface
     /**
      * @inheritdoc
      */
-    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters)
-    {
-        return $this->canUpdate($record, $parameters);
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function getErrorRepository()
     {
         return $this->errorRepository;

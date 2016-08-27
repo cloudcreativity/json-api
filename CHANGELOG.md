@@ -19,6 +19,9 @@ relationship. I.e. that it is a valid relationship object according to the JSON 
 an error or error collection instead of a boolean. This allows a custom error message to be returned.
 - `AbstractHydrator::methodForRelationship()` is no longer abstract. The default implementation camel cases a 
 relationship key, prepends `hydrate` and appends `Relationship`.
+- Authorizers now receive the client sent resource in `canUpdate()` and the client sent relationship in 
+`canModifyRelationship`. This allows authorization logic to factor in what a client is attempting to change on a 
+specific resource if needed.
 - `AbstractAuthorizer` now uses the new `ErrorCreatorTrait` instead of the `ErrorsAwareTrait`, so that authorizers can
 load authorization errors from the error repository.
 - Improved `ValidatorProviderInterface` so that a provider receives the URL arguments from a request. This means that

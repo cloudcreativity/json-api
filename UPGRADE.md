@@ -6,6 +6,14 @@ This file provides notes on how to upgrade between versions.
 
 ### Authorizers
 
+The method signatures of `AuthorizerInterface::canUpdate()` and `canModifyRelationship()` have changed. `canUpdate`
+now also received the resource provided by the client, and `canModifyRelationship` receives the relationship provided
+by the client. 
+
+If you've implemented the interface yourself, you'll need to update your implementations. We've updated 
+this package's `AbstractAuthorizer` to reflect this change, however you will need to implement `canModifyRelationship`
+yourself in any child classes.
+
 `AbstractAuthorizer` now has an `ErrorRepositoryInterface` instance injected via its constructor. If you are extending
 this class and overloading the constructor, you will need to update your constructor to ensure the parent constructor
 is called.
