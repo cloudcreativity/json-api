@@ -16,24 +16,15 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Exceptions;
+
+use InvalidArgumentException as BaseException;
 
 /**
- * Interface ApiFactoryInterface
+ * Class RequestException
  * @package CloudCreativity\JsonApi
  */
-interface ApiFactoryInterface
+class InvalidArgumentException extends BaseException
 {
-
-    const CONFIG_URL_PREFIX = 'url-prefix';
-    const CONFIG_SUPPORTED_EXT = 'supported-ext';
-    const CONFIG_PAGING = 'paging';
-
-    /**
-     * @param $namespace
-     * @param array $config
-     * @return ApiInterface
-     */
-    public function createApi($namespace, array $config = []);
 
 }

@@ -22,6 +22,7 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 
 /**
  * Interface ApiInterface
@@ -92,4 +93,21 @@ interface ApiInterface
      * @return StoreInterface
      */
     public function getStore();
+
+    /**
+     * Get the paging strategy that is being used for this API.
+     *
+     * @return PagingStrategyInterface
+     */
+    public function getPagingStrategy();
+
+    /**
+     * Get other options for this API
+     *
+     * This allows injection of options for any framework-specific components
+     * that you may have.
+     *
+     * @return array
+     */
+    public function getOptions();
 }

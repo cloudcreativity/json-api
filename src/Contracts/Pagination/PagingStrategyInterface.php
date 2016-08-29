@@ -16,24 +16,22 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-/**
- * Interface ApiFactoryInterface
- * @package CloudCreativity\JsonApi
- */
-interface ApiFactoryInterface
+interface PagingStrategyInterface
 {
 
-    const CONFIG_URL_PREFIX = 'url-prefix';
-    const CONFIG_SUPPORTED_EXT = 'supported-ext';
-    const CONFIG_PAGING = 'paging';
+    /**
+     * Get the paging param key that represents the number of resources per page.
+     *
+     * @return string
+     */
+    public function getPage();
 
     /**
-     * @param $namespace
-     * @param array $config
-     * @return ApiInterface
+     * Get the paging param key that represents the number of resources per page.
+     *
+     * @return string
      */
-    public function createApi($namespace, array $config = []);
-
+    public function getPerPage();
 }

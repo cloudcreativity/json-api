@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-/**
- * Interface ApiFactoryInterface
- * @package CloudCreativity\JsonApi
- */
-interface ApiFactoryInterface
+interface PaginatorInterface
 {
 
-    const CONFIG_URL_PREFIX = 'url-prefix';
-    const CONFIG_SUPPORTED_EXT = 'supported-ext';
-    const CONFIG_PAGING = 'paging';
+    /**
+     * Get the current page number, or null if pagination has not been request.
+     *
+     * @return int|null
+     */
+    public function getCurrentPage();
 
     /**
-     * @param $namespace
-     * @param array $config
-     * @return ApiInterface
+     * Get the number of resources per-page.
+     *
+     * @param int $default
+     *      the default to use if the client has not specified a per-page amount.
+     * @param int|null $max
+     *      the maximum allowed per-page, or null if no maximum.
+     * @return int
      */
-    public function createApi($namespace, array $config = []);
+    public function getPerPage($default = 15, $max = null);
 
 }

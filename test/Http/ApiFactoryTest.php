@@ -61,9 +61,43 @@ final class ApiFactoryTest extends TestCase
 
     public function testApiV1()
     {
-        $api = $this->factory->createApi('v1', []);
+        $api = $this->factory->createApi('v1');
         $this->assertSame('v1', $api->getNamespace());
         $this->assertSame($this->store, $api->getStore());
         $this->assertSame($this->requestInterpreter, $api->getRequestInterpreter());
+    }
+
+    public function testDefaultPagingStrategy()
+    {
+        $api = $this->factory->createApi('v1');
+
+        $this->assertSame('number', $api->getPagingStrategy()->getPage());
+        $this->assertSame('size', $api->getPagingStrategy()->getPerPage());
+    }
+
+    public function testPagingStrategy()
+    {
+        $api = $this->factory->createApi('v1', [
+            'paging' => [
+                'page' => 'foo',
+                'per-page' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals('foo', $api->getPagingStrategy()->getPage());
+        $this->assertEquals('bar', $api->getPagingStrategy()->getPerPage());
+    }
+
+    public function testOtherOptions()
+    {
+        $expected = ['paging-meta' => ['key' => 'page']];
+        $config = array_merge([
+            'url-prefix' => '/api/v1',
+            'supported-ext' => null,
+            'paging' => ['page' => 'foo'],
+        ], $expected);
+
+        $api = $this->factory->createApi('v1', $config);
+        $this->assertEquals($expected, $api->getOptions());
     }
 }

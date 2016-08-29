@@ -25,6 +25,8 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 
 /**
  * Class Api
@@ -73,6 +75,16 @@ class Api implements ApiInterface
     private $supportedExtensions;
 
     /**
+     * @var PagingStrategyInterface
+     */
+    private $pagingStrategy;
+
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * ApiContainer constructor.
      * @param string $namespace
      * @param RequestInterpreterInterface $interpreter
@@ -81,6 +93,7 @@ class Api implements ApiInterface
      * @param StoreInterface $store
      * @param string|null $urlPrefix
      * @param SupportedExtensionsInterface|null $supportedExtensions
+     * @param array $options
      */
     public function __construct(
         $namespace,
@@ -89,7 +102,9 @@ class Api implements ApiInterface
         SchemaContainerInterface $schemaContainer,
         StoreInterface $store,
         $urlPrefix = null,
-        SupportedExtensionsInterface $supportedExtensions = null
+        SupportedExtensionsInterface $supportedExtensions = null,
+        PagingStrategyInterface $pagingStrategy = null,
+        array $options = []
     ) {
         $this->namespace = $namespace;
         $this->interpreter = $interpreter;
@@ -98,6 +113,8 @@ class Api implements ApiInterface
         $this->store = $store;
         $this->urlPrefix = $urlPrefix;
         $this->supportedExtensions = $supportedExtensions;
+        $this->pagingStrategy = $pagingStrategy ?: new PagingStrategy();
+        $this->options = $options;
     }
 
     /**
@@ -170,5 +187,21 @@ class Api implements ApiInterface
     public function getSupportedExts()
     {
         return $this->supportedExtensions;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPagingStrategy()
+    {
+        return $this->pagingStrategy;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

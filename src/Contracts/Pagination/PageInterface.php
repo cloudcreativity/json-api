@@ -16,24 +16,25 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-/**
- * Interface ApiFactoryInterface
- * @package CloudCreativity\JsonApi
- */
-interface ApiFactoryInterface
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+
+interface PageInterface
 {
 
-    const CONFIG_URL_PREFIX = 'url-prefix';
-    const CONFIG_SUPPORTED_EXT = 'supported-ext';
-    const CONFIG_PAGING = 'paging';
+    /**
+     * @return mixed
+     */
+    public function getData();
 
     /**
-     * @param $namespace
-     * @param array $config
-     * @return ApiInterface
+     * @return object|array|null
      */
-    public function createApi($namespace, array $config = []);
+    public function getMeta();
 
+    /**
+     * @return LinkInterface[]
+     */
+    public function getLinks();
 }

@@ -28,6 +28,8 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 
 /**
  * Class ApiFactory
@@ -76,19 +78,17 @@ class ApiFactory implements ApiFactoryInterface
     }
 
     /**
-     * @param $namespace
-     * @param array $config
-     * @return ApiInterface
+     * @inheritdoc
      */
-    public function createApi(
-        $namespace,
-        array $config
-    ) {
+    public function createApi($namespace, array $config = [])
+    {
         $config = $this->normalizeConfig($config);
         $urlPrefix = $config[self::CONFIG_URL_PREFIX] ?: null;
         $schemas = $this->createSchemas($namespace);
         $codecMatcher = $this->createCodecMatcher($schemas, $urlPrefix);
         $supportedExt = $this->createSupportedExt($config[self::CONFIG_SUPPORTED_EXT]);
+        $paging = $this->createPagingStrategy((array) $config[self::CONFIG_PAGING]);
+        $options = $this->createOptions($config);
 
         return new Api(
             $namespace,
@@ -97,7 +97,9 @@ class ApiFactory implements ApiFactoryInterface
             $schemas,
             $this->store,
             $urlPrefix,
-            $supportedExt
+            $supportedExt,
+            $paging,
+            $options
         );
     }
 
@@ -135,13 +137,37 @@ class ApiFactory implements ApiFactoryInterface
 
     /**
      * @param array $config
+     * @return PagingStrategyInterface
+     */
+    protected function createPagingStrategy(array $config)
+    {
+        return new PagingStrategy($config);
+    }
+
+    /**
+     * @param array $config
+     */
+    protected function createOptions(array $config)
+    {
+        unset(
+            $config[self::CONFIG_URL_PREFIX],
+            $config[self::CONFIG_SUPPORTED_EXT],
+            $config[self::CONFIG_PAGING]
+        );
+
+        return $config;
+    }
+
+    /**
+     * @param array $config
      * @return array
      */
-    protected function normalizeConfig(array $config)
+    private function normalizeConfig(array $config)
     {
         return array_replace([
             self::CONFIG_URL_PREFIX => null,
             self::CONFIG_SUPPORTED_EXT => null,
+            self::CONFIG_PAGING => null,
         ], $config);
     }
 
