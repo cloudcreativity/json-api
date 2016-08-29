@@ -16,31 +16,23 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Interface ContentNegotiatorInterface
- * @package CloudCreativity\JsonApi
- */
-interface ContentNegotiatorInterface
+interface RequestFactoryInterface
 {
 
     /**
-     * Do content negotiation as per the JSON API spec.
+     * Build the JSON API request
      *
-     * @param CodecMatcherInterface $codecMatcher
+     * @param ApiInterface $api
      * @param ServerRequestInterface $request
-     * @return void
+     * @return RequestInterface
      * @throws JsonApiException
-     *      if content negotiation fails.
-     * @see http://jsonapi.org/format/#content-negotiation
+     *      if the request is not compliant with the JSON API spec.
      */
-    public function doContentNegotiation(
-        CodecMatcherInterface $codecMatcher,
-        ServerRequestInterface $request
-    );
+    public function build(ApiInterface $api, ServerRequestInterface $request);
 }

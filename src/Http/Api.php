@@ -19,6 +19,8 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
@@ -41,6 +43,11 @@ class Api implements ApiInterface
     private $namespace;
 
     /**
+     * @var RequestInterpreterInterface
+     */
+    private $interpreter;
+
+    /**
      * @var CodecMatcherInterface
      */
     private $codecMatcher;
@@ -49,6 +56,11 @@ class Api implements ApiInterface
      * @var SchemaContainerInterface
      */
     private $schemas;
+
+    /**
+     * @param StoreInterface
+     */
+    private $store;
 
     /**
      * @var null|string
@@ -63,21 +75,27 @@ class Api implements ApiInterface
     /**
      * ApiContainer constructor.
      * @param string $namespace
+     * @param RequestInterpreterInterface $interpreter
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
+     * @param StoreInterface $store
      * @param string|null $urlPrefix
      * @param SupportedExtensionsInterface|null $supportedExtensions
      */
     public function __construct(
         $namespace,
+        RequestInterpreterInterface $interpreter,
         CodecMatcherInterface $codecMatcher,
         SchemaContainerInterface $schemaContainer,
+        StoreInterface $store,
         $urlPrefix = null,
         SupportedExtensionsInterface $supportedExtensions = null
     ) {
         $this->namespace = $namespace;
+        $this->interpreter = $interpreter;
         $this->codecMatcher = $codecMatcher;
         $this->schemas = $schemaContainer;
+        $this->store = $store;
         $this->urlPrefix = $urlPrefix;
         $this->supportedExtensions = $supportedExtensions;
     }
@@ -88,6 +106,14 @@ class Api implements ApiInterface
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @return RequestInterpreterInterface
+     */
+    public function getRequestInterpreter()
+    {
+        return $this->interpreter;
     }
 
     /**
@@ -120,6 +146,14 @@ class Api implements ApiInterface
     public function getSchemas()
     {
         return $this->schemas;
+    }
+
+    /**
+     * @return StoreInterface
+     */
+    public function getStore()
+    {
+        return $this->store;
     }
 
     /**

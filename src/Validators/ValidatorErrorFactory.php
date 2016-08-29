@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
 
@@ -53,11 +54,11 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 
     /**
      * ValidatorErrorFactory constructor.
-     * @param ErrorRepositoryInterface $repository
+     * @param ErrorRepositoryInterface|null $repository
      */
-    public function __construct(ErrorRepositoryInterface $repository)
+    public function __construct(ErrorRepositoryInterface $repository = null)
     {
-        $this->repository = $repository;
+        $this->repository = $repository ?: new ErrorRepository();
     }
 
     /**

@@ -37,9 +37,9 @@ class ValidatorProvider implements ValidatorProviderInterface
      * ValidatorProvider constructor.
      * @param ValidatorFactoryInterface $factory
      */
-    public function __construct(ValidatorFactoryInterface $factory)
+    public function __construct(ValidatorFactoryInterface $factory = null)
     {
-        $this->factory = $factory;
+        $this->factory = $factory ?: new ValidatorFactory();
     }
 
     /**

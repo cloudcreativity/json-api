@@ -38,6 +38,13 @@ interface ApiInterface
     public function getNamespace();
 
     /**
+     * Get the request interpreter to use for this API instance.
+     *
+     * @return RequestInterpreterInterface
+     */
+    public function getRequestInterpreter();
+
+    /**
      * Get the codec matcher for this API.
      *
      * @return CodecMatcherInterface
@@ -78,4 +85,11 @@ interface ApiInterface
      * @return SupportedExtensionsInterface|null
      */
     public function getSupportedExts();
+
+    /**
+     * Get the store for domain record objects for this API.
+     *
+     * @return StoreInterface
+     */
+    public function getStore();
 }

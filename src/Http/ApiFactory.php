@@ -22,6 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Http\ApiFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
@@ -45,16 +47,32 @@ class ApiFactory implements ApiFactoryInterface
     private $schemasRepository;
 
     /**
+     * @var StoreInterface
+     */
+    private $store;
+
+    /**
+     * @var RequestInterpreterInterface
+     */
+    private $requestInterpreter;
+
+    /**
      * ApiFactory constructor.
      * @param CodecMatcherRepositoryInterface $codecMatcherRespository
      * @param SchemasRepositoryInterface $schemasRepository
+     * @param StoreInterface $store
+     * @todo support a store on a per-api basis.
      */
     public function __construct(
         CodecMatcherRepositoryInterface $codecMatcherRespository,
-        SchemasRepositoryInterface $schemasRepository
+        SchemasRepositoryInterface $schemasRepository,
+        StoreInterface $store,
+        RequestInterpreterInterface $interpreter
     ) {
         $this->codecMatcherRepository = $codecMatcherRespository;
         $this->schemasRepository = $schemasRepository;
+        $this->store = $store;
+        $this->requestInterpreter = $interpreter;
     }
 
     /**
@@ -74,8 +92,10 @@ class ApiFactory implements ApiFactoryInterface
 
         return new Api(
             $namespace,
+            $this->requestInterpreter,
             $codecMatcher,
             $schemas,
+            $this->store,
             $urlPrefix,
             $supportedExt
         );

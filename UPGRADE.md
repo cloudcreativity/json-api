@@ -4,13 +4,24 @@ This file provides notes on how to upgrade between versions.
 
 ## v0.5 to v0.6
 
+### Api
+
+The `ApiInterface` has been updated so that an API returns a request interpreter and a store instance.
+This allows applications with multiple APIs to define a store different stores and request settings on
+a per-API basis. If you are implementing this interface anywhere you will need to update it
+accordingly.
+
+At the moment the `ApiFactory` included within this library injects that same request interpreter and
+store into each API it builds, but our future intention is to make these injections configurable on
+a per-API basis.
+
 ### Authorizers
 
 The method signatures of `AuthorizerInterface::canUpdate()` and `canModifyRelationship()` have changed. `canUpdate`
 now also received the resource provided by the client, and `canModifyRelationship` receives the relationship provided
-by the client. 
+by the client.
 
-If you've implemented the interface yourself, you'll need to update your implementations. We've updated 
+If you've implemented the interface yourself, you'll need to update your implementations. We've updated
 this package's `AbstractAuthorizer` to reflect this change, however you will need to implement `canModifyRelationship`
 yourself in any child classes.
 
@@ -24,7 +35,7 @@ If you are implementing the `ValidatorFactoryInterface`, you need to make the fo
 
 - The argument for `resourceDocument` is now optional.
 - The argument for `relationshipDocument()` is now optional.
-- The `$expectedType` argument for `resource()` is now optional. 
+- The `$expectedType` argument for `resource()` is now optional.
 - You need to add the `relationship()` method and return a validator that validates either a has-one or a has-many
 relationship. Use the new `RelationshipValidator` class if needed.
 
@@ -36,21 +47,21 @@ to the interface for details.
 If you are implementing this interface you will need to update your method signatures.
 
 Note that the interface now requires the resource type to be provided in the method signatures. This is so that the
-method signatures match the information that would be known from a request (they can be obtained from the URL). This 
-does not stop you implementing a validator provider for each resource type, however it means that a validator 
+method signatures match the information that would be known from a request (they can be obtained from the URL). This
+does not stop you implementing a validator provider for each resource type, however it means that a validator
 provider can be used across multiple resource types if needed.
 
 ### Validation: Relationships
 
-The following changes are unlikely to affect most applications. Only applications that have extended validator 
+The following changes are unlikely to affect most applications. Only applications that have extended validator
 classes provided by this package or created their own implementations may be affected:
 
 - `AcceptRelatedResourceInterface` may now return an `ErrorInterface` or `ErrorCollection` object instead of
 a boolean. You'll need to update any validators that consume this interface to support these return types in
 addition to a `boolean`.
-- `ValidatorErrorFactoryInterface::relationshipNotAcceptable()` now takes a third argument (the custom 
+- `ValidatorErrorFactoryInterface::relationshipNotAcceptable()` now takes a third argument (the custom
 error) and must return an `ErrorCollection` instance.
-- Internal methods within `AbstractRelationshipValidator`, `HasOneValidator` and `HasManyValidator` have been 
+- Internal methods within `AbstractRelationshipValidator`, `HasOneValidator` and `HasManyValidator` have been
 re-organised to move all the validation logic into the abstract class. You will need to make changes to any validators
 that extend these classes.
 
@@ -62,7 +73,7 @@ done is based on us using the package in multiple production systems and represe
 in the construction and extensibility of this package. We won't be refactoring again and we are planning on only
 minor adjustments before hitting v1.0 of this package.
 
-Note that some breaking changes were also made because the underlying `neomerx/json-api` package was upgraded from 
+Note that some breaking changes were also made because the underlying `neomerx/json-api` package was upgraded from
 `v0.6.6` to `v0.8.0`.
 [You may need to refer to these notes.](https://github.com/neomerx/json-api/wiki/Upgrade-Notes)
 
@@ -86,11 +97,11 @@ Exception renderers and introduced throwing JSON API errors via a `JsonApiExcept
 
 We've kept our approach of being able to construct errors from config arrays, as this is how we prefer to define
 errors within an application instance. We've made some changes to our Error object -
-`CloudCreativity\JsonApi\Document\Error` which implements 
+`CloudCreativity\JsonApi\Document\Error` which implements
 `CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface` to indicate that it is an error that has setters.
 
 You can find an example of error configuration in the [validation error configuration file](config/validation.php)
-You should use this file as the starting point for your error configuration in your application - it defines the 
+You should use this file as the starting point for your error configuration in your application - it defines the
 errors that the validators provided by this package will produce.
 
 Your error configuration should be loaded into an instance of `CloudCreativity\JsonApi\Repositories\ErrorRepository`.
@@ -99,7 +110,7 @@ because this allows things such as translation to occur via this service if requ
 
 ### Validators
 
-Our validator interfaces are now in the `CloudCreativity\JsonApi\Contracts\Validators` namespace, and default 
+Our validator interfaces are now in the `CloudCreativity\JsonApi\Contracts\Validators` namespace, and default
 instances are in the `CloudCreativity\JsonApi\Validators` namespace.
 
 Previously we had a single validator interface. We now have a validator interface for each 'leaf' in the document
@@ -111,13 +122,13 @@ interface. This factory can be used as a service to build the default validators
 
 We've also introduced a `ValidatorProviderInterface`. The concept is that each JSON API resource type in your
 application would have a validator provider instance that can provide your controller with the validators that
-are specific for that resource type. We've moved to this approach because it allows us to unitize the 
+are specific for that resource type. We've moved to this approach because it allows us to unitize the
 creation of resource specific validators, reducing the complexity of our controller code.
 
 ### Store
 
 We've introduced a 'store' defined via the `CloudCreativity\JsonApi\Contracts\Store\StoreInterface`. This is a simple
-interface to allow validators to check that a resource type/id combination exists. 
+interface to allow validators to check that a resource type/id combination exists.
 
 A default store implementation is provided at `CloudCreativity\JsonApi\Store\Store`. To get this working, you need to
 inject it with adapters - `CloudCreativity\JsonApi\Contracts\Store\AdapterInterface`. Adapters look up a type/id to
