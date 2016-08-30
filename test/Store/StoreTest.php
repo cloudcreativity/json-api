@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Store;
 
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
-use CloudCreativity\JsonApi\Exceptions\StoreException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
@@ -64,7 +64,7 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
         $store = $this->store([$adapter]);
 
-        $this->setExpectedException(StoreException::class);
+        $this->setExpectedException(RuntimeException::class);
         $store->exists($identifier);
     }
 

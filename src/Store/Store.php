@@ -22,7 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
-use CloudCreativity\JsonApi\Exceptions\StoreException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use InvalidArgumentException;
 
 /**
@@ -101,7 +101,7 @@ class Store implements StoreInterface
             }
         }
 
-        throw new StoreException("No adapter for resource type: $resourceType");
+        throw new RuntimeException("No adapter for resource type: $resourceType");
     }
 
     /**

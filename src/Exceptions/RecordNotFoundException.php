@@ -25,7 +25,7 @@ use Exception;
  * Class RecordNotFoundException
  * @package CloudCreativity\JsonApi
  */
-class RecordNotFoundException extends StoreException
+class RecordNotFoundException extends RuntimeException
 {
 
     /**
@@ -34,8 +34,10 @@ class RecordNotFoundException extends StoreException
     private $identifier;
 
     /**
+     * RecordNotFoundException constructor.
      * @param ResourceIdentifierInterface $identifier
-     * @return RecordNotFoundException
+     * @param int $code
+     * @param Exception|null $previous
      */
     public function __construct(
         ResourceIdentifierInterface $identifier,
