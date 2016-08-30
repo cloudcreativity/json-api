@@ -20,7 +20,6 @@ namespace CloudCreativity\JsonApi\Exceptions;
 
 use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Document\Error;
-use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -33,7 +32,7 @@ class MutableErrorCollection extends ErrorCollection
 {
 
     /**
-     * @param ErrorInterface|ErrorInterface[]|MutableErrorCollection|ErrorCollection $errors
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
      * @return MutableErrorCollection
      */
     public static function cast($errors)

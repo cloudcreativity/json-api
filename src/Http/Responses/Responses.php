@@ -18,14 +18,11 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use Illuminate\Http\Response;
-use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Http\Responses;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Http\Responses;
 
 /**
  * Class Responses
@@ -34,10 +31,21 @@ use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 abstract class AbstractResponses extends Responses
 {
 
+    /**
+     * @var ApiInterface
+     */
     private $api;
 
+    /**
+     * @var RequestInterface
+     */
     private $request;
 
+    /**
+     * AbstractResponses constructor.
+     * @param ApiInterface $api
+     * @param RequestInterface $request
+     */
     public function __construct(ApiInterface $api, RequestInterface $request)
     {
         $this->api = $api;
@@ -65,7 +73,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncodingParameters()
     {
-        return $this->request->getEncodingParameters();
+        return $this->request->getParameters();
     }
 
     /**

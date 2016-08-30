@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Contracts\Http\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
@@ -59,7 +59,7 @@ trait ChecksDocuments
     /**
      * @param ValidatorProviderInterface $validators
      * @param RequestInterpreterInterface $interpreter
-     * @param JsonApiRequest $request
+     * @param RequestInterface $request
      * @return DocumentValidatorInterface|null
      */
     private function documentAcceptanceValidator(

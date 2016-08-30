@@ -20,13 +20,13 @@ namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
-use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 
 /**
  * Class Api
@@ -93,6 +93,7 @@ class Api implements ApiInterface
      * @param StoreInterface $store
      * @param string|null $urlPrefix
      * @param SupportedExtensionsInterface|null $supportedExtensions
+     * @param PagingStrategyInterface|null $pagingStrategy
      * @param array $options
      */
     public function __construct(
@@ -118,7 +119,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getNamespace()
     {
@@ -126,7 +127,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return RequestInterpreterInterface
+     * @inheritdoc
      */
     public function getRequestInterpreter()
     {
@@ -134,7 +135,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return CodecMatcherInterface
+     * @inheritdoc
      */
     public function getCodecMatcher()
     {
@@ -142,7 +143,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return EncoderInterface|null
+     * @inheritdoc
      */
     public function getEncoder()
     {
@@ -150,7 +151,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function hasEncoder()
     {
@@ -158,7 +159,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return SchemaContainerInterface
+     * @inheritdoc
      */
     public function getSchemas()
     {
@@ -166,7 +167,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return StoreInterface
+     * @inheritdoc
      */
     public function getStore()
     {
@@ -174,7 +175,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return null|string
+     * @inheritdoc
      */
     public function getUrlPrefix()
     {
@@ -182,7 +183,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return SupportedExtensionsInterface|null
+     * @inheritdoc
      */
     public function getSupportedExts()
     {

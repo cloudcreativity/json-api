@@ -18,25 +18,47 @@
 
 namespace CloudCreativity\JsonApi\Http;
 
-use CloudCreativity\JsonApi\TestCase;
-use CloudCreativity\JsonApi\Store\Store;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use CloudCreativity\JsonApi\Repositories\SchemasRepository;
+use CloudCreativity\JsonApi\Store\Store;
+use CloudCreativity\JsonApi\TestCase;
 
+/**
+ * Class ApiFactoryTest
+ * @package CloudCreativity\JsonApi
+ */
 final class ApiFactoryTest extends TestCase
 {
 
+    /**
+     * @var CodecMatcherRepository
+     */
     private $codecMatchers;
 
+    /**
+     * @var SchemasRepository
+     */
     private $schemas;
 
+    /**
+     * @var Store
+     */
     private $store;
 
+    /**
+     * @var RequestInterpreterInterface
+     */
     private $requestInterpreter;
 
+    /**
+     * @var ApiFactory
+     */
     private $factory;
 
+    /**
+     * @return void
+     */
     protected function setUp()
     {
         $this->codecMatchers = new CodecMatcherRepository();

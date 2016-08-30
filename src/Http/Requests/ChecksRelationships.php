@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\LaravelJsonApi\Http\Requests;
+namespace CloudCreativity\JsonApi\Http\Requests;
 
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use CloudCreativity\JsonApi\Contracts\Http\RequestInterpreterInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**

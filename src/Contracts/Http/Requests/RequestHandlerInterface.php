@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
-use CloudCreativity\JsonApi\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -30,7 +30,7 @@ interface RequestHandlerInterface
 
     /**
      * @param ApiInterface $api
-     * @param JsonApiRequest $request
+     * @param RequestInterface $request
      * @return void
      * @throws JsonApiException
      */

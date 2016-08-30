@@ -18,20 +18,15 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
-use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection as Errors;
-use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
+use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 
-/**
- * Class ResponseFactory
- * @package CloudCreativity\JsonApi
- */
-class ResponseFactory
+class ResponseFactory implements ResponseFactoryInterface
 {
 
     /**
@@ -58,49 +53,37 @@ class ResponseFactory
     }
 
     /**
-     * @param $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
     public function statusCode($statusCode, array $headers = [])
     {
-        /** @var Response $response */
         return $this->responses->getCodeResponse($statusCode, $headers);
     }
 
     /**
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
     public function noContent(array $headers = [])
     {
-        return $this->statusCode(Response::HTTP_NO_CONTENT, $headers);
+        return $this->statusCode(204, $headers);
     }
 
     /**
-     * @param mixed $meta
-     * @param int $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
-    public function meta($meta, $statusCode = Response::HTTP_OK, array $headers = [])
+    public function meta($meta, $statusCode = 200, array $headers = [])
     {
         return $this->responses->getMetaResponse($meta, $statusCode, $headers);
     }
 
     /**
-     * @param mixed $data
-     * @param array $links
-     * @param mixed|null $meta
-     * @param int $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
     public function content(
         $data,
         array $links = [],
         $meta = null,
-        $statusCode = Response::HTTP_OK,
+        $statusCode = 200,
         array $headers = []
     ) {
         if ($data instanceof PageInterface) {
@@ -111,11 +94,7 @@ class ResponseFactory
     }
 
     /**
-     * @param object $resource
-     * @param array $links
-     * @param mixed|null $meta
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
     public function created($resource, array $links = [], $meta = null, array $headers = [])
     {
@@ -123,18 +102,13 @@ class ResponseFactory
     }
 
     /**
-     * @param $data
-     * @param array $links
-     * @param mixed|null $meta
-     * @param int $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
     public function relationship(
         $data,
         array $links = [],
         $meta = null,
-        $statusCode = Response::HTTP_OK,
+        $statusCode = 200,
         array $headers = []
     ) {
         if ($data instanceof PageInterface) {
@@ -145,40 +119,52 @@ class ResponseFactory
     }
 
     /**
-     * @param ErrorInterface|string $error
-     *      the error object or a string error key to get the error from the repository.
-     * @param int|string|null $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
-    public function error($error, $statusCode = null, array $headers = [])
+    public function error($errors, $defaultStatusCode = null, array $headers = [])
     {
-        if (is_string($error) && !empty($error)) {
-            $error = $this->errors->error($error);
+        if (is_string($errors) && !empty($errors)) {
+            $errors = $this->errors->error($errors);
         }
 
-        if (!$error instanceof ErrorInterface) {
-            throw new InvalidArgumentException('Expecting an error object or a string error key.');
-        }
+        $response = new ErrorResponse($errors, $defaultStatusCode, $headers);
 
-        return $this->errors($error, $statusCode, $headers);
+        return $this->errors($response);
     }
 
     /**
-     * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
-     * @param int|string|null $statusCode
-     * @param array $headers
-     * @return Response
+     * @inheritdoc
      */
-    public function errors($errors, $statusCode = null, array $headers = [])
+    public function errors(ErrorResponseInterface $errors)
     {
-        if (is_null($statusCode)) {
-            $statusCode = Errors::cast($errors)->getHttpStatus();
-        }
-
-        return $this->responses->getErrorResponse($errors, $statusCode, $headers);
+        return $this
+            ->responses
+            ->getErrorResponse($errors->getErrors(), $errors->getHttpCode(), $errors->getHeaders());
     }
 
+    /**
+     * @param PageInterface $page
+     * @param $meta
+     * @param $links
+     * @return array
+     */
+    private function extractPage(PageInterface $page, $meta, $links)
+    {
+        $key = QueryParametersParserInterface::PARAM_PAGE;
+
+        return [
+            $page->getData(),
+            $this->mergeMeta($meta, $key, $page->getMeta()),
+            $this->mergeLinks($links, $page->getLinks()),
+        ];
+    }
+
+    /**
+     * @param $existing
+     * @param $key
+     * @param $value
+     * @return array
+     */
     private function mergeMeta($existing, $key, $value)
     {
         $existing = $existing ?: [];
@@ -194,19 +180,13 @@ class ResponseFactory
         return $existing;
     }
 
+    /**
+     * @param array $existing
+     * @param array $merge
+     * @return array
+     */
     private function mergeLinks(array $existing, array $merge)
     {
         return array_replace($existing, $merge);
-    }
-
-    private function extractPage(PageInterface $page, $meta, $links)
-    {
-        $key = QueryParametersParserInterface::PARAM_PAGE;
-
-        return [
-            $page->getData(),
-            $this->mergeMeta($meta, $key, $page->getMeta()),
-            $this->mergeLinks($links, $page->getLinks()),
-        ];
     }
 }

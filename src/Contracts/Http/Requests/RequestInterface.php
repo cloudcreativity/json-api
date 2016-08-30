@@ -18,8 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
+/**
+ * Interface RequestInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface RequestInterface
 {
 

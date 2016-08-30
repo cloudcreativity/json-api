@@ -22,6 +22,10 @@ use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Interface RequestFactoryInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface RequestFactoryInterface
 {
 

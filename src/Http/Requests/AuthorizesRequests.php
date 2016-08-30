@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Http\Requests;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
-use CloudCreativity\JsonApi\Contracts\Http\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Exceptions\AuthorizationException;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 

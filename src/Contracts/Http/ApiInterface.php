@@ -18,11 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 
 /**
  * Interface ApiInterface
@@ -104,8 +106,7 @@ interface ApiInterface
     /**
      * Get other options for this API
      *
-     * This allows injection of options for any framework-specific components
-     * that you may have.
+     * This allows injection of options for any framework-specific components as needed.
      *
      * @return array
      */

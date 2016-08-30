@@ -20,25 +20,43 @@ namespace CloudCreativity\JsonApi\Http\Requests;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestFactoryInterface;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Psr\Http\Message\ServerRequestInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
-use CloudCreativity\JsonApi\Validators\ValidatorFactory;
-use Neomerx\JsonApi\Factories\Factory;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Object\Document;
-use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
+use CloudCreativity\JsonApi\Object\Document;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier;
+use CloudCreativity\JsonApi\Validators\ValidatorFactory;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Factories\Factory;
+use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Class RequestFactory
+ * @package CloudCreativity\JsonApi
+ */
 class RequestFactory implements RequestFactoryInterface
 {
 
+    /**
+     * @var HttpFactoryInterface
+     */
     private $httpFactory;
 
+    /**
+     * @var ValidatorFactory
+     */
     private $validators;
 
+    /**
+     * RequestFactory constructor.
+     * @param HttpFactoryInterface|null $httpFactory
+     * @param ValidatorFactoryInterface|null $validators
+     */
     public function __construct(
         HttpFactoryInterface $httpFactory = null,
         ValidatorFactoryInterface $validators = null
@@ -97,7 +115,7 @@ class RequestFactory implements RequestFactoryInterface
     /**
      * @param ApiInterface $api
      * @param ServerRequestInterface $request
-     * @return RequestDocument|null
+     * @return DocumentInterface
      * @throws JsonApiException
      */
     protected function parseDocument(ApiInterface $api, ServerRequestInterface $request)
@@ -121,6 +139,10 @@ class RequestFactory implements RequestFactoryInterface
         return $document;
     }
 
+    /**
+     * @param DocumentInterface $document
+     * @param RequestInterpreterInterface $interpreter
+     */
     protected function validateDocument(DocumentInterface $document, RequestInterpreterInterface $interpreter)
     {
         $validator = $this->documentValidator($interpreter);
@@ -130,6 +152,10 @@ class RequestFactory implements RequestFactoryInterface
         }
     }
 
+    /**
+     * @param ApiInterface $api
+     * @return object
+     */
     protected function locateRecord(ApiInterface $api)
     {
         $interpreter = $api->getRequestInterpreter();

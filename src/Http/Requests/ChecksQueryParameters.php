@@ -18,7 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -78,6 +80,7 @@ trait ChecksQueryParameters
      * Empty array = clients are not allowed to request paging.
      * Null = clients can specify any paging fields they want.
      *
+     * @param PagingStrategyInterface $strategy
      * @return string[]|null
      */
     abstract protected function allowedPagingParameters(PagingStrategyInterface $strategy);
@@ -92,7 +95,12 @@ trait ChecksQueryParameters
      */
     abstract protected function allowedFilteringParameters();
 
-
+    /**
+     * @param HttpFactoryInterface $factory
+     * @param ApiInterface $api
+     * @param RequestInterface $request
+     * @param FilterValidatorInterface|null $filterValidator
+     */
     protected function checkQueryParameters(
         HttpFactoryInterface $factory,
         ApiInterface $api,
@@ -100,7 +108,7 @@ trait ChecksQueryParameters
         FilterValidatorInterface $filterValidator = null
     ) {
         $parameters = $request->getParameters();
-        $this->checkEncodingParameters($factory, $parameters);
+        $this->checkEncodingParameters($factory, $parameters, $api);
 
         if ($filterValidator) {
             $this->checkFilterParameters($filterValidator, $parameters);
@@ -110,6 +118,7 @@ trait ChecksQueryParameters
     /**
      * @param HttpFactoryInterface $factory
      * @param EncodingParametersInterface $parameters
+     * @param ApiInterface $api
      * @throws JsonApiException
      */
     private function checkEncodingParameters(

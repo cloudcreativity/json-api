@@ -20,13 +20,13 @@ namespace CloudCreativity\JsonApi\Http\Requests;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestHandlerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestHandlerInterface;
 use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Factories\Factory;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 
 /**
  * Class Request
@@ -78,6 +78,11 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
      */
     protected $allowedFilteringParameters = [];
 
+    /**
+     * Whether paging is allowed for this resource
+     *
+     * @var bool
+     */
     protected $allowPaging = true;
 
     /**
@@ -123,6 +128,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     public function handle(ApiInterface $api, RequestInterface $request)
     {
         $interpreter = $api->getRequestInterpreter();
+        $resourceType = $request->getResourceType();
 
         /** Check the relationship is acceptable */
         if ($request->getRelationshipName()) {
@@ -130,7 +136,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
         }
 
         /** Check request parameters are acceptable */
-        $this->checkQueryParameters($this->factory, $request, $this->filterValidator());
+        $this->checkQueryParameters($this->factory, $api, $request, $this->filterValidator($resourceType));
 
         /** Authorize the request */
         if ($this->authorizer) {
@@ -152,7 +158,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     protected function allowUnrecognizedParameters()
     {
@@ -160,7 +166,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return string[]|null
+     * @inheritDoc
      */
     protected function allowedIncludePaths()
     {
@@ -168,7 +174,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
     protected function allowedFieldSetTypes()
     {
@@ -176,7 +182,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return string[]|null
+     * @inheritDoc
      */
     protected function allowedSortParameters()
     {
@@ -184,13 +190,16 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
-     * @return string[]|null
+     * @inheritDoc
      */
     protected function allowedFilteringParameters()
     {
         return $this->allowedFilteringParameters;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function allowedPagingParameters(PagingStrategyInterface $strategy)
     {
         if (!$this->allowPaging) {
@@ -201,10 +210,11 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     }
 
     /**
+     * @param string $resourceType
      * @return FilterValidatorInterface|null
      */
-    private function filterValidator()
+    private function filterValidator($resourceType)
     {
-        return $this->validators ? $this->validators->filterResources($this->getResourceType()) : null;
+        return $this->validators ? $this->validators->filterResources($resourceType) : null;
     }
 }

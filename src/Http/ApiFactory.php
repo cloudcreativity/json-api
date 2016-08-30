@@ -19,17 +19,16 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiFactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
-use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 
 /**
  * Class ApiFactory
@@ -63,6 +62,7 @@ class ApiFactory implements ApiFactoryInterface
      * @param CodecMatcherRepositoryInterface $codecMatcherRespository
      * @param SchemasRepositoryInterface $schemasRepository
      * @param StoreInterface $store
+     * @param RequestInterpreterInterface $interpreter
      * @todo support a store on a per-api basis.
      */
     public function __construct(
@@ -85,21 +85,17 @@ class ApiFactory implements ApiFactoryInterface
         $config = $this->normalizeConfig($config);
         $urlPrefix = $config[self::CONFIG_URL_PREFIX] ?: null;
         $schemas = $this->createSchemas($namespace);
-        $codecMatcher = $this->createCodecMatcher($schemas, $urlPrefix);
-        $supportedExt = $this->createSupportedExt($config[self::CONFIG_SUPPORTED_EXT]);
-        $paging = $this->createPagingStrategy((array) $config[self::CONFIG_PAGING]);
-        $options = $this->createOptions($config);
 
         return new Api(
             $namespace,
             $this->requestInterpreter,
-            $codecMatcher,
+            $this->createCodecMatcher($schemas, $urlPrefix),
             $schemas,
             $this->store,
             $urlPrefix,
-            $supportedExt,
-            $paging,
-            $options
+            $this->createSupportedExt($config[self::CONFIG_SUPPORTED_EXT]),
+            $this->createPagingStrategy((array) $config[self::CONFIG_PAGING]),
+            $this->createOptions($config)
         );
     }
 
@@ -146,6 +142,7 @@ class ApiFactory implements ApiFactoryInterface
 
     /**
      * @param array $config
+     * @return array
      */
     protected function createOptions(array $config)
     {
