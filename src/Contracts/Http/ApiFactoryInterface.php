@@ -27,14 +27,13 @@ interface ApiFactoryInterface
 
     const CONFIG_URL_PREFIX = 'url-prefix';
     const CONFIG_SUPPORTED_EXT = 'supported-ext';
+    const CONFIG_PAGING = 'paging';
 
     /**
      * @param $namespace
      * @param array $config
      * @return ApiInterface
      */
-    public function createApi(
-        $namespace,
-        array $config
-    );
+    public function createApi($namespace, array $config = []);
+
 }

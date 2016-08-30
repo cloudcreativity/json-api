@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 
 /**
@@ -37,13 +37,13 @@ class Document extends StandardObject implements DocumentInterface
     public function getData()
     {
         if (!$this->has(self::DATA)) {
-            throw new DocumentException('Data member is not present.');
+            throw new RuntimeException('Data member is not present.');
         }
 
         $data = $this->get(self::DATA);
 
         if (!is_object($data)) {
-            throw new DocumentException('Data member is not an object or null.');
+            throw new RuntimeException('Data member is not an object or null.');
         }
 
         return new StandardObject($data);

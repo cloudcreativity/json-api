@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 
@@ -79,7 +79,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
             return $map[$type];
         }
 
-        throw new DocumentException(sprintf('Type "%s" is not in the supplied map.', $type));
+        throw new RuntimeException(sprintf('Type "%s" is not in the supplied map.', $type));
     }
 
     /**

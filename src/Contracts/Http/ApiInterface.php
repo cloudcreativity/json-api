@@ -18,9 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 
 /**
@@ -36,6 +40,20 @@ interface ApiInterface
      * @return string
      */
     public function getNamespace();
+
+    /**
+     * Get the HTTP factory for this API instance
+     *
+     * @return HttpFactoryInterface
+     */
+    public function getHttpFactory();
+
+    /**
+     * Get the request interpreter to use for this API instance.
+     *
+     * @return RequestInterpreterInterface
+     */
+    public function getRequestInterpreter();
 
     /**
      * Get the codec matcher for this API.
@@ -78,4 +96,27 @@ interface ApiInterface
      * @return SupportedExtensionsInterface|null
      */
     public function getSupportedExts();
+
+    /**
+     * Get the store for domain record objects for this API.
+     *
+     * @return StoreInterface
+     */
+    public function getStore();
+
+    /**
+     * Get the paging strategy that is being used for this API.
+     *
+     * @return PagingStrategyInterface
+     */
+    public function getPagingStrategy();
+
+    /**
+     * Get other options for this API
+     *
+     * This allows injection of options for any framework-specific components as needed.
+     *
+     * @return array
+     */
+    public function getOptions();
 }

@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http;
+namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Contracts\Http\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\TestCase;
 
 /**

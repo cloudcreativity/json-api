@@ -16,34 +16,35 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Object;
+namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use IteratorAggregate;
-use Traversable;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
- * Interface RelationshipsInterface
+ * Class ChecksRelationships
  * @package CloudCreativity\JsonApi
  */
-interface RelationshipsInterface extends StandardObjectInterface, IteratorAggregate
+trait ChecksRelationships
 {
 
     /**
-     * Get a traversable object of keys to relationship objects.
+     * Get the allowed has-one relationships
      *
-     * This iterator will return all keys with values cast to `RelationshipInterface` objects.
-     *
-     * @return Traversable
+     * @return string[]
      */
-    public function getAll();
+    abstract protected function allowedRelationships();
 
     /**
-     * @param $key
-     * @return RelationshipInterface
-     * @throws RuntimeException
-     *      if the key is not present, or is not an object.
+     * @param RequestInterface $request
+     * @throws JsonApiException
      */
-    public function getRelationship($key);
+    protected function checkRelationshipName(RequestInterface $request)
+    {
+        $name = $request->getRelationshipName();
 
+        if (!in_array($name, $this->allowedRelationships(), true)) {
+            throw new JsonApiException([], 404);
+        }
+    }
 }

@@ -27,6 +27,7 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use RuntimeException;
 
@@ -88,11 +89,11 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
     private $decoders = [];
 
     /**
-     * @param FactoryInterface $factory
+     * @param FactoryInterface|null $factory
      */
-    public function __construct(FactoryInterface $factory)
+    public function __construct(FactoryInterface $factory = null)
     {
-        $this->factory = $factory;
+        $this->factory = $factory ?: new Factory();
     }
 
     /**

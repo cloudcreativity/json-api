@@ -26,6 +26,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Store\Store;
 
 /**
  * Class ValidatorFactory
@@ -50,11 +51,11 @@ class ValidatorFactory implements ValidatorFactoryInterface
      * @param StoreInterface $store
      */
     public function __construct(
-        ValidatorErrorFactoryInterface $validationErrors,
-        StoreInterface $store
+        ValidatorErrorFactoryInterface $validationErrors = null,
+        StoreInterface $store = null
     ) {
-        $this->validationErrors = $validationErrors;
-        $this->store = $store;
+        $this->validationErrors = $validationErrors ?: new ValidatorErrorFactory();
+        $this->store = $store ?: new Store();
     }
 
     /**

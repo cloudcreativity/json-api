@@ -16,15 +16,29 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Http\Responses;
 
-use RuntimeException;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
- * Class SchemaException
+ * Interface ErrorResponseInterface
  * @package CloudCreativity\JsonApi
  */
-class SchemaException extends RuntimeException
+interface ErrorResponseInterface
 {
 
+    /**
+     * @return ErrorCollection
+     */
+    public function getErrors();
+
+    /**
+     * @return int
+     */
+    public function getHttpCode();
+
+    /**
+     * @return array
+     */
+    public function getHeaders();
 }

@@ -26,17 +26,6 @@ interface ValidatorProviderInterface
 {
 
     /**
-     * Get a generic validator to check that a supplied resource is valid according to the JSON API spec.
-     *
-     * @param $resourceType
-     *      the JSON API resource type that is being validated
-     * @param $resourceId
-     *      if a specific resource is being validated, its id
-     * @return DocumentValidatorInterface
-     */
-    public function resource($resourceType, $resourceId = null);
-
-    /**
      * Get a validator for a create resource request is logically valid.
      *
      * @param string $resourceType

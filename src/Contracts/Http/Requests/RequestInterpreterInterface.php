@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
 /**
  * Interface RequestInterpreterInterface
@@ -24,6 +24,13 @@ namespace CloudCreativity\JsonApi\Contracts\Http;
  */
 interface RequestInterpreterInterface
 {
+
+    /**
+     * What resource type is in the URI?
+     *
+     * @return string
+     */
+    public function getResourceType();
 
     /**
      * What resource id was sent by the client?

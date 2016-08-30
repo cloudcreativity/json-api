@@ -16,19 +16,27 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-use RuntimeException;
-
-/**
- * Class DocumentException
- *
- * An exception to use when a part of a processes JSON API document is not as expected.
- * E.g. when part of the document is expected to be an object, but it is not.
- *
- * @package CloudCreativity\JsonApi
- */
-class DocumentException extends RuntimeException
+interface PaginatorInterface
 {
+
+    /**
+     * Get the current page number, or null if pagination has not been request.
+     *
+     * @return int|null
+     */
+    public function getCurrentPage();
+
+    /**
+     * Get the number of resources per-page.
+     *
+     * @param int $default
+     *      the default to use if the client has not specified a per-page amount.
+     * @param int|null $max
+     *      the maximum allowed per-page, or null if no maximum.
+     * @return int
+     */
+    public function getPerPage($default = 15, $max = null);
 
 }

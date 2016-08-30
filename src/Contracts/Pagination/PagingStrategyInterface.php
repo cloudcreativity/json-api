@@ -16,24 +16,22 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
-use Exception;
-
-/**
- * Interface ExceptionParserInterface
- * @package CloudCreativity\JsonApi
- */
-interface ExceptionParserInterface
+interface PagingStrategyInterface
 {
 
     /**
-     * Convert the exception to a JSON API error response.
+     * Get the paging param key that represents the number of resources per page.
      *
-     * @param Exception $e
-     * @return ErrorResponseInterface
+     * @return string
      */
-    public function parse(Exception $e);
+    public function getPage();
 
+    /**
+     * Get the paging param key that represents the number of resources per page.
+     *
+     * @return string
+     */
+    public function getPerPage();
 }

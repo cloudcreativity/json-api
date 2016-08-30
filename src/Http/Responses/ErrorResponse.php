@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http;
+namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection as Errors;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;

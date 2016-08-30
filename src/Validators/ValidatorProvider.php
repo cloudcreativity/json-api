@@ -37,19 +37,9 @@ class ValidatorProvider implements ValidatorProviderInterface
      * ValidatorProvider constructor.
      * @param ValidatorFactoryInterface $factory
      */
-    public function __construct(ValidatorFactoryInterface $factory)
+    public function __construct(ValidatorFactoryInterface $factory = null)
     {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function resource($resourceType, $resourceId = null)
-    {
-        $resourceValidator = $this->factory->resource($resourceType, $resourceId);
-
-        return $this->factory->resourceDocument($resourceValidator);
+        $this->factory = $factory ?: new ValidatorFactory();
     }
 
     /**
@@ -82,6 +72,16 @@ class ValidatorProvider implements ValidatorProviderInterface
     public function filterResources($resourceType)
     {
         return new FilterValidator();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function resource($resourceType, $resourceId = null)
+    {
+        $resourceValidator = $this->factory->resource($resourceType, $resourceId);
+
+        return $this->factory->resourceDocument($resourceValidator);
     }
 
 }

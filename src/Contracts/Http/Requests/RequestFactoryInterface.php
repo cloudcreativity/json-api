@@ -16,15 +16,27 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
-use RuntimeException;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Class StoreException
+ * Interface RequestFactoryInterface
  * @package CloudCreativity\JsonApi
  */
-class StoreException extends RuntimeException
+interface RequestFactoryInterface
 {
 
+    /**
+     * Build the JSON API request
+     *
+     * @param ApiInterface $api
+     * @param ServerRequestInterface $request
+     * @return RequestInterface
+     * @throws JsonApiException
+     *      if the request is not compliant with the JSON API spec.
+     */
+    public function build(ApiInterface $api, ServerRequestInterface $request);
 }

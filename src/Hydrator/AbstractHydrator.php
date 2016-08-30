@@ -23,7 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
-use CloudCreativity\JsonApi\Exceptions\HydratorException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
  * Class AbstractHydrator
@@ -72,7 +72,7 @@ abstract class AbstractHydrator implements HydratorInterface
         $method = $this->methodForRelationship($relationshipKey);
 
         if (!$method || !method_exists($this, $method)) {
-            throw new HydratorException("Cannot hydrate relationship: $relationshipKey");
+            throw new RuntimeException("Cannot hydrate relationship: $relationshipKey");
         }
 
         call_user_func([$this, $method], $relationship, $record);

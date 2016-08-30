@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object\Helpers;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**
@@ -43,19 +43,19 @@ trait IdentifiableTrait
 
     /**
      * @return string
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the type member is not present, or is not a string, or is an empty string.
      */
     public function getType()
     {
         if (!$this->has(DocumentInterface::KEYWORD_TYPE)) {
-            throw new DocumentException('Type member not present.');
+            throw new RuntimeException('Type member not present.');
         }
 
         $type = $this->get(DocumentInterface::KEYWORD_TYPE);
 
         if (!is_string($type) || empty($type)) {
-            throw new DocumentException('Type member is not a string, or is empty.');
+            throw new RuntimeException('Type member is not a string, or is empty.');
         }
 
         return $type;
@@ -71,23 +71,23 @@ trait IdentifiableTrait
 
     /**
      * @return string|int
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the id member is not present, or is not a string/int, or is an empty string.
      */
     public function getId()
     {
         if (!$this->has(DocumentInterface::KEYWORD_ID)) {
-            throw new DocumentException('Id member not present.');
+            throw new RuntimeException('Id member not present.');
         }
 
         $id = $this->get(DocumentInterface::KEYWORD_ID);
 
         if (!is_string($id) && !is_int($id)) {
-            throw new DocumentException('Id member is not a string or integer.');
+            throw new RuntimeException('Id member is not a string or integer.');
         }
 
         if (is_string($id) && empty($id)) {
-            throw new DocumentException('Id member is an empty string.');
+            throw new RuntimeException('Id member is an empty string.');
         }
 
         return $id;

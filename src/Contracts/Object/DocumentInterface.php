@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
@@ -35,7 +35,7 @@ interface DocumentInterface extends StandardObjectInterface, MetaMemberInterface
      * Get the data member of the document as a standard object.
      *
      * @return StandardObjectInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the data member is not an object, or is not present.
      */
     public function getData();
@@ -44,7 +44,7 @@ interface DocumentInterface extends StandardObjectInterface, MetaMemberInterface
      * Get the data member as a resource object.
      *
      * @return ResourceInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the data member is not an object or is not present.
      */
     public function getResource();

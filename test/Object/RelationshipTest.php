@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
@@ -76,7 +76,7 @@ class RelationshipTest extends TestCase
         $this->assertFalse($object->isHasMany());
         $this->assertFalse($object->hasIdentifier());
 
-        $this->setExpectedException(DocumentException::class);
+        $this->setExpectedException(RuntimeException::class);
         $object->getIdentifier();
     }
 
