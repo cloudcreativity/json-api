@@ -6,7 +6,7 @@ This file provides notes on how to upgrade between versions.
 
 ### Api
 
-The `ApiInterface` has been updated so that an API returns a request interpreter and a store instance.
+The `ApiInterface` has been updated so that an API returns a HTTP factory, request interpreter and a store instance.
 This allows applications with multiple APIs to define a store different stores and request settings on
 a per-API basis. If you are implementing this interface anywhere you will need to update it
 accordingly.
@@ -28,6 +28,33 @@ yourself in any child classes.
 `AbstractAuthorizer` now has an `ErrorRepositoryInterface` instance injected via its constructor. If you are extending
 this class and overloading the constructor, you will need to update your constructor to ensure the parent constructor
 is called.
+
+### Exceptions
+
+All internal package exceptions have been consolidated into a single class: `Exceptions\RuntimeException`. This 
+means we have removed the following classes:
+
+- `Exceptions\DocumentException`
+- `Exceptions\HydratorException`
+- `Exceptions\RepositoryException`
+- `Exceptions\SchemaException`
+- `Exceptions\StoreException`
+
+### Requests
+
+We've added a suite of request classes for processing incoming JSON API requests. The following interface and class
+have been removed:
+
+- `CloudCreativity\JsonApi\Contracts\Http\ContentNegotiatorInterface`
+- `CloudCreativity\JsonApi\Http\ContentNegotiator`
+
+You should use the `CloudCreativity\JsonApi\Contracts\Http\Requests\RequestFactoryInterface` instead. This package
+supplied `CloudCreativity\JsonApi\Http\Requests\RequestFactoryInterface` as the default implementation.
+
+### Responses
+
+The `ErrorResponsesInterface` has been moved to the `Contracts\Http\Responses` namespace. The `ErrorResponse` object
+has been moved to the `Http\Responses` namespace.
 
 ### Validation: Factory
 

@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 ### Added
-- Added a `RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
-'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
-integration required.
+- Added a full suite of request processing classes, as this changes to the `ApiInterface` and the addition of a
+ `RequestInterface` allow this to be framework-agnostic.
+  - A request factory now builds a JSON API request object, throwing JSON API exceptions if anything about the 
+   request does not conform to the JSON API specification.
+  -`RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
+  'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
+  integration required.
+  - `RequestHandlerInterface` validates the request against domain (application) logic. A default request handler is
+  provided and applications can compose the logic by injecting it with an authorizer and validator provider.
+- Added an `AbstractResponses` class that means very minimal framework integration is required.
+- Added a `ResponseFactory` class to provided easy creation of common JSON API responses.
 - A new trait `ErrorCreatorTrait` is now available. This allows an object to construct the errors it contains either
 directly from error objects or by using string keys that load errors from the error repository. The recommended 
 approach is to always load errors via an error repository.
