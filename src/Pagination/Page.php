@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Copyright 2016 Cloud Creativity Limited
  *
@@ -22,15 +21,34 @@ namespace CloudCreativity\JsonApi\Pagination;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
+/**
+ * Class Page
+ * @package CloudCreativity\JsonApi
+ */
 final class Page implements PageInterface
 {
 
+    /**
+     * @var mixed
+     */
     private $data;
 
+    /**
+     * @var array|null|object
+     */
     private $meta;
 
+    /**
+     * @var LinkInterface[]
+     */
     private $links;
 
+    /**
+     * Page constructor.
+     * @param mixed $data
+     * @param object|array|null $meta
+     * @param LinkInterface[] $links
+     */
     public function __construct($data, $meta = null, array $links = [])
     {
         $this->data = $data;
@@ -38,16 +56,25 @@ final class Page implements PageInterface
         $this->links = $links;
     }
 
+    /**
+     * @return mixed
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @return array|null|object
+     */
     public function getMeta()
     {
         return $this->meta;
     }
 
+    /**
+     * @return LinkInterface[]
+     */
     public function getLinks()
     {
         return $this->links;

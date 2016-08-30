@@ -51,7 +51,7 @@ trait ChecksDocuments
 
         $validator = $this->documentAcceptanceValidator($validators, $interpreter, $request);
 
-        if ($validator && !$validator->isValid($document->getContent())) {
+        if ($validator && !$validator->isValid($document)) {
             throw new ValidationException($validator->getErrors());
         }
     }

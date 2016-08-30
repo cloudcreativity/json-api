@@ -18,8 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Http\Responses;
@@ -32,24 +31,17 @@ abstract class AbstractResponses extends Responses
 {
 
     /**
-     * @var ApiInterface
+     * @var HttpServiceInterface
      */
-    private $api;
-
-    /**
-     * @var RequestInterface
-     */
-    private $request;
+    private $service;
 
     /**
      * AbstractResponses constructor.
-     * @param ApiInterface $api
-     * @param RequestInterface $request
+     * @param HttpServiceInterface $service
      */
-    public function __construct(ApiInterface $api, RequestInterface $request)
+    public function __construct(HttpServiceInterface $service)
     {
-        $this->api = $api;
-        $this->request = $request;
+        $this->service = $service;
     }
 
     /**
@@ -57,7 +49,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncoder()
     {
-        return $this->api->getEncoder();
+        return $this->service->getApi()->getEncoder();
     }
 
     /**
@@ -65,7 +57,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getUrlPrefix()
     {
-        return $this->api->getUrlPrefix();
+        return $this->service->getApi()->getUrlPrefix();
     }
 
     /**
@@ -73,7 +65,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncodingParameters()
     {
-        return $this->request->getParameters();
+        return $this->service->getRequest()->getParameters();
     }
 
     /**
@@ -81,7 +73,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSchemaContainer()
     {
-        return $this->api->getSchemas();
+        return $this->service->getApi()->getSchemas();
     }
 
     /**
@@ -89,7 +81,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSupportedExtensions()
     {
-        return $this->api->getSupportedExts();
+        return $this->service->getApi()->getSupportedExts();
     }
 
     /**
@@ -98,7 +90,8 @@ abstract class AbstractResponses extends Responses
     protected function getMediaType()
     {
         $type = $this
-            ->api
+            ->service
+            ->getApi()
             ->getCodecMatcher()
             ->getEncoderRegisteredMatchedType();
 

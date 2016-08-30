@@ -16,46 +16,70 @@
  * limitations under the License.
  */
 
- namespace CloudCreativity\JsonApi\Pagination;
+namespace CloudCreativity\JsonApi\Pagination;
 
- use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
- use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
 
- final class PagingStrategy implements PagingStrategyInterface, ConfigurableInterface
- {
+/**
+ * Class PagingStrategy
+ * @package CloudCreativity\JsonApi
+ */
+final class PagingStrategy implements PagingStrategyInterface, ConfigurableInterface
+{
 
-     const OPTION_PAGE = 'page';
-     const OPTION_PER_PAGE = 'per-page';
+    const OPTION_PAGE = 'page';
+    const OPTION_PER_PAGE = 'per-page';
 
-     private $page;
+    /**
+     * @var string|null
+     */
+    private $page;
 
-     private $perPage;
+    /**
+     * @var string|null
+     */
+    private $perPage;
 
-     public function __construct(array $config = [])
-     {
-         $this->configure($config);
-     }
+    /**
+     * PagingStrategy constructor.
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        $this->configure($config);
+    }
 
-     public function configure(array $input)
-     {
-         if (isset($input[self::OPTION_PAGE])) {
-             $this->page = (string) $input[self::OPTION_PAGE];
-         }
+    /**
+     * @param array $input
+     * @return $this
+     */
+    public function configure(array $input)
+    {
+        if (isset($input[self::OPTION_PAGE])) {
+            $this->page = (string) $input[self::OPTION_PAGE];
+        }
 
-         if (isset($input[self::OPTION_PER_PAGE])) {
-             $this->perPage = (string) $input[self::OPTION_PER_PAGE];
-         }
+        if (isset($input[self::OPTION_PER_PAGE])) {
+            $this->perPage = (string) $input[self::OPTION_PER_PAGE];
+        }
 
-         return $this;
-     }
+        return $this;
+    }
 
-     public function getPage()
-     {
-         return !empty($this->page) ? $this->page : 'number';
-     }
+    /**
+     * @return string
+     */
+    public function getPage()
+    {
+        return !empty($this->page) ? $this->page : 'number';
+    }
 
-     public function getPerPage()
-     {
-         return !empty($this->perPage) ? $this->perPage : 'size';
-     }
- }
+    /**
+     * @return string
+     */
+    public function getPerPage()
+    {
+        return !empty($this->perPage) ? $this->perPage : 'size';
+    }
+}

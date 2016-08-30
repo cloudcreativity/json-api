@@ -18,9 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Pagination;
 
+use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PaginatorInterface;
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 
 /**
  * Class Paginator
@@ -30,24 +29,17 @@ class Paginator implements PaginatorInterface
 {
 
     /**
-     * @var ApiInterface
+     * @var HttpServiceInterface
      */
-    private $api;
-
-    /**
-     * @var RequestInterface
-     */
-    private $request;
+    private $service;
 
     /**
      * Paginator constructor.
-     * @param ApiInterface $api
-     * @param RequestInterface $request
+     * @param HttpServiceInterface $service
      */
-    public function __construct(ApiInterface $api, RequestInterface $request)
+    public function __construct(HttpServiceInterface $service)
     {
-        $this->api = $api;
-        $this->request = $request;
+        $this->service = $service;
     }
 
     /**
@@ -55,7 +47,7 @@ class Paginator implements PaginatorInterface
      */
     public function getCurrentPage()
     {
-        $key = $this->api->getPagingStrategy()->getPage();
+        $key = $this->service->getApi()->getPagingStrategy()->getPage();
         $page = $this->getParam($key);
         $page = is_numeric($page) ? (int) $page : 0;
 
@@ -67,7 +59,7 @@ class Paginator implements PaginatorInterface
      */
     public function getPerPage($default = 15, $max = null)
     {
-        $key = $this->api->getPagingStrategy()->getPerPage();
+        $key = $this->service->getApi()->getPagingStrategy()->getPerPage();
         $perPage = (int) $this->getParam($key, $default);
 
         if (is_int($max) && $perPage > $max) {
@@ -86,9 +78,9 @@ class Paginator implements PaginatorInterface
      */
     protected function getParams()
     {
-        $requestParameters = $this->request->getParameters();
+        $encodingParameters = $this->service->getRequest()->getParameters();
 
-        return (array) $requestParameters->getPaginationParameters();
+        return (array) $encodingParameters->getPaginationParameters();
     }
 
     /**
