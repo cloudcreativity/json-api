@@ -18,10 +18,20 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
+/**
+ * Interface PageInterface
+ * @package CloudCreativity\JsonApi
+ */
 interface PageInterface
 {
+
+    const LINK_FIRST = DocumentInterface::KEYWORD_FIRST;
+    const LINK_PREV = DocumentInterface::KEYWORD_PREV;
+    const LINK_NEXT = DocumentInterface::KEYWORD_NEXT;
+    const LINK_LAST = DocumentInterface::KEYWORD_LAST;
 
     /**
      * @return mixed

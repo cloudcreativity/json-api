@@ -30,7 +30,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
  * Class Request
  * @package CloudCreativity\JsonApi
  */
-abstract class AbstractRequestHandler implements RequestHandlerInterface
+class RequestHandler implements RequestHandlerInterface
 {
 
     use ChecksRelationships,

@@ -26,6 +26,10 @@ use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 
+/**
+ * Class ResponseFactory
+ * @package CloudCreativity\JsonApi
+ */
 class ResponseFactory implements ResponseFactoryInterface
 {
 

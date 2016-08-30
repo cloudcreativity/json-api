@@ -22,13 +22,28 @@ use CloudCreativity\JsonApi\Contracts\Pagination\PaginatorInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 
+/**
+ * Class Paginator
+ * @package CloudCreativity\JsonApi
+ */
 class Paginator implements PaginatorInterface
 {
 
+    /**
+     * @var ApiInterface
+     */
     private $api;
 
+    /**
+     * @var RequestInterface
+     */
     private $request;
 
+    /**
+     * Paginator constructor.
+     * @param ApiInterface $api
+     * @param RequestInterface $request
+     */
     public function __construct(ApiInterface $api, RequestInterface $request)
     {
         $this->api = $api;
@@ -48,17 +63,11 @@ class Paginator implements PaginatorInterface
     }
 
     /**
-     * Get the number of resources per-page.
-     *
-     * @param int $default
-     *      the default to use if the client has not specified a per-page amount.
-     * @param int|null $max
-     *      the maximum allowed per-page, or null if no maximum.
-     * @return int
+     * @inheritdoc
      */
     public function getPerPage($default = 15, $max = null)
     {
-        $key = $this->api->getPagingingStrategy()->getPerPage();
+        $key = $this->api->getPagingStrategy()->getPerPage();
         $perPage = (int) $this->getParam($key, $default);
 
         if (is_int($max) && $perPage > $max) {
