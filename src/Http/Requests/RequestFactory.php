@@ -30,9 +30,7 @@ use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\Validators\ValidatorFactory;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Neomerx\JsonApi\Factories\Factory;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -43,25 +41,16 @@ class RequestFactory implements RequestFactoryInterface
 {
 
     /**
-     * @var HttpFactoryInterface
-     */
-    private $httpFactory;
-
-    /**
      * @var ValidatorFactory
      */
     private $validators;
 
     /**
      * RequestFactory constructor.
-     * @param HttpFactoryInterface|null $httpFactory
      * @param ValidatorFactoryInterface|null $validators
      */
-    public function __construct(
-        HttpFactoryInterface $httpFactory = null,
-        ValidatorFactoryInterface $validators = null
-    ) {
-        $this->httpFactory = $httpFactory ?: new Factory();
+    public function __construct(ValidatorFactoryInterface $validators = null)
+    {
         $this->validators = $validators ?: new ValidatorFactory();
     }
 
@@ -71,7 +60,7 @@ class RequestFactory implements RequestFactoryInterface
     public function build(ApiInterface $api, ServerRequestInterface $request)
     {
         $this->doContentNegotiation($api, $request);
-        $params = $this->parseParameters($request);
+        $params = $this->parseParameters($api, $request);
         $document = $this->parseDocument($api, $request);
         $interpreter = $api->getRequestInterpreter();
         $record = $this->locateRecord($api);
@@ -93,23 +82,24 @@ class RequestFactory implements RequestFactoryInterface
      */
     protected function doContentNegotiation(ApiInterface $api, ServerRequestInterface $request)
     {
-        $parser = $this->httpFactory->createHeaderParametersParser();
-        $checker = $this->httpFactory->createHeadersChecker($api->getCodecMatcher());
+        $httpFactory = $api->getHttpFactory();
+        $parser = $httpFactory->createHeaderParametersParser();
+        $checker = $httpFactory->createHeadersChecker($api->getCodecMatcher());
 
         $checker->checkHeaders($parser->parse($request));
     }
 
     /**
+     * @param ApiInterface $api
      * @param ServerRequestInterface $request
      * @return EncodingParametersInterface
      * @throws JsonApiException
      */
-    protected function parseParameters(ServerRequestInterface $request)
+    protected function parseParameters(ApiInterface $api, ServerRequestInterface $request)
     {
-        return $this
-            ->httpFactory
-            ->createQueryParametersParser()
-            ->parse($request);
+        $parser = $api->getHttpFactory()->createQueryParametersParser();
+
+        return $parser->parse($request);
     }
 
     /**

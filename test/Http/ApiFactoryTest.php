@@ -23,6 +23,8 @@ use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use CloudCreativity\JsonApi\Repositories\SchemasRepository;
 use CloudCreativity\JsonApi\Store\Store;
 use CloudCreativity\JsonApi\TestCase;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class ApiFactoryTest
@@ -52,6 +54,11 @@ final class ApiFactoryTest extends TestCase
     private $requestInterpreter;
 
     /**
+     * @var HttpFactoryInterface
+     */
+    private $httpFactory;
+
+    /**
      * @var ApiFactory
      */
     private $factory;
@@ -65,7 +72,15 @@ final class ApiFactoryTest extends TestCase
         $this->schemas = new SchemasRepository();
         $this->store = new Store();
         $this->requestInterpreter = $this->getMock(RequestInterpreterInterface::class);
-        $this->factory = new ApiFactory($this->codecMatchers, $this->schemas, $this->store, $this->requestInterpreter);
+        $this->httpFactory = new Factory();
+
+        $this->factory = new ApiFactory(
+            $this->codecMatchers,
+            $this->schemas,
+            $this->store,
+            $this->requestInterpreter,
+            $this->httpFactory
+        );
 
         $this->schemas->configure([
             'defaults' => [
@@ -87,6 +102,7 @@ final class ApiFactoryTest extends TestCase
         $this->assertSame('v1', $api->getNamespace());
         $this->assertSame($this->store, $api->getStore());
         $this->assertSame($this->requestInterpreter, $api->getRequestInterpreter());
+        $this->assertSame($this->httpFactory, $api->getHttpFactory());
     }
 
     public function testDefaultPagingStrategy()

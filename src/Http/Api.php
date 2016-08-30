@@ -26,7 +26,9 @@ use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class Api
@@ -43,6 +45,11 @@ class Api implements ApiInterface
      * @var string
      */
     private $namespace;
+
+    /**
+     * @var HttpFactoryInterface
+     */
+    private $httpFactory;
 
     /**
      * @var RequestInterpreterInterface
@@ -91,9 +98,10 @@ class Api implements ApiInterface
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
      * @param StoreInterface $store
-     * @param string|null $urlPrefix
      * @param SupportedExtensionsInterface|null $supportedExtensions
      * @param PagingStrategyInterface|null $pagingStrategy
+     * @param HttpFactoryInterface|null $httpFactory
+     * @param string|null $urlPrefix
      * @param array $options
      */
     public function __construct(
@@ -102,9 +110,10 @@ class Api implements ApiInterface
         CodecMatcherInterface $codecMatcher,
         SchemaContainerInterface $schemaContainer,
         StoreInterface $store,
-        $urlPrefix = null,
         SupportedExtensionsInterface $supportedExtensions = null,
         PagingStrategyInterface $pagingStrategy = null,
+        HttpFactoryInterface $httpFactory = null,
+        $urlPrefix = null,
         array $options = []
     ) {
         $this->namespace = $namespace;
@@ -112,9 +121,10 @@ class Api implements ApiInterface
         $this->codecMatcher = $codecMatcher;
         $this->schemas = $schemaContainer;
         $this->store = $store;
-        $this->urlPrefix = $urlPrefix;
         $this->supportedExtensions = $supportedExtensions;
         $this->pagingStrategy = $pagingStrategy ?: new PagingStrategy();
+        $this->httpFactory = $httpFactory ?: new Factory();
+        $this->urlPrefix = $urlPrefix;
         $this->options = $options;
     }
 
@@ -124,6 +134,14 @@ class Api implements ApiInterface
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHttpFactory()
+    {
+        return $this->httpFactory;
     }
 
     /**

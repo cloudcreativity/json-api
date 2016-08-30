@@ -27,7 +27,9 @@ use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
 
 /**
@@ -58,23 +60,31 @@ class ApiFactory implements ApiFactoryInterface
     private $requestInterpreter;
 
     /**
+     * @var HttpFactoryInterface
+     */
+    private $httpFactory;
+
+    /**
      * ApiFactory constructor.
      * @param CodecMatcherRepositoryInterface $codecMatcherRespository
      * @param SchemasRepositoryInterface $schemasRepository
      * @param StoreInterface $store
      * @param RequestInterpreterInterface $interpreter
-     * @todo support a store on a per-api basis.
+     * @param HttpFactoryInterface $httpFactory
+     * @todo support a store on a per-API basis.
      */
     public function __construct(
         CodecMatcherRepositoryInterface $codecMatcherRespository,
         SchemasRepositoryInterface $schemasRepository,
         StoreInterface $store,
-        RequestInterpreterInterface $interpreter
+        RequestInterpreterInterface $interpreter,
+        HttpFactoryInterface $httpFactory = null
     ) {
         $this->codecMatcherRepository = $codecMatcherRespository;
         $this->schemasRepository = $schemasRepository;
         $this->store = $store;
         $this->requestInterpreter = $interpreter;
+        $this->httpFactory = $httpFactory ?: new Factory();
     }
 
     /**
@@ -92,9 +102,10 @@ class ApiFactory implements ApiFactoryInterface
             $this->createCodecMatcher($schemas, $urlPrefix),
             $schemas,
             $this->store,
-            $urlPrefix,
             $this->createSupportedExt($config[self::CONFIG_SUPPORTED_EXT]),
             $this->createPagingStrategy((array) $config[self::CONFIG_PAGING]),
+            $this->httpFactory,
+            $urlPrefix,
             $this->createOptions($config)
         );
     }

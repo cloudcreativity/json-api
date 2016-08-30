@@ -96,19 +96,17 @@ trait ChecksQueryParameters
     abstract protected function allowedFilteringParameters();
 
     /**
-     * @param HttpFactoryInterface $factory
      * @param ApiInterface $api
      * @param RequestInterface $request
      * @param FilterValidatorInterface|null $filterValidator
      */
     protected function checkQueryParameters(
-        HttpFactoryInterface $factory,
         ApiInterface $api,
         RequestInterface $request,
         FilterValidatorInterface $filterValidator = null
     ) {
         $parameters = $request->getParameters();
-        $this->checkEncodingParameters($factory, $parameters, $api);
+        $this->checkEncodingParameters($api->getHttpFactory(), $parameters, $api);
 
         if ($filterValidator) {
             $this->checkFilterParameters($filterValidator, $parameters);

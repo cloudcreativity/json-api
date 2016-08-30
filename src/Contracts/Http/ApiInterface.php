@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 
 /**
@@ -39,6 +40,13 @@ interface ApiInterface
      * @return string
      */
     public function getNamespace();
+
+    /**
+     * Get the HTTP factory for this API instance
+     *
+     * @return HttpFactoryInterface
+     */
+    public function getHttpFactory();
 
     /**
      * Get the request interpreter to use for this API instance.

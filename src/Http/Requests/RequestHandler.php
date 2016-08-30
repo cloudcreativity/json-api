@@ -25,8 +25,6 @@ use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
-use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class Request
@@ -102,24 +100,14 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
     private $authorizer;
 
     /**
-     * @var HttpFactoryInterface
-     */
-    private $factory;
-
-    /**
      * AbstractRequest constructor.
      * @param AuthorizerInterface|null $authorizer
      * @param ValidatorProviderInterface|null $validators
-     * @param HttpFactoryInterface|null $factory
      */
-    public function __construct(
-        AuthorizerInterface $authorizer = null,
-        ValidatorProviderInterface $validators = null,
-        HttpFactoryInterface $factory = null
-    ) {
+    public function __construct(AuthorizerInterface $authorizer = null, ValidatorProviderInterface $validators = null)
+    {
         $this->validators = $validators;
         $this->authorizer = $authorizer;
-        $this->factory = $factory ?: new Factory();
     }
 
     /**
@@ -136,7 +124,7 @@ abstract class AbstractRequestHandler implements RequestHandlerInterface
         }
 
         /** Check request parameters are acceptable */
-        $this->checkQueryParameters($this->factory, $api, $request, $this->filterValidator($resourceType));
+        $this->checkQueryParameters($api, $request, $this->filterValidator($resourceType));
 
         /** Authorize the request */
         if ($this->authorizer) {
