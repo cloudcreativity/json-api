@@ -60,17 +60,13 @@ class Paginator implements PaginatorInterface
     public function getPerPage($default = 15, $max = null)
     {
         $key = $this->service->getApi()->getPagingStrategy()->getPerPage();
-        $perPage = (int) $this->getParam($key, $default);
+        $perPage = (int) $this->getParam($key);
 
         if (is_int($max) && $perPage > $max) {
             $perPage = $max;
         }
 
-        if (1 > $perPage) {
-            $perPage = 1;
-        }
-
-        return (0 < $perPage) ? $perPage : 1;
+        return (0 < $perPage) ? $perPage : $default;
     }
 
     /**
