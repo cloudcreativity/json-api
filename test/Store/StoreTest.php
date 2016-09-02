@@ -187,10 +187,7 @@ final class StoreTest extends TestCase
     private function store(array $adapters)
     {
         $store = new Store();
-
-        foreach ($adapters as $adapter) {
-            $store->register($adapter);
-        }
+        $store->registerMany($adapters);
 
         return $store;
     }

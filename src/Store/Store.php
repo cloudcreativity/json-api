@@ -21,9 +21,9 @@ namespace CloudCreativity\JsonApi\Store;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use InvalidArgumentException;
 
 /**
  * Class Store
@@ -51,10 +51,7 @@ class Store implements StoreInterface
     }
 
     /**
-     * Does the record this resource identifier refers to exist?
-     *
-     * @param ResourceIdentifierInterface $identifier
-     * @return bool
+     * @inheritdoc
      */
     public function exists(ResourceIdentifierInterface $identifier)
     {
@@ -74,9 +71,7 @@ class Store implements StoreInterface
     }
 
     /**
-     * @param ResourceIdentifierInterface $identifier
-     * @return object|null
-     *      the record, or null if it does not exist.
+     * @inheritdoc
      */
     public function find(ResourceIdentifierInterface $identifier)
     {
@@ -98,11 +93,7 @@ class Store implements StoreInterface
     }
 
     /**
-     * @param ResourceIdentifierInterface $identifier
-     * @return object
-     *      the record
-     * @throws RecordNotFoundException
-     *      if the record does not exist.
+     * @inheritdoc
      */
     public function findRecord(ResourceIdentifierInterface $identifier)
     {
@@ -116,11 +107,25 @@ class Store implements StoreInterface
     }
 
     /**
-     * @param AdapterInterface $adapter
+     * @inheritdoc
      */
     public function register(AdapterInterface $adapter)
     {
         $this->adapters[] = $adapter;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerMany(array $adapters)
+    {
+        foreach ($adapters as $adapter) {
+            if (!$adapter instanceof AdapterInterface) {
+                throw new InvalidArgumentException('Expecting an array of adapter instances.');
+            }
+
+            $this->register($adapter);
+        }
     }
 
     /**
@@ -137,19 +142,5 @@ class Store implements StoreInterface
         }
 
         throw new RuntimeException("No adapter for resource type: $resourceType");
-    }
-
-    /**
-     * @param array $adapters
-     */
-    protected function registerMany(array $adapters)
-    {
-        foreach ($adapters as $adapter) {
-            if (!$adapter instanceof AdapterInterface) {
-                throw new InvalidArgumentException('Expecting an array of adapter instances.');
-            }
-
-            $this->register($adapter);
-        }
     }
 }

@@ -29,10 +29,20 @@ interface StoreInterface
 {
 
     /**
+     * Attach an adapter to the store
+     *
      * @param AdapterInterface $adapter
      * @return void
      */
     public function register(AdapterInterface $adapter);
+
+    /**
+     * Attach many adapters to the store
+     *
+     * @param AdapterInterface[] $adapters
+     * @return void
+     */
+    public function registerMany(array $adapters);
 
     /**
      * Does the record this resource identifier refers to exist?
