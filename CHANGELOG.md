@@ -21,6 +21,8 @@ directly from error objects or by using string keys that load errors from the er
 approach is to always load errors via an error repository.
 - New validator - `RelationshipValidator` - that validates that a relationships object is either a has-one or a has-many
 relationship. I.e. that it is a valid relationship object according to the JSON API spec.
+- The store is now backed by an identity map, meaning multiple checks for resource identifiers will not result in
+adapters being queried multiple times.
 
 ### Changed
 - An acceptable relationship callback or class implementing `AceptRelatedResourceInterface` can now return

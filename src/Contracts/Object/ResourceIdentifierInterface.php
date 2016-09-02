@@ -81,4 +81,11 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
      */
     public function isComplete();
 
+    /**
+     * Get a string representation of the identifier.
+     *
+     * @return string
+     */
+    public function toString();
+
 }

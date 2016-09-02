@@ -33,9 +33,22 @@ class Store implements StoreInterface
 {
 
     /**
+     * @var IdentityMap
+     */
+    private $identityMap;
+
+    /**
      * @var AdapterInterface[]
      */
     private $adapters = [];
+
+    /**
+     * Store constructor.
+     */
+    public function __construct()
+    {
+        $this->identityMap = new IdentityMap();
+    }
 
     /**
      * Does the record this resource identifier refers to exist?
@@ -45,9 +58,19 @@ class Store implements StoreInterface
      */
     public function exists(ResourceIdentifierInterface $identifier)
     {
-        return $this
+        $check = $this->identityMap->exists($identifier);
+
+        if (is_bool($check)) {
+            return $check;
+        }
+
+        $exists = $this
             ->adapterFor($identifier->getType())
             ->exists($identifier);
+
+        $this->identityMap->add($identifier, $exists);
+
+        return $exists;
     }
 
     /**
@@ -57,9 +80,21 @@ class Store implements StoreInterface
      */
     public function find(ResourceIdentifierInterface $identifier)
     {
-        return $this
+        $record = $this->identityMap->find($identifier);
+
+        if (is_object($record)) {
+            return $record;
+        } elseif (false === $record) {
+            return null;
+        }
+
+        $record = $this
             ->adapterFor($identifier->getType())
             ->find($identifier);
+
+        $this->identityMap->add($identifier, is_object($record) ? $record : false);
+
+        return $record;
     }
 
     /**

@@ -90,4 +90,13 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
         return $this->hasType() && $this->hasId();
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function toString()
+    {
+        return sprintf('%s:%s', $this->getType(), $this->getId());
+    }
+
+
 }

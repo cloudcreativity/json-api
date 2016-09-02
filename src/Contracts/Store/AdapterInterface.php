@@ -37,7 +37,7 @@ interface AdapterInterface
 
     /**
      * @param ResourceIdentifierInterface $identifier
-     * @return mixed
+     * @return bool
      */
     public function exists(ResourceIdentifierInterface $identifier);
 
