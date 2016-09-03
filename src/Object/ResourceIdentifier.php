@@ -49,8 +49,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     }
 
     /**
-     * @param $typeOrTypes
-     * @return bool
+     * @inheritDoc
      */
     public function isType($typeOrTypes)
     {
@@ -68,8 +67,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     }
 
     /**
-     * @param array $map
-     * @return mixed
+     * @inheritDoc
      */
     public function mapType(array $map)
     {
@@ -83,11 +81,20 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function isComplete()
     {
         return $this->hasType() && $this->hasId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSame(ResourceIdentifierInterface $identifier)
+    {
+        return $this->getType() === $identifier->getType() &&
+            $this->getId() == $identifier->getId();
     }
 
     /**

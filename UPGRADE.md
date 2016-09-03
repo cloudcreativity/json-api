@@ -40,6 +40,23 @@ means we have removed the following classes:
 - `Exceptions\SchemaException`
 - `Exceptions\StoreException`
 
+### Objects
+
+If you have implemented the following interfaces any where, you will need to make the changes described below:
+
+#### DocumentInterface
+
+`getData()` must now return an object, array or null as these are the return types defined in the JSON API spec.
+
+You need to add a `getResources()` method that returns a `ResourceCollectionInterface` object if the data member is
+an array.
+
+#### ResourceIdentifierInterface
+
+You need to add a `toString()` method to cast the identifier to a string. You must also add an `isSame()` method
+that takes a resource identifier as its argument and returns `true` if this is logically the same as the identifier
+on which the method is invoked.
+
 ### Requests
 
 We've added a suite of request classes for processing incoming JSON API requests. The following interface and class

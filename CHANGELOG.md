@@ -23,6 +23,8 @@ approach is to always load errors via an error repository.
 relationship. I.e. that it is a valid relationship object according to the JSON API spec.
 - The store is now backed by an identity map, meaning multiple checks for resource identifiers will not result in
 adapters being queried multiple times.
+- Allow a document's data member to be returned as a resource collection if it is an array. Added a resource collection
+interface and class for this purpose.
 
 ### Changed
 - An acceptable relationship callback or class implementing `AceptRelatedResourceInterface` can now return

@@ -82,6 +82,14 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
     public function isComplete();
 
     /**
+     * Do the type and id match?
+     *
+     * @param ResourceIdentifierInterface $identifier
+     * @return bool
+     */
+    public function isSame(ResourceIdentifierInterface $identifier);
+
+    /**
      * Get a string representation of the identifier.
      *
      * @return string
