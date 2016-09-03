@@ -25,6 +25,8 @@ relationship. I.e. that it is a valid relationship object according to the JSON 
 adapters being queried multiple times.
 - Allow a document's data member to be returned as a resource collection if it is an array. Added a resource collection
 interface and class for this purpose.
+- Allow a hydrator to hint that it needs to hydrate related domain records by implementing the `HydratesRelatedInterface`.
+This is useful for two-step hydration, which is commonly needed for relational databases.
 
 ### Changed
 - An acceptable relationship callback or class implementing `AceptRelatedResourceInterface` can now return
