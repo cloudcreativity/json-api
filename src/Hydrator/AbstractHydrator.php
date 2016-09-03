@@ -32,6 +32,8 @@ use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 abstract class AbstractHydrator implements HydratorInterface
 {
 
+    use RelationshipHydratorTrait;
+
     /**
      * @param StandardObjectInterface $attributes
      * @param $record
@@ -69,13 +71,9 @@ abstract class AbstractHydrator implements HydratorInterface
      */
     public function hydrateRelationship($relationshipKey, RelationshipInterface $relationship, $record)
     {
-        $method = $this->methodForRelationship($relationshipKey);
-
-        if (!$method || !method_exists($this, $method)) {
+        if (!$this->callHydrateRelationship($relationshipKey, $relationship, $record)) {
             throw new RuntimeException("Cannot hydrate relationship: $relationshipKey");
         }
-
-        call_user_func([$this, $method], $relationship, $record);
     }
 
     /**
@@ -86,13 +84,7 @@ abstract class AbstractHydrator implements HydratorInterface
     {
         /** @var RelationshipInterface $relationship */
         foreach ($relationships->getAll() as $key => $relationship) {
-            $method = $this->methodForRelationship($key);
-
-            if (empty($method) || !method_exists($this, $method)) {
-                continue;
-            }
-
-            call_user_func([$this, $method], $relationship, $record);
+            $this->callHydrateRelationship($key, $relationship, $record);
         }
     }
 
@@ -120,21 +112,5 @@ abstract class AbstractHydrator implements HydratorInterface
      */
     protected function hydrated(ResourceInterface $resource, $record)
     {
-    }
-
-    /**
-     * Return the method name to call for hydrating the specific relationship.
-     *
-     * If this method returns an empty value, or a value that is not callable, hydration
-     * of the the relationship will be skipped.
-     *
-     * @param $key
-     * @return string|null
-     */
-    protected function methodForRelationship($key)
-    {
-        $key = ucwords(str_replace(['_', '-'], ' ', $key));
-
-        return sprintf('hydrate%sRelationship', str_replace(' ', '', $key));
     }
 }

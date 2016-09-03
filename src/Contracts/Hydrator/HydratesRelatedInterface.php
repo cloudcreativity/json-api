@@ -43,8 +43,8 @@ interface HydratesRelatedInterface
      * @param ResourceInterface $resource
      * @param object $record
      *      the domain record that the resource represents
-     * @return object|object[]|null
-     *      the related record(s) that were hydrated, or none.
+     * @return object[]
+     *      the related record(s) that were hydrated.
      */
     public function hydrateRelated(ResourceInterface $resource, $record);
 }
