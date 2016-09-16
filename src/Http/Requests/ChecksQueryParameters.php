@@ -108,7 +108,7 @@ trait ChecksQueryParameters
         $parameters = $request->getParameters();
         $this->checkEncodingParameters($api->getHttpFactory(), $parameters, $api);
 
-        if ($filterValidator) {
+        if ($filterValidator && $api->getRequestInterpreter()->isIndex()) {
             $this->checkFilterParameters($filterValidator, $parameters);
         }
     }
