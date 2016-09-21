@@ -65,6 +65,10 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncodingParameters()
     {
+        if (!$this->service->hasRequest()) {
+            return null;
+        }
+
         return $this->service->getRequest()->getParameters();
     }
 
