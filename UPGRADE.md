@@ -6,6 +6,14 @@ This file provides notes on how to upgrade between versions.
 
 ### Api
 
+#### Api Factory
+
+The `createApi` method signature on the `Contracts\Http\ApiFactoryInterface` has changed so that it only receives
+the API namespace and the HTTP schema/host as the provided arguments. Configuration arrays can be injected into the
+actual API factory instance using the `Http\ApiFactory::configure()` method.
+
+#### Api Instance
+
 The `ApiInterface` has been updated so that an API returns a HTTP factory, request interpreter and a store instance.
 This allows applications with multiple APIs to define a store different stores and request settings on
 a per-API basis. If you are implementing this interface anywhere you will need to update it

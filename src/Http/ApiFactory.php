@@ -24,6 +24,8 @@ use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
@@ -36,8 +38,12 @@ use Neomerx\JsonApi\Http\Headers\SupportedExtensions;
  * Class ApiFactory
  * @package CloudCreativity\JsonApi
  */
-class ApiFactory implements ApiFactoryInterface
+class ApiFactory implements ApiFactoryInterface, ConfigurableInterface
 {
+
+    const CONFIG_URL_PREFIX = 'url-prefix';
+    const CONFIG_SUPPORTED_EXT = 'supported-ext';
+    const CONFIG_PAGING = 'paging';
 
     /**
      * @var CodecMatcherRepositoryInterface
@@ -65,6 +71,11 @@ class ApiFactory implements ApiFactoryInterface
     private $httpFactory;
 
     /**
+     * @var array
+     */
+    private $config = [];
+
+    /**
      * ApiFactory constructor.
      * @param CodecMatcherRepositoryInterface $codecMatcherRespository
      * @param SchemasRepositoryInterface $schemasRepository
@@ -88,11 +99,21 @@ class ApiFactory implements ApiFactoryInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function configure(array $config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function createApi($namespace, array $config = [])
+    public function createApi($namespace, $host = null)
     {
-        $config = $this->normalizeConfig($config);
+        $config = $this->configFor($namespace, $host);
         $urlPrefix = $config[self::CONFIG_URL_PREFIX] ?: null;
         $schemas = $this->createSchemas($namespace);
 
@@ -167,16 +188,30 @@ class ApiFactory implements ApiFactoryInterface
     }
 
     /**
-     * @param array $config
+     * @param string $namespace
+     * @param string|null $host
      * @return array
      */
-    private function normalizeConfig(array $config)
+    private function configFor($namespace, $host)
     {
-        return array_replace([
+        if (!isset($this->config[$namespace])) {
+            throw new RuntimeException("Did not recognise JSON API namespace: $namespace");
+        }
+
+        $config = (array) $this->config[$namespace];
+
+        $config = array_replace([
             self::CONFIG_URL_PREFIX => null,
             self::CONFIG_SUPPORTED_EXT => null,
             self::CONFIG_PAGING => null,
         ], $config);
+
+        if ($host) {
+            $host = rtrim($host, '/');
+            $config[self::CONFIG_URL_PREFIX] = $host . $config[self::CONFIG_URL_PREFIX];
+        }
+
+        return $config;
     }
 
 }
