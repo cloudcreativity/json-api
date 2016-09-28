@@ -16,15 +16,26 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Exceptions;
+namespace CloudCreativity\JsonApi\Validators;
 
-use RuntimeException;
+use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
+use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 
 /**
- * Class StoreException
+ * Class FilterValidator
  * @package CloudCreativity\JsonApi
  */
-class StoreException extends RuntimeException
+final class FilterValidator implements FilterValidatorInterface
 {
+
+    use ErrorsAwareTrait;
+
+    /**
+     * @inheritDoc
+     */
+    public function isValid(array $filters)
+    {
+        return true;
+    }
 
 }

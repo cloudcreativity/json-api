@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http;
+namespace CloudCreativity\JsonApi\Http\Responses;
 
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\TestCase;

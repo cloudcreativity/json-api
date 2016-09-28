@@ -19,8 +19,6 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
 /**
@@ -45,83 +43,7 @@ class HasManyValidator extends AbstractRelationshipValidator
             return false;
         }
 
-        if (!$this->validateHasMany($relationship, $key)) {
-            return false;
-        }
-
-        $identifiers = $relationship->getIdentifiers();
-
-        if (!$this->validateEmpty($identifiers, $key)) {
-            return false;
-        }
-
-        if (!$this->validateIdentifiers($identifiers, $record, $key, $resource)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param RelationshipInterface $relationship
-     * @param string|null $key
-     * @return bool
-     */
-    protected function validateHasMany(RelationshipInterface $relationship, $key = null)
-    {
-        if (!$relationship->isHasMany()) {
-            $this->addError($this->errorFactory->relationshipHasManyExpected($key));
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param ResourceIdentifierCollectionInterface $identifiers
-     * @param string|null $key
-     * @return bool
-     */
-    protected function validateEmpty(ResourceIdentifierCollectionInterface $identifiers, $key = null)
-    {
-        if (!$this->isEmptyAllowed() && $identifiers->isEmpty()) {
-            $this->addError($this->errorFactory->relationshipEmptyNotAllowed($key));
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param ResourceIdentifierCollectionInterface $identifiers
-     * @param object|null $record
-     * @param string|null $key
-     * @param ResourceInterface $resource
-     * @return bool
-     */
-    protected function validateIdentifiers(
-        ResourceIdentifierCollectionInterface $identifiers,
-        $record = null,
-        $key = null,
-        ResourceInterface $resource = null
-    ) {
-        /** @var ResourceIdentifierInterface $identifier */
-        foreach ($identifiers as $identifier) {
-
-            if (!$this->validateIdentifier($identifier, $key) || !$this->validateExists($identifier, $key)) {
-                return false;
-            }
-        }
-
-        /** @var ResourceIdentifierInterface $identifier */
-        foreach ($identifiers as $identifier) {
-
-            if (!$this->validateAcceptable($identifier, $record, $key, $resource)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->validateHasMany($relationship, $record, $key, $resource);
     }
 
 }

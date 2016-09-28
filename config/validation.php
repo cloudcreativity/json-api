@@ -105,7 +105,8 @@ return [
     ],
 
     /**
-     * When a related resource is not logically acceptable for the relationship.
+     * When a related resource is not logically acceptable for the relationship. This is the default error
+     * used if an accept relationship callback/instance returns a boolean rather than an error or errors.
      */
     V::RELATIONSHIP_NOT_ACCEPTABLE => [
         Error::TITLE => 'Invalid Relationship',

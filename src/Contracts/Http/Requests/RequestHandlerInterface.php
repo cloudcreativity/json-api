@@ -16,15 +16,24 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Exceptions;
+namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
-use RuntimeException;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
- * Class SchemaException
+ * Interface RequestHandlerInterface
  * @package CloudCreativity\JsonApi
  */
-class SchemaException extends RuntimeException
+interface RequestHandlerInterface
 {
+
+    /**
+     * @param ApiInterface $api
+     * @param RequestInterface $request
+     * @return void
+     * @throws JsonApiException
+     */
+    public function handle(ApiInterface $api, RequestInterface $request);
 
 }

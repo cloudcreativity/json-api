@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
  * Class Relationships
@@ -44,13 +44,13 @@ class Relationships extends StandardObject implements RelationshipsInterface
     public function getRelationship($key)
     {
         if (!$this->has($key)) {
-            throw new DocumentException("Relationship member '$key' is not present.");
+            throw new RuntimeException("Relationship member '$key' is not present.");
         }
 
         $value = parent::get($key);
 
         if (!is_object($value)) {
-            throw new DocumentException("Relationship member '$key' is not an object.'");
+            throw new RuntimeException("Relationship member '$key' is not an object.'");
         }
 
         return new Relationship($value);

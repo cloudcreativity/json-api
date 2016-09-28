@@ -26,35 +26,50 @@ interface ValidatorProviderInterface
 {
 
     /**
-     * Get a validator for a create resource request.
+     * Get a validator for a create resource request is logically valid.
      *
+     * @param string $resourceType
+     *      the JSON API resource type that is being created
      * @return DocumentValidatorInterface
      */
-    public function createResource();
+    public function createResource($resourceType);
 
     /**
-     * Get a validator for an update resource request.
+     * Get a validator for an update resource request is logically valid.
      *
-     * @param object $record
+     * @param string $resourceType
+     *      the JSON API resource type that is being updated
      * @param string $resourceId
+     *      the JSON API resource id that is being updated
+     * @param object $record
+     *      the domain record that is being updated
      * @return DocumentValidatorInterface
      */
-    public function updateResource($record, $resourceId);
+    public function updateResource($resourceType, $resourceId, $record);
 
     /**
      * Get a validator for modifying a relationship.
      *
+     * @param string $resourceType
+     *      the JSON API resource type that is being modified
+     * @param string $resourceId
+     *      the JSON API resource id that is being modified
      * @param string $relationshipName
+     *      the resource's relationship name that is being modified
      * @param object $record
+     *      the domain record that is being modified
+     *
      * @return DocumentValidatorInterface
      */
-    public function modifyRelationship($relationshipName, $record);
+    public function modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
 
     /**
      * Get a validator for filtering resources.
      *
+     * @param string $resourceType
+     *      the JSON API resource type that is being filtered
      * @return FilterValidatorInterface
      */
-    public function filterResources();
+    public function filterResources($resourceType);
 
 }

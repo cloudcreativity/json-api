@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
 
@@ -49,7 +49,7 @@ class Resource extends StandardObject implements ResourceInterface
         $attributes = $this->get(self::ATTRIBUTES);
 
         if ($this->has(self::ATTRIBUTES) && !is_object($attributes)) {
-            throw new DocumentException('Attributes member is not an object.');
+            throw new RuntimeException('Attributes member is not an object.');
         }
 
         return new StandardObject($attributes);
@@ -71,7 +71,7 @@ class Resource extends StandardObject implements ResourceInterface
         $relationships = $this->get(self::RELATIONSHIPS);
 
         if ($this->has(self::RELATIONSHIPS) && !is_object($relationships)) {
-            throw new DocumentException('Relationships member is not an object.');
+            throw new RuntimeException('Relationships member is not an object.');
         }
 
         return new Relationships($relationships);

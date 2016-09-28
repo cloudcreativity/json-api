@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Interface ValidatorErrorFactoryInterface
@@ -170,7 +171,13 @@ interface ValidatorErrorFactoryInterface
      *      the related resource that is not acceptable.
      * @param string|null $relationshipKey
      *      the relationship key, or null if validating the relationship in the data member of a document.
-     * @return ErrorInterface
+     * @param ErrorInterface|ErrorCollection|null
+     *      a custom error message to use for this occurrence
+     * @return ErrorCollection
      */
-    public function relationshipNotAcceptable(ResourceIdentifierInterface $identifier, $relationshipKey = null);
+    public function relationshipNotAcceptable(
+        ResourceIdentifierInterface $identifier,
+        $relationshipKey = null,
+        $errors = null
+    );
 }

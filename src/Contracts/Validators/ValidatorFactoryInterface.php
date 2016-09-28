@@ -28,26 +28,26 @@ interface ValidatorFactoryInterface
     /**
      * Create a validator for a document containing a resource in its data member.
      *
-     * @param ResourceValidatorInterface $resource
+     * @param ResourceValidatorInterface|null $resource
      *      the validator to use for the data member.
      * @return DocumentValidatorInterface
      */
-    public function resourceDocument(ResourceValidatorInterface $resource);
+    public function resourceDocument(ResourceValidatorInterface $resource = null);
 
     /**
      * Create a validator for a document containing a relationship in its data member.
      *
-     * @param RelationshipValidatorInterface $relationship
+     * @param RelationshipValidatorInterface|null $relationship
      *      the validator to use for the data member.
      * @return DocumentValidatorInterface
      */
-    public function relationshipDocument(RelationshipValidatorInterface $relationship);
+    public function relationshipDocument(RelationshipValidatorInterface $relationship = null);
 
     /**
      * Create a validator for a resource object.
      *
-     * @param $expectedType
-     *      the expected resource type.
+     * @param $expectedType|null
+     *      the expected resource type or null to accept any type
      * @param string|int|null $expectedId
      *      the expected resource id, or null if none expected (create request).
      * @param AttributesValidatorInterface|null $attributes
@@ -59,7 +59,7 @@ interface ValidatorFactoryInterface
      * @return ResourceValidatorInterface
      */
     public function resource(
-        $expectedType,
+        $expectedType = null,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,
@@ -72,6 +72,22 @@ interface ValidatorFactoryInterface
      * @return RelationshipsValidatorInterface
      */
     public function relationships();
+
+    /**
+     * Create a validator for a relationship object.
+     *
+     * This validator will validate for either a has-one or a has-many relationship: i.e. that the
+     * relationship is structurally correct according to the JSON API spec.
+     *
+     * @param string|string[]|null
+     *      the expected type or types, or null to allow any expected types.
+     * @param bool $allowEmpty
+     *      is an empty relationship acceptable?
+     * @param AcceptRelatedResourceInterface|callable|null $acceptable
+     *      if a non-empty relationship that exists, is it acceptable?
+     * @return RelationshipValidatorInterface
+     */
+    public function relationship($expectedType = null, $allowEmpty = true, $acceptable = null);
 
     /**
      * Create a relationship validator for a has-one relationship.

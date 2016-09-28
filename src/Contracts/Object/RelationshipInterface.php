@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
@@ -38,7 +38,7 @@ interface RelationshipInterface extends StandardObjectInterface, MetaMemberInter
      * a has-many relationship, a ResourceIdentifierCollectionInterface will be returned.
      *
      * @return ResourceIdentifierInterface|ResourceIdentifierCollectionInterface|null
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the value for the data member is not a valid relationship value.
      */
     public function getData();
@@ -47,7 +47,7 @@ interface RelationshipInterface extends StandardObjectInterface, MetaMemberInter
      * Get the data member as a resource identifier (has-one relationship).
      *
      * @return ResourceIdentifierInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the data member is not a resource identifier.
      */
     public function getIdentifier();
@@ -70,7 +70,7 @@ interface RelationshipInterface extends StandardObjectInterface, MetaMemberInter
      * Get the data member as a has-many relationship.
      *
      * @return ResourceIdentifierCollectionInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the data member is not an array.
      */
     public function getIdentifiers();

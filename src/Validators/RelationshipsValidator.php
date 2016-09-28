@@ -82,7 +82,13 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
      */
     public function get($key)
     {
-        return isset($this->stack[$key]) ? $this->stack[$key] : null;
+        $validator = isset($this->stack[$key]) ? $this->stack[$key] : null;
+
+        if (!$validator) {
+            $validator = $this->factory->relationship();
+        }
+
+        return $validator;
     }
 
     /**
@@ -202,7 +208,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
         $validator = $this->get($key);
         $relationship = $relationships->getRelationship($key);
 
-        if ($validator && !$validator->isValid($relationship, $record, $key, $resource)) {
+        if (!$validator->isValid($relationship, $record, $key, $resource)) {
             $this->addErrors($validator->getErrors());
             return false;
         }

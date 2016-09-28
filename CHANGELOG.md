@@ -2,16 +2,61 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+- Added a full suite of request processing classes, as this changes to the `ApiInterface` and the addition of a
+ `RequestInterface` allow this to be framework-agnostic.
+  - A request factory now builds a JSON API request object, throwing JSON API exceptions if anything about the 
+   request does not conform to the JSON API specification.
+  -`RequestInterpreterInterface` and an `AbstractRequestInterpreter` class. This interface determines what
+  'type' of JSON API request the current request is. The abstract implementation means there is minimal framework 
+  integration required.
+  - `RequestHandlerInterface` validates the request against domain (application) logic. A default request handler is
+  provided and applications can compose the logic by injecting it with an authorizer and validator provider.
+- Added an `AbstractResponses` class that means very minimal framework integration is required.
+- Added a `ResponseFactory` class to provided easy creation of common JSON API responses.
+- A new trait `ErrorCreatorTrait` is now available. This allows an object to construct the errors it contains either
+directly from error objects or by using string keys that load errors from the error repository. The recommended 
+approach is to always load errors via an error repository.
+- New validator - `RelationshipValidator` - that validates that a relationships object is either a has-one or a has-many
+relationship. I.e. that it is a valid relationship object according to the JSON API spec.
+- The store is now backed by an identity map, meaning multiple checks for resource identifiers will not result in
+adapters being queried multiple times.
+- Allow a document's data member to be returned as a resource collection if it is an array. Added a resource collection
+interface and class for this purpose.
+- Allow a hydrator to hint that it needs to hydrate related domain records by implementing the `HydratesRelatedInterface`.
+This is useful for two-step hydration, which is commonly needed for relational databases.
+
+### Changed
+- An acceptable relationship callback or class implementing `AceptRelatedResourceInterface` can now return
+an error or error collection instead of a boolean. This allows a custom error message to be returned.
+- `AbstractHydrator::methodForRelationship()` is no longer abstract. The default implementation camel cases a 
+relationship key, prepends `hydrate` and appends `Relationship`.
+- Authorizers now receive the client sent resource in `canUpdate()` and the client sent relationship in 
+`canModifyRelationship`. This allows authorization logic to factor in what a client is attempting to change on a 
+specific resource if needed.
+- `AbstractAuthorizer` now uses the new `ErrorCreatorTrait` instead of the `ErrorsAwareTrait`, so that authorizers can
+load authorization errors from the error repository.
+- Improved `ValidatorProviderInterface` so that a provider receives the URL arguments from a request. This means that
+a validator provider can now be used for multiple resource types if required.
+- Can now construct generic validators to check a document is valid according to the JSON API spec without knowing
+any *business logic* - i.e. that the document is semantically correct. The validator factory can now make:
+  - a generic resource validator, plus the resource validator argument is now optional
+  when creating a resource document validator; and
+  - a generic relationship validator, plus the relationship validator argument is now optional when creating a 
+  relationship document validator.
+- A generic validator provider is now available that will validate any request against the JSON API spec using these
+  default validators.
+
 ## [0.5.2] - 2016-08-09
 
 ### Fixed
-
 - Bug in resources tester that prevented normalization of ids if an integer was passed for ids.
 
 ## [0.5.1] - 2016-07-27
 
 ### Added
-
 - Testers for a resource and multiple resources (resource collections). These tester can be obtained via
 methods on the document tester.
 - Hydration hooks in `AbstractHydrator` so that it is easier to implement pre- and post-hydration logic.

@@ -18,13 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use RuntimeException;
+use RuntimeException as BaseException;
 
 /**
- * Class RepositoryException
+ * Class RequestException
  * @package CloudCreativity\JsonApi
  */
-class RepositoryException extends RuntimeException
+class RuntimeException extends BaseException
 {
 
 }

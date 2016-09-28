@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
@@ -34,7 +34,7 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
 
     /**
      * @return string
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the type member is not present, or is not a string, or is an empty string.
      */
     public function getType();
@@ -57,14 +57,14 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
      *
      * @param array $types
      * @return mixed
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the current type is not one of those in the supplied $types
      */
     public function mapType(array $types);
 
     /**
      * @return string|int
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the id member is not present, or is not a string/int, or is an empty string.
      */
     public function getId();
@@ -80,5 +80,20 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
      * @return bool
      */
     public function isComplete();
+
+    /**
+     * Do the type and id match?
+     *
+     * @param ResourceIdentifierInterface $identifier
+     * @return bool
+     */
+    public function isSame(ResourceIdentifierInterface $identifier);
+
+    /**
+     * Get a string representation of the identifier.
+     *
+     * @return string
+     */
+    public function toString();
 
 }

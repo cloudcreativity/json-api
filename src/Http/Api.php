@@ -19,10 +19,16 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class Api
@@ -41,6 +47,16 @@ class Api implements ApiInterface
     private $namespace;
 
     /**
+     * @var HttpFactoryInterface
+     */
+    private $httpFactory;
+
+    /**
+     * @var RequestInterpreterInterface
+     */
+    private $interpreter;
+
+    /**
      * @var CodecMatcherInterface
      */
     private $codecMatcher;
@@ -49,6 +65,11 @@ class Api implements ApiInterface
      * @var SchemaContainerInterface
      */
     private $schemas;
+
+    /**
+     * @param StoreInterface
+     */
+    private $store;
 
     /**
      * @var null|string
@@ -61,29 +82,54 @@ class Api implements ApiInterface
     private $supportedExtensions;
 
     /**
+     * @var PagingStrategyInterface
+     */
+    private $pagingStrategy;
+
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * ApiContainer constructor.
      * @param string $namespace
+     * @param RequestInterpreterInterface $interpreter
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
-     * @param string|null $urlPrefix
+     * @param StoreInterface $store
      * @param SupportedExtensionsInterface|null $supportedExtensions
+     * @param PagingStrategyInterface|null $pagingStrategy
+     * @param HttpFactoryInterface|null $httpFactory
+     * @param string|null $urlPrefix
+     * @param array $options
      */
     public function __construct(
         $namespace,
+        RequestInterpreterInterface $interpreter,
         CodecMatcherInterface $codecMatcher,
         SchemaContainerInterface $schemaContainer,
+        StoreInterface $store,
+        SupportedExtensionsInterface $supportedExtensions = null,
+        PagingStrategyInterface $pagingStrategy = null,
+        HttpFactoryInterface $httpFactory = null,
         $urlPrefix = null,
-        SupportedExtensionsInterface $supportedExtensions = null
+        array $options = []
     ) {
         $this->namespace = $namespace;
+        $this->interpreter = $interpreter;
         $this->codecMatcher = $codecMatcher;
         $this->schemas = $schemaContainer;
-        $this->urlPrefix = $urlPrefix;
+        $this->store = $store;
         $this->supportedExtensions = $supportedExtensions;
+        $this->pagingStrategy = $pagingStrategy ?: new PagingStrategy();
+        $this->httpFactory = $httpFactory ?: new Factory();
+        $this->urlPrefix = $urlPrefix;
+        $this->options = $options;
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getNamespace()
     {
@@ -91,7 +137,23 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return CodecMatcherInterface
+     * @inheritDoc
+     */
+    public function getHttpFactory()
+    {
+        return $this->httpFactory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRequestInterpreter()
+    {
+        return $this->interpreter;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getCodecMatcher()
     {
@@ -99,7 +161,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return EncoderInterface|null
+     * @inheritdoc
      */
     public function getEncoder()
     {
@@ -107,7 +169,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function hasEncoder()
     {
@@ -115,7 +177,7 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return SchemaContainerInterface
+     * @inheritdoc
      */
     public function getSchemas()
     {
@@ -123,7 +185,15 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return null|string
+     * @inheritdoc
+     */
+    public function getStore()
+    {
+        return $this->store;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getUrlPrefix()
     {
@@ -131,10 +201,26 @@ class Api implements ApiInterface
     }
 
     /**
-     * @return SupportedExtensionsInterface|null
+     * @inheritdoc
      */
     public function getSupportedExts()
     {
         return $this->supportedExtensions;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPagingStrategy()
+    {
+        return $this->pagingStrategy;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

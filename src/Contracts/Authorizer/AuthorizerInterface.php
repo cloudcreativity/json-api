@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Authorizer;
 
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -68,11 +69,13 @@ interface AuthorizerInterface extends ErrorsAwareInterface
      *
      * @param object $record
      *      the record that the client is trying to update.
+     * @param ResourceInterface $resource
+     *      the resource provided by the client
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      */
-    public function canUpdate($record, EncodingParametersInterface $parameters);
+    public function canUpdate($record, ResourceInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client delete the specified record?
@@ -113,11 +116,19 @@ interface AuthorizerInterface extends ErrorsAwareInterface
      *
      * @param string $relationshipKey
      * @param object $record
+     *      the record that the client is attempting to modify the relationship on.
+     * @param RelationshipInterface $relationship
+     *      the relationship object provided by the client
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      * @see http://jsonapi.org/format/#crud-updating-relationships
      */
-    public function canModifyRelationship($relationshipKey, $record, EncodingParametersInterface $parameters);
+    public function canModifyRelationship(
+        $relationshipKey,
+        $record,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $parameters
+    );
 
 }

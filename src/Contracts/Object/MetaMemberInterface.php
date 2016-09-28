@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
  * Interface MetaMemberInterface
@@ -31,7 +31,7 @@ interface MetaMemberInterface
      * Get the meta member of the object.
      *
      * @return StandardObjectInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the meta member is present and is not an object.
      */
     public function getMeta();

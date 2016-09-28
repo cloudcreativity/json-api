@@ -18,9 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Authorizer;
 
-use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
+use CloudCreativity\JsonApi\Object\Relationship;
 use CloudCreativity\JsonApi\Object\Resource;
 use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
@@ -35,17 +36,16 @@ final class ReadOnlyAuthorizerTest extends TestCase
     {
         /** @var EncodingParametersInterface $parameters */
         $parameters = $this->getMockBuilder(EncodingParametersInterface::class)->getMock();
-        $authorizer = new ReadOnlyAuthorizer();
+        $authorizer = new ReadOnlyAuthorizer(new ErrorRepository());
         $record = new StandardObject();
-        $errors = new MutableErrorCollection();
 
-        $this->assertTrue($authorizer->canReadMany($parameters, $errors));
-        $this->assertTrue($authorizer->canRead($record, $parameters, $errors));
-        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters, $errors));
+        $this->assertTrue($authorizer->canReadMany($parameters));
+        $this->assertTrue($authorizer->canRead($record, $parameters));
+        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters));
 
-        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters, $errors));
-        $this->assertFalse($authorizer->canUpdate($record, $parameters, $errors));
-        $this->assertFalse($authorizer->canDelete($record, $parameters, $errors));
-        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, $parameters, $errors));
+        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters));
+        $this->assertFalse($authorizer->canUpdate($record, new Resource(), $parameters));
+        $this->assertFalse($authorizer->canDelete($record, $parameters));
+        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, new Relationship(), $parameters));
     }
 }

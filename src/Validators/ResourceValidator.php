@@ -41,7 +41,8 @@ class ResourceValidator implements ResourceValidatorInterface
     private $errorFactory;
 
     /**
-     * @var string
+     * @var string|null
+     *      null to accept any type
      */
     private $expectedType;
 
@@ -68,7 +69,7 @@ class ResourceValidator implements ResourceValidatorInterface
     /**
      * ResourceValidator constructor.
      * @param ValidatorErrorFactoryInterface $errorFactory
-     * @param string $expectedType
+     * @param string|null $expectedType
      * @param string|int|null $expectedId
      * @param AttributesValidatorInterface|null $attributes
      * @param RelationshipsValidatorInterface|null $relationships
@@ -76,7 +77,7 @@ class ResourceValidator implements ResourceValidatorInterface
      */
     public function __construct(
         ValidatorErrorFactoryInterface $errorFactory,
-        $expectedType,
+        $expectedType = null,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,
@@ -119,6 +120,19 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
+     * @param $type
+     * @return bool
+     */
+    protected function isSupportedType($type)
+    {
+        if (is_null($this->expectedType)) {
+            return true;
+        }
+
+        return $this->expectedType === $type;
+    }
+
+    /**
      * @param ResourceInterface $resource
      * @return bool
      */
@@ -130,12 +144,11 @@ class ResourceValidator implements ResourceValidatorInterface
             return false;
         }
 
+        $type = $resource->get(ResourceInterface::TYPE);
+
         /** Must be the expected type */
-        if ($this->expectedType !== $resource->getType()) {
-            $this->addError($this->errorFactory->resourceUnsupportedType(
-                $this->expectedType,
-                $resource->getType()
-            ));
+        if (empty($type) || !$this->isSupportedType($type)) {
+            $this->addError($this->errorFactory->resourceUnsupportedType($this->expectedType, $type));
             return false;
         }
 

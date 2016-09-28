@@ -16,29 +16,35 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Pagination;
 
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 /**
- * Interface ErrorResponseInterface
+ * Interface PageInterface
  * @package CloudCreativity\JsonApi
  */
-interface ErrorResponseInterface
+interface PageInterface
 {
 
-    /**
-     * @return ErrorCollection
-     */
-    public function getErrors();
+    const LINK_FIRST = DocumentInterface::KEYWORD_FIRST;
+    const LINK_PREV = DocumentInterface::KEYWORD_PREV;
+    const LINK_NEXT = DocumentInterface::KEYWORD_NEXT;
+    const LINK_LAST = DocumentInterface::KEYWORD_LAST;
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getHttpCode();
+    public function getData();
 
     /**
-     * @return array
+     * @return object|array|null
      */
-    public function getHeaders();
+    public function getMeta();
+
+    /**
+     * @return LinkInterface[]
+     */
+    public function getLinks();
 }

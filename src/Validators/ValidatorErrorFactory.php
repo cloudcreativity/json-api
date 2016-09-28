@@ -18,9 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
+use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
@@ -51,11 +54,11 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 
     /**
      * ValidatorErrorFactory constructor.
-     * @param ErrorRepositoryInterface $repository
+     * @param ErrorRepositoryInterface|null $repository
      */
-    public function __construct(ErrorRepositoryInterface $repository)
+    public function __construct(ErrorRepositoryInterface $repository = null)
     {
-        $this->repository = $repository;
+        $this->repository = $repository ?: new ErrorRepository();
     }
 
     /**
@@ -206,13 +209,26 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     /**
      * @inheritdoc
      */
-    public function relationshipNotAcceptable(ResourceIdentifierInterface $identifier, $relationshipKey = null)
-    {
-        return $this->repository->errorWithPointer(
+    public function relationshipNotAcceptable(
+        ResourceIdentifierInterface $identifier,
+        $relationshipKey = null,
+        $error = null
+    ) {
+        $base = $this->repository->errorWithPointer(
             self::RELATIONSHIP_NOT_ACCEPTABLE,
             $relationshipKey ? P::relationship($relationshipKey) : P::data(),
             ['type' => $identifier->getType(), 'id' => $identifier->getId()]
         );
+
+        $errors = new MutableErrorCollection();
+
+        /** @var MutableErrorInterface $err */
+        foreach (MutableErrorCollection::cast($error ?: $base) as $err) {
+            $add = clone $base;
+            $errors->add($add->merge($err));
+        }
+
+        return $errors;
     }
 
 }

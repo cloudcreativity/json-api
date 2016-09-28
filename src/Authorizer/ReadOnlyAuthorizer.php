@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Authorizer;
 
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
@@ -55,7 +56,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canUpdate($record, EncodingParametersInterface $parameters)
+    public function canUpdate($record, ResourceInterface $resource, EncodingParametersInterface $parameters)
     {
         return false;
     }
@@ -67,5 +68,18 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     {
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function canModifyRelationship(
+        $relationshipKey,
+        $record,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $parameters
+    ) {
+        return false;
+    }
+
 
 }
