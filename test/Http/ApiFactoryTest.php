@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use CloudCreativity\JsonApi\Repositories\SchemasRepository;
 use CloudCreativity\JsonApi\Store\Store;
@@ -98,6 +99,7 @@ final class ApiFactoryTest extends TestCase
 
     public function testApiV1()
     {
+        $this->factory->configure(['v1' => []]);
         $api = $this->factory->createApi('v1');
         $this->assertSame('v1', $api->getNamespace());
         $this->assertSame($this->store, $api->getStore());
@@ -107,6 +109,7 @@ final class ApiFactoryTest extends TestCase
 
     public function testDefaultPagingStrategy()
     {
+        $this->factory->configure(['v1' => []]);
         $api = $this->factory->createApi('v1');
 
         $this->assertSame('number', $api->getPagingStrategy()->getPage());
@@ -115,13 +118,16 @@ final class ApiFactoryTest extends TestCase
 
     public function testPagingStrategy()
     {
-        $api = $this->factory->createApi('v1', [
-            'paging' => [
-                'page' => 'foo',
-                'per-page' => 'bar',
+        $this->factory->configure([
+            'v1' => [
+                'paging' => [
+                    'page' => 'foo',
+                    'per-page' => 'bar',
+                ],
             ],
         ]);
 
+        $api = $this->factory->createApi('v1');
         $this->assertEquals('foo', $api->getPagingStrategy()->getPage());
         $this->assertEquals('bar', $api->getPagingStrategy()->getPerPage());
     }
@@ -135,7 +141,19 @@ final class ApiFactoryTest extends TestCase
             'paging' => ['page' => 'foo'],
         ], $expected);
 
-        $api = $this->factory->createApi('v1', $config);
+        $this->factory->configure([
+            'v1' => $config,
+        ]);
+
+        $api = $this->factory->createApi('v1');
         $this->assertEquals($expected, $api->getOptions());
+    }
+
+    public function testInvalidApiNamespace()
+    {
+        $this->setExpectedException(RuntimeException::class, 'v2');
+
+        $this->factory->configure(['v1' => []]);
+        $this->factory->createApi('v2');
     }
 }
