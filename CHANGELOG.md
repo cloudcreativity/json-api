@@ -2,10 +2,10 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## [Unreleased]
+## [0.6.0] - 2016-10-21
 
 ### Added
-- Added a full suite of request processing classes, as this changes to the `ApiInterface` and the addition of a
+- Added a full suite of request processing classes, as changes to the `ApiInterface` and the addition of a
  `RequestInterface` allow this to be framework-agnostic.
   - A request factory now builds a JSON API request object, throwing JSON API exceptions if anything about the 
    request does not conform to the JSON API specification.
