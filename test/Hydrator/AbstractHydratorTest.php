@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
-use CloudCreativity\JsonApi\Exceptions\HydratorException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
@@ -59,7 +59,7 @@ final class AbstractHydratorTest extends TestCase
                     "id": "123"
                 }
             },
-            "tags": {
+            "latest-tags": {
                 "data": [
                     {
                         "type": "tags",
@@ -126,7 +126,7 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $this->setExpectedException(HydratorException::class);
+        $this->setExpectedException(RuntimeException::class);
         $this->hydrator->hydrateRelationship('foo', $document->getRelationship(), new stdClass());
     }
 }

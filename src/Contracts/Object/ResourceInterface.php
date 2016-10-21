@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
 
 /**
@@ -38,14 +38,14 @@ interface ResourceInterface extends StandardObjectInterface, MetaMemberInterface
      * Get the type member.
      *
      * @return string
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if no type is set, is empty or is not a string.
      */
     public function getType();
 
     /**
      * @return string|int
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if no id is set, is not a string or integer, or is an empty string.
      */
     public function getId();
@@ -59,14 +59,14 @@ interface ResourceInterface extends StandardObjectInterface, MetaMemberInterface
      * Get the type and id members as a resource identifier object.
      *
      * @return ResourceIdentifierInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the type and/or id members are not valid.
      */
     public function getIdentifier();
 
     /**
      * @return StandardObjectInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the attributes member is present and is not an object.
      */
     public function getAttributes();
@@ -78,7 +78,7 @@ interface ResourceInterface extends StandardObjectInterface, MetaMemberInterface
 
     /**
      * @return RelationshipsInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the relationships member is present and is not an object.
      */
     public function getRelationships();

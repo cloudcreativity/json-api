@@ -19,7 +19,6 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
 
 /**
@@ -44,62 +43,7 @@ class HasOneValidator extends AbstractRelationshipValidator
             return false;
         }
 
-        if (!$this->validateHasOne($relationship, $key)) {
-            return false;
-        }
-
-        $identifier = $relationship->getData();
-
-        /** If there's an identifier, it must be a valid identifier object. */
-        if ($identifier && !$this->validateIdentifier($identifier, $key)) {
-            return false;
-        }
-
-        /** Check that empty is allowed. */
-        if (!$this->validateEmpty($identifier, $key)) {
-            return false;
-        }
-
-        /** If an identifier has been provided, the resource it references must exist. */
-        if ($identifier && !$this->validateExists($identifier, $key)) {
-            return false;
-        }
-
-        /** If an identifier has been provided, is it acceptable for the relationship? */
-        if ($identifier && !$this->validateAcceptable($identifier, $record, $key, $resource)) {
-            return false;
-        }
-
-        return true;
+        return $this->validateHasOne($relationship, $record, $key, $resource);
     }
 
-    /**
-     * @param RelationshipInterface $relationship
-     * @param string|null $key
-     * @return bool
-     */
-    protected function validateHasOne(RelationshipInterface $relationship, $key = null)
-    {
-        if (!$relationship->isHasOne()) {
-            $this->addError($this->errorFactory->relationshipHasOneExpected($key));
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param ResourceIdentifierInterface|null $identifier
-     * @param string|null $key
-     * @return bool
-     */
-    protected function validateEmpty(ResourceIdentifierInterface $identifier = null, $key = null)
-    {
-        if (!$this->isEmptyAllowed() && !$identifier) {
-            $this->addError($this->errorFactory->relationshipEmptyNotAllowed($key));
-            return false;
-        }
-
-        return true;
-    }
 }

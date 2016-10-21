@@ -70,6 +70,24 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * @param bool $exists
+     * @return $this
+     */
+    protected function willExist($exists = true)
+    {
+        $this->store->method('exists')->willReturn($exists);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function willNotExist()
+    {
+        return $this->willExist(false);
+    }
+
+    /**
      * @param ErrorCollection $errors
      * @param $pointer
      * @param $errorKey
@@ -98,6 +116,18 @@ class TestCase extends BaseTestCase
         $error = $this->findErrorAt($errors, $pointer);
 
         $this->assertContains($needle, $error->getDetail(), "Invalid detail for error: $pointer");
+    }
+
+    /**
+     * @param ErrorCollection $errors
+     * @param $pointer
+     * @param $expected
+     */
+    protected function assertDetailIs(ErrorCollection $errors, $pointer, $expected)
+    {
+        $error = $this->findErrorAt($errors, $pointer);
+
+        $this->assertEquals($expected, $error->getDetail(), "Invalid detail for error: $pointer");
     }
 
     /**

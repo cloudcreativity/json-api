@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Utils;
 
-use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
 use Exception;
 
 /**

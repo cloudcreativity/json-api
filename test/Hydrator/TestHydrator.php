@@ -41,20 +41,6 @@ final class TestHydrator extends AbstractHydrator
     }
 
     /**
-     * Return the method name to call for hydrating the specific relationship.
-     *
-     * If this method returns an empty value, or a value that is not callable, hydration
-     * of the the relationship will be skipped.
-     *
-     * @param $key
-     * @return string|null
-     */
-    protected function methodForRelationship($key)
-    {
-        return sprintf('hydrate%sRelationship', ucfirst($key));
-    }
-
-    /**
      * @param RelationshipInterface $relationship
      * @param $record
      */
@@ -67,7 +53,7 @@ final class TestHydrator extends AbstractHydrator
      * @param RelationshipInterface $relationship
      * @param $record
      */
-    protected function hydrateTagsRelationship(RelationshipInterface $relationship, $record)
+    protected function hydrateLatestTagsRelationship(RelationshipInterface $relationship, $record)
     {
         $record->tag_ids = $relationship->getIdentifiers()->getIds();
     }

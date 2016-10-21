@@ -26,6 +26,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Store\Store;
 
 /**
  * Class ValidatorFactory
@@ -50,34 +51,40 @@ class ValidatorFactory implements ValidatorFactoryInterface
      * @param StoreInterface $store
      */
     public function __construct(
-        ValidatorErrorFactoryInterface $validationErrors,
-        StoreInterface $store
+        ValidatorErrorFactoryInterface $validationErrors = null,
+        StoreInterface $store = null
     ) {
-        $this->validationErrors = $validationErrors;
-        $this->store = $store;
+        $this->validationErrors = $validationErrors ?: new ValidatorErrorFactory();
+        $this->store = $store ?: new Store();
     }
 
     /**
      * @inheritdoc
      */
-    public function resourceDocument(ResourceValidatorInterface $resource)
+    public function resourceDocument(ResourceValidatorInterface $resource = null)
     {
-        return new ResourceDocumentValidator($this->validationErrors, $resource);
+        return new ResourceDocumentValidator(
+            $this->validationErrors,
+            $resource ?: $this->resource()
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function relationshipDocument(RelationshipValidatorInterface $relationship)
+    public function relationshipDocument(RelationshipValidatorInterface $relationship = null)
     {
-        return new RelationshipDocumentValidator($this->validationErrors, $relationship);
+        return new RelationshipDocumentValidator(
+            $this->validationErrors,
+            $relationship ?: $this->relationship()
+        );
     }
 
     /**
      * @inheritdoc
      */
     public function resource(
-        $expectedType,
+        $expectedType = null,
         $expectedId = null,
         AttributesValidatorInterface $attributes = null,
         RelationshipsValidatorInterface $relationships = null,
@@ -88,7 +95,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
             $expectedType,
             $expectedId,
             $attributes,
-            $relationships,
+            $relationships ?: $this->relationships(),
             $context
         );
     }
@@ -102,13 +109,24 @@ class ValidatorFactory implements ValidatorFactoryInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function relationship($expectedType = null, $allowEmpty = true, $acceptable = null)
+    {
+        return new RelationshipValidator(
+            $this->validationErrors,
+            $this->store,
+            $expectedType,
+            $allowEmpty,
+            $acceptable
+        );
+    }
+
+    /**
      * @inheritdoc
      */
-    public function hasOne(
-        $expectedType,
-        $allowEmpty = true,
-        $acceptable = null
-    ) {
+    public function hasOne($expectedType, $allowEmpty = true, $acceptable = null)
+    {
         return new HasOneValidator(
             $this->validationErrors,
             $this->store,
@@ -121,11 +139,8 @@ class ValidatorFactory implements ValidatorFactoryInterface
     /**
      * @inheritdoc
      */
-    public function hasMany(
-        $expectedType,
-        $allowEmpty = false,
-        $acceptable = null
-    ) {
+    public function hasMany($expectedType, $allowEmpty = false, $acceptable = null)
+    {
         return new HasManyValidator(
             $this->validationErrors,
             $this->store,

@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Repositories;
 use CloudCreativity\JsonApi\Contracts\Repositories\SchemasRepositoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepository
@@ -64,11 +65,11 @@ class SchemasRepository implements SchemasRepositoryInterface
     private $schemas = [];
 
     /**
-     * @param SchemaFactoryInterface $factory
+     * @param SchemaFactoryInterface|null $factory
      */
-    public function __construct(SchemaFactoryInterface $factory)
+    public function __construct(SchemaFactoryInterface $factory = null)
     {
-        $this->factory = $factory;
+        $this->factory = $factory ?: new Factory();
     }
 
     /**

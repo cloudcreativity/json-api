@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
+use CloudCreativity\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory as Keys;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
@@ -47,6 +49,19 @@ JSON_API;
         $validator = $this->hasOne();
 
         $this->assertTrue($validator->isValid($document));
+
+        return $document;
+    }
+
+    /**
+     * @param Document $document
+     * @depends testValid
+     */
+    public function testValidWithDefaultValidator(Document $document)
+    {
+        $validator = $this->factory->relationshipDocument();
+
+        $this->willExist()->assertTrue($validator->isValid($document));
     }
 
     public function testValidPolymorph()
@@ -225,6 +240,34 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data', 'acceptable');
     }
 
+    public function testDataAcceptableReturnsError()
+    {
+        $content = '{"data": {"type": "users", "id": "99"}}';
+        $document = $this->decode($content);
+        $validator = $this->hasOne(false, true, function () {
+            $error = new Error();
+            $error->setDetail('Foobar');
+            return $error;
+        });
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertDetailIs($validator->getErrors(), '/data', 'Foobar');
+    }
+
+    public function testDataAcceptableReturnsErrors()
+    {
+        $content = '{"data": {"type": "users", "id": "99"}}';
+        $document = $this->decode($content);
+        $validator = $this->hasOne(false, true, function () {
+            $error = new Error();
+            $error->setDetail('Foobar');
+            return new MutableErrorCollection([$error]);
+        });
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertDetailIs($validator->getErrors(), '/data', 'Foobar');
+    }
+
     public function testValidImmutable()
     {
         $content = <<<JSON_API
@@ -307,7 +350,7 @@ JSON_API;
         $acceptable = null,
         $expectedType = 'users'
     ) {
-        $this->store->method('exists')->willReturn($exists);
+        $this->willExist($exists);
         $validator = $this->factory->hasOne($expectedType, $allowEmpty, $acceptable);
 
         return $this->factory->relationshipDocument($validator);

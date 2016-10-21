@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use IteratorAggregate;
 use Traversable;
 
@@ -41,7 +41,7 @@ interface RelationshipsInterface extends StandardObjectInterface, IteratorAggreg
     /**
      * @param $key
      * @return RelationshipInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the key is not present, or is not an object.
      */
     public function getRelationship($key);

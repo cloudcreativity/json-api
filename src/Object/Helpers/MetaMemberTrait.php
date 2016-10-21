@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Object\Helpers;
 
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
-use CloudCreativity\JsonApi\Exceptions\DocumentException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
@@ -47,7 +47,7 @@ trait MetaMemberTrait
      * Get the meta member of the document.
      *
      * @return StandardObjectInterface
-     * @throws DocumentException
+     * @throws RuntimeException
      *      if the meta member is present and is not an object or null.
      */
     public function getMeta()
@@ -55,7 +55,7 @@ trait MetaMemberTrait
         $meta = $this->get(DocumentInterface::KEYWORD_META);
 
         if ($this->has(DocumentInterface::KEYWORD_META) && !is_object($meta)) {
-            throw new DocumentException('Data member is not an object.');
+            throw new RuntimeException('Data member is not an object.');
         }
 
         return new StandardObject($meta);

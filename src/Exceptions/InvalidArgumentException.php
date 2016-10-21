@@ -18,13 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Exceptions;
 
-use RuntimeException;
+use InvalidArgumentException as BaseException;
 
 /**
- * Class HydratorException
+ * Class RequestException
  * @package CloudCreativity\JsonApi
  */
-class HydratorException extends RuntimeException
+class InvalidArgumentException extends BaseException
 {
 
 }
