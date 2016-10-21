@@ -3,7 +3,7 @@
          verbose="true"
          colors="true">
     <testsuites>
-        <testsuite name="JSON API Test Suite">
+        <testsuite name="Unit">
             <directory>./test/</directory>
         </testsuite>
     </testsuites>
