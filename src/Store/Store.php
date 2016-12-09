@@ -53,6 +53,21 @@ class Store implements StoreInterface
     /**
      * @inheritdoc
      */
+    public function isType($resourceType)
+    {
+        /** @var AdapterInterface $adapter */
+        foreach ($this->adapters as $adapter) {
+            if ($adapter->recognises($resourceType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function exists(ResourceIdentifierInterface $identifier)
     {
         $check = $this->identityMap->exists($identifier);

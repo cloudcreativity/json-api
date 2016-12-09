@@ -34,6 +34,15 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 final class HasOneDocumentValidatorTest extends TestCase
 {
 
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->resourceTypes = ['users', 'posts'];
+    }
+
     public function testValid()
     {
         $content = <<<JSON_API
@@ -112,7 +121,6 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_DATA);
     }
 
-
     public function testDataTypeRequired()
     {
         $content = <<<JSON_API
@@ -129,6 +137,26 @@ JSON_API;
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
+    }
+
+    public function testDataTypeUnknown()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "foobar",
+        "id": "99"
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::RELATIONSHIP_UNKNOWN_TYPE);
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'not recognised');
+        $this->assertDetailContains($validator->getErrors(), '/data/type', 'foobar');
     }
 
     public function testDataTypeNotSupported()

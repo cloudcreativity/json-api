@@ -107,6 +107,15 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * @param $type
      * @return bool
      */
+    protected function isKnownType($type)
+    {
+        return $this->store->isType($type);
+    }
+
+    /**
+     * @param $type
+     * @return bool
+     */
     protected function isSupportedType($type)
     {
         if (!is_array($this->expectedTypes)) {
@@ -229,21 +238,22 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
     protected function validateIdentifier(ResourceIdentifierInterface $identifier, $key = null)
     {
         $valid = true;
+        $type = $identifier->hasType() ? $identifier->getType() : null;
 
         /** Must have a type */
-        if (!$identifier->hasType()) {
+        if (!$type) {
             $this->addError($this->errorFactory->memberRequired(
                 ResourceIdentifierInterface::TYPE,
                 $key ? P::relationshipData($key) : P::data()
             ));
             $valid = false;
+        } /** Check the submitted resource type is a known resource type */
+        elseif (!$this->isKnownType($type)) {
+            $this->addError($this->errorFactory->relationshipUnknownType($type, $key));
+            $valid = false;
         } /** Check type is valid for this relationship */
-        elseif (!$this->isSupportedType($identifier->getType())) {
-            $this->addError($this->errorFactory->relationshipUnsupportedType(
-                $this->expectedTypes,
-                $identifier->getType(),
-                $key
-            ));
+        elseif (!$this->isSupportedType($type)) {
+            $this->addError($this->errorFactory->relationshipUnsupportedType($this->expectedTypes, $type, $key));
             $valid = false;
         }
 

@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+- Can now check whether a resource type is known to the store (i.e. is a valid resource type).
+- Relationships validators will now reject a resource identifier if the resource type is not known to the store - i.e.
+is not valid. A specific validation error message is returned when this is encountered.
+
 ## [0.6.0] - 2016-10-21
 
 ### Added

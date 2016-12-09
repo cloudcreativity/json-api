@@ -31,6 +31,15 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 final class HasManyDocumentValidatorTest extends TestCase
 {
 
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->resourceTypes = ['users', 'posts'];
+    }
+
     public function testValid()
     {
         $content = <<<JSON_API

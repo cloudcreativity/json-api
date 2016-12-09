@@ -37,6 +37,15 @@ final class ResourceDocumentValidatorTest extends TestCase
 {
 
     /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->resourceTypes = ['people', 'tags', 'users'];
+    }
+
+    /**
      * Test a valid create resource document.
      */
     public function testCreate()
@@ -121,11 +130,11 @@ JSON_API;
             "tags": {
                 "data": [
                     {
-                        "type": "tag",
+                        "type": "tags",
                         "id": "1"
                     },
                     {
-                        "type": "tag",
+                        "type": "tags",
                         "id": "2"
                     }
                 ]
