@@ -24,6 +24,11 @@ The following new validation error keys need to be added to your `validation.php
 If you have your own store implementation, you will need to add `Contracts\Store\StoreInterface::isType()` to your
 implementation.
 
+### Validation
+
+If you have your own validation error factory implementation, you will need to add 
+`Contracts\Validators\ValidatorErrorFactoryInterface::relationshipUnknownType()` to your implementation.
+
 ## v0.5 to v0.6
 
 ### Api
