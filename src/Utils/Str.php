@@ -18,6 +18,11 @@ class Str
     /**
      * @var array
      */
+    private static $underscored = [];
+
+    /**
+     * @var array
+     */
     private static $camelized = [];
 
     /**
@@ -53,6 +58,21 @@ class Str
         }
 
         return self::$decamelized[$value] = strtolower(preg_replace('/(.)(?=[A-Z])/u', '$1_', $value));
+    }
+
+    /**
+     * Converts a camel case or dasherized string into a lower cased and underscored string.
+     *
+     * @param $value
+     * @return string
+     */
+    public static function underscore($value)
+    {
+        if (isset(self::$underscored[$value])) {
+            return self::$underscored[$value];
+        }
+
+        return self::$underscored[$value] = str_replace('-', '_', self::decamelize($value));
     }
 
     /**

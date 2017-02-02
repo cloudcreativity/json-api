@@ -131,7 +131,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
     protected function hydrateRelatedAuthor(StandardObject $object, $record)
     {
         return $object->transformKeys(function ($key) {
-            return Str::decamelize(Str::camelize($key));
+            return Str::underscore($key);
         })->getProxy();
     }
 }

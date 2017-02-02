@@ -56,6 +56,31 @@ class StrTest extends TestCase
     /**
      * @return array
      */
+    public function underscoreProvider()
+    {
+        return [
+            ['foo', 'foo'],
+            ['fooBar', 'foo_bar'],
+            ['fooBarBazBat', 'foo_bar_baz_bat'],
+            ['foo_bar', 'foo_bar'],
+            ['foo-bar', 'foo_bar'],
+            ['foo-bar-baz-bat', 'foo_bar_baz_bat'],
+        ];
+    }
+
+    /**
+     * @param $value
+     * @param $expected
+     * @dataProvider underscoreProvider
+     */
+    public function testUnderscore($value, $expected)
+    {
+        $this->assertSame($expected, Str::underscore($value));
+    }
+
+    /**
+     * @return array
+     */
     public function camelizeProvider()
     {
         return [
