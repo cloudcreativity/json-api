@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
+use CloudCreativity\JsonApi\Utils\Str;
 
 /**
  * Class RelationshipHydratorTrait
@@ -60,8 +61,6 @@ trait RelationshipHydratorTrait
      */
     protected function methodForRelationship($key)
     {
-        $key = ucwords(str_replace(['_', '-'], ' ', $key));
-
-        return sprintf('hydrate%sRelationship', str_replace(' ', '', $key));
+        return sprintf('hydrate%sRelationship', Str::classify($key));
     }
 }

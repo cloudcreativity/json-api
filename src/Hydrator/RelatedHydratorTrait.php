@@ -19,6 +19,9 @@
 namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
+use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Utils\Str;
+use stdClass;
 
 /**
  * Class RelatedHydratorTrait
@@ -26,6 +29,43 @@ use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
  */
 trait RelatedHydratorTrait
 {
+
+    /**
+     * @param $relationshipKey
+     * @param RelationshipInterface $relationship
+     * @param $record
+     * @return false|null|\object[]
+     * @deprecated use `callHydrateRelatedRelationship` instead
+     */
+    protected function callHydrateRelated($relationshipKey, RelationshipInterface $relationship, $record)
+    {
+        return $this->callHydrateRelatedRelationship($relationshipKey, $relationship, $record);
+    }
+
+    /**
+     * @param $attributeKey
+     * @param $attributeValue
+     * @param $record
+     * @return mixed
+     */
+    protected function callHydrateRelatedAttribute($attributeKey, $attributeValue, $record)
+    {
+        $method = $this->methodForRelated($attributeKey);
+
+        if (!$method || !method_exists($this, $method)) {
+            return null;
+        }
+
+        /**
+         * Temporary fix for standard object iteration
+         * @see https://github.com/cloudcreativity/json-api/issues/30
+         * @todo change this when that bug is fixed.
+         */
+        $value = ($attributeValue instanceof stdClass) ?
+            new StandardObject($attributeValue) : $attributeValue;
+
+        return call_user_func([$this, $method], $value, $record);
+    }
 
     /**
      * Hydrate a relationship by invoking a method on this hydrator.
@@ -36,7 +76,7 @@ trait RelatedHydratorTrait
      * @return object[]|null|false
      *      false if no method was invoked, otherwise the return result of the method.
      */
-    protected function callHydrateRelated($relationshipKey, RelationshipInterface $relationship, $record)
+    protected function callHydrateRelatedRelationship($relationshipKey, RelationshipInterface $relationship, $record)
     {
         $method = $this->methodForRelated($relationshipKey);
 
@@ -58,8 +98,6 @@ trait RelatedHydratorTrait
      */
     protected function methodForRelated($key)
     {
-        $key = ucwords(str_replace(['_', '-'], ' ', $key));
-
-        return sprintf('hydrateRelated%s', str_replace(' ', '', $key));
+        return sprintf('hydrateRelated%s', Str::classify($key));
     }
 }

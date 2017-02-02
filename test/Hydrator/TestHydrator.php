@@ -18,16 +18,20 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
+use CloudCreativity\JsonApi\Contracts\Hydrator\HydratesRelatedInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Utils\Str;
 
 /**
  * Class TestHydrator
  * @package CloudCreativity\JsonApi
  */
-class TestHydrator extends AbstractHydrator
+class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
 {
 
-    use HydratesAttributesTrait;
+    use HydratesAttributesTrait, RelatedHydratorTrait;
 
     /**
      * The attributes that can be hydrated
@@ -52,6 +56,37 @@ class TestHydrator extends AbstractHydrator
     }
 
     /**
+     * @inheritDoc
+     * @todo an equivalent method for this needs to be on the `RelatedHydratorTrait`
+     * @see https://github.com/cloudcreativity/json-api/issues/28
+     */
+    public function hydrateRelated(ResourceInterface $resource, $record)
+    {
+        $results = [];
+        $attributes = $resource->getAttributes();
+
+        /**
+         * Have to iterate over keys because the standard object iteration has a bug.
+         * @see https://github.com/cloudcreativity/json-api/issues/30
+         * @todo change this when that issue is fixed.
+         */
+        foreach ($attributes->keys() as $key) {
+            $results[] = $this->callHydrateRelatedAttribute($key, $attributes->get($key), $record);
+        }
+
+        /** @var RelationshipInterface $relationship */
+        foreach ($resource->getRelationships()->getAll() as $key => $relationship) {
+            $result = $this->callHydrateRelated($key, $relationship, $record);
+
+            if (is_array($result)) {
+                $results = array_merge($results, $result);
+            }
+        }
+
+        return array_values(array_filter($results));
+    }
+
+    /**
      * @param RelationshipInterface $relationship
      * @param $record
      */
@@ -69,4 +104,34 @@ class TestHydrator extends AbstractHydrator
         $record->tag_ids = $relationship->getIdentifiers()->getIds();
     }
 
+    /**
+     * @param RelationshipInterface $relationship
+     * @return array
+     */
+    protected function hydrateRelatedLinkedPosts(RelationshipInterface $relationship)
+    {
+        $arr = [];
+
+        foreach ($relationship->getData()->getAll() as $identifier) {
+            $arr[] = (object) [
+                'type' => $identifier->getType(),
+                'id' => $identifier->getId(),
+                'title' => sprintf('Post %d', $identifier->getId()),
+            ];
+        }
+
+        return $arr;
+    }
+
+    /**
+     * @param StandardObject $object
+     * @param $record
+     * @return object
+     */
+    protected function hydrateRelatedAuthor(StandardObject $object, $record)
+    {
+        return $object->transformKeys(function ($key) {
+            return Str::decamelize(Str::camelize($key));
+        })->getProxy();
+    }
 }

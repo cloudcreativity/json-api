@@ -234,4 +234,57 @@ JSON_API;
         $this->setExpectedException(RuntimeException::class);
         $this->hydrator->hydrateRelationship('foo', $document->getRelationship(), new stdClass());
     }
+
+    /**
+     * Test related (second step) hydration.
+     *
+     * - E.g. a nested record within the `author` attribute.
+     * - E.g. a has-many relationship.
+     */
+    public function testHydrateRelated()
+    {
+        $this->hydrator->attributes = ['title', 'content'];
+
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My First Post",
+            "content": "Here is some content...",
+            "author": {
+                "first-name": "John",
+                "surname": "Doe"
+            }
+        },
+        "relationships": {
+            "user": {
+                "data": {
+                    "type": "users",
+                    "id": "123"
+                }
+            },
+            "linked-posts": {
+                "data": [
+                    { "type": "posts", "id": "98" },
+                    { "type": "posts", "id": "99" }
+                ]
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $author = (object) ['first_name' => "John", "surname" => "Doe"];
+        $post1 = (object) ['type' => 'posts', 'id' => '98', 'title' => 'Post 98'];
+        $post2 = (object) ['type' => 'posts', 'id' => '99', 'title' => 'Post 99'];
+        $record = new stdClass();
+
+        $this->assertEquals([
+            $author,
+            $post1,
+            $post2
+        ], $this->hydrator->hydrateRelated($document->getResource(), $record));
+    }
 }
