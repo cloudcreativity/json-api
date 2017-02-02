@@ -19,25 +19,36 @@
 namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 
 /**
  * Class TestHydrator
  * @package CloudCreativity\JsonApi
  */
-final class TestHydrator extends AbstractHydrator
+class TestHydrator extends AbstractHydrator
 {
 
+    use HydratesAttributesTrait;
+
     /**
-     * @param StandardObjectInterface $attributes
-     * @param $record
-     * @return void
+     * The attributes that can be hydrated
+     *
+     * @var array|null
      */
-    protected function hydrateAttributes(StandardObjectInterface $attributes, $record)
+    public $attributes;
+
+    /**
+     * Attributes to cast as dates
+     *
+     * @var array|null
+     */
+    public $dates;
+
+    /**
+     * @inheritDoc
+     */
+    protected function hydrateAttribute($record, $attrKey, $value)
     {
-        foreach ($attributes as $key => $value) {
-            $record->{$key} = $value;
-        }
+        $record->{$attrKey} = $value;
     }
 
     /**

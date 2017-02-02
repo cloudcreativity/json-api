@@ -20,13 +20,15 @@ namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
+use DateTime;
+use DateTimeZone;
 use stdClass;
 
 /**
  * Class AbstractHydratorTest
  * @package CloudCreativity\JsonApi
  */
-final class AbstractHydratorTest extends TestCase
+class AbstractHydratorTest extends TestCase
 {
 
     /**
@@ -85,14 +87,117 @@ JSON_API;
         $document = $this->decode($content);
         $record = new stdClass();
 
-        $expected = new stdClass();
-        $expected->title = 'My First Post';
-        $expected->content = 'Here is some content...';
-        $expected->user_id = "123";
-        $expected->tag_ids = ["456", "789"];
+        $expected = (object) [
+            'title' => 'My First Post',
+            'content' => 'Here is some content...',
+            'user_id' => '123',
+            'tag_ids' => ['456', '789'],
+        ];
 
         $this->hydrator->hydrate($document->getResource(), $record);
         $this->assertEquals($expected, $record);
+    }
+
+    public function testAttributeAliases()
+    {
+        $this->hydrator->attributes = [
+            'title',
+            'content',
+            'published' => 'is_published',
+        ];
+
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My First Post",
+            "content": "Here is some content...",
+            "published": true
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $record = new stdClass();
+
+        $expected = (object) [
+            'title' => 'My First Post',
+            'content' => 'Here is some content...',
+            'is_published' => true,
+        ];
+
+        $this->hydrator->hydrate($document->getResource(), $record);
+        $this->assertEquals($expected, $record);
+    }
+
+    public function testIgnoresAttributes()
+    {
+        $this->hydrator->attributes = ['title', 'content'];
+
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My First Post",
+            "content": "Here is some content...",
+            "published": true
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $record = new stdClass();
+
+        $this->hydrator->hydrate($document->getResource(), $record);
+        $this->assertObjectNotHasAttribute('published', $record);
+    }
+
+    /**
+     * Test for date conversion
+     *
+     * - Dates to be specified using the `dates` attribute on the hydrator
+     * - Should cast W3C date strings, including timezone.
+     * - As Javascript will include milliseconds, these need to work too.
+     * - Empty (`null`) values should be respected.
+     */
+    public function testConvertsDates()
+    {
+        $this->hydrator->attributes = [
+            'exact',
+            'published-at' => 'published_at',
+            'empty',
+        ];
+
+        $this->hydrator->dates = ['exact', 'empty', 'published-at'];
+
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "My First Post",
+            "content": "Here is some content...",
+            "published-at": "2017-07-01T12:30:00+01:00",
+            "exact": "2017-07-10T13:00:00.150+10:00",
+            "empty": null
+        }
+    }
+}
+JSON_API;
+
+        $published = new DateTime('2017-07-01 12:30:00', new DateTimeZone('Europe/London'));
+        $exact = new DateTime('2017-07-10 13:00:00.150', new DateTimeZone('Australia/Melbourne'));
+        $document = $this->decode($content);
+
+        $this->hydrator->hydrate($document->getResource(), $record = new stdClass());
+        $this->assertEquals($published, $record->published_at);
+        $this->assertEquals($exact, $record->exact);
+        $this->assertObjectHasAttribute('empty', $record);
+        $this->assertNull($record->empty);
     }
 
     public function testHydrateRelationship()
