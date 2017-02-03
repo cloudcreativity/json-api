@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file. This projec
 - Relationships validators will now reject a resource identifier if the resource type is not known to the store - i.e.
 is not valid. A specific validation error message is returned when this is encountered.
 
+## [0.6.1] - 2017-02-03
+
+### Added
+- New trait for standard hydrating of attributes: `Hydrator\HydratesAttributesTrait`.
+- New trait for standard extraction of attributes: `Schema\ExtractsAttributesTrait`.
+- Helpers have been added for converting string keys, to aid conversion from the JSON API recommended *dasherized*
+format to underscores or camel case. Helpers are on the `Utils\Str` class.
+- `RelatedHydratorTrait` now also enables attributes to be mapped during related hydration.
+
 ## [0.6.0] - 2016-10-21
 
 ### Added
