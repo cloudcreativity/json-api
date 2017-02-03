@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.6.1] - 2017-02-03
+
+### Added
+- New trait for standard hydrating of attributes: `Hydrator\HydratesAttributesTrait`.
+- New trait for standard extraction of attributes: `Schema\ExtractsAttributesTrait`.
+- Helpers have been added for converting string keys, to aid conversion from the JSON API recommended *dasherized*
+format to underscores or camel case. Helpers are on the `Utils\Str` class.
+- `RelatedHydratorTrait` now also enables attributes to be mapped during related hydration.
+
 ## [0.6.0] - 2016-10-21
 
 ### Added
