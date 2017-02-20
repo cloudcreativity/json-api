@@ -16,7 +16,7 @@
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "lindyhopchris",
+            "name": "Cloud Creativity Ltd",
             "email": "info@cloudcreativity.co.uk"
         }
     ],
@@ -41,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.7.x-dev"
+            "dev-develop": "0.8.x-dev"
         }
     }
 }
