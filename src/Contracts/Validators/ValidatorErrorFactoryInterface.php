@@ -111,6 +111,17 @@ interface ValidatorErrorFactoryInterface
     public function resourceInvalidRelationships();
 
     /**
+     * The related resource type is not known.
+     *
+     * @param string $actual
+     *      the resource type that was provided.
+     * @param string|null $relationshipKey
+     *      the relationship key, or null if validating the relationship in the data member of a document.
+     * @return ErrorInterface
+     */
+    public function relationshipUnknownType($actual, $relationshipKey = null);
+
+    /**
      * The related resource is not of the correct type for the relationship.
      *
      * @param string|string[] $expected

@@ -42,6 +42,7 @@ final class StoreTest extends TestCase
             $this->willExist($identifier)
         ]);
 
+        $this->assertTrue($store->isType('users'));
         $this->assertTrue($store->exists($identifier));
     }
 
@@ -54,6 +55,7 @@ final class StoreTest extends TestCase
             $this->willNotExist($identifier)
         ]);
 
+        $this->assertTrue($store->isType('users'));
         $this->assertFalse($store->exists($identifier));
     }
 
@@ -64,6 +66,7 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
         $store = $this->store([$adapter]);
 
+        $this->assertFalse($store->isType('users'));
         $this->setExpectedException(RuntimeException::class);
         $store->exists($identifier);
     }

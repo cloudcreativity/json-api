@@ -45,6 +45,14 @@ interface StoreInterface
     public function registerMany(array $adapters);
 
     /**
+     * Is the supplied resource type valid?
+     *
+     * @param $resourceType
+     * @return bool
+     */
+    public function isType($resourceType);
+
+    /**
      * Does the record this resource identifier refers to exist?
      *
      * @param ResourceIdentifierInterface $identifier

@@ -54,13 +54,21 @@ class TestCase extends BaseTestCase
     protected $factory;
 
     /**
+     * @var array
+     */
+    protected $resourceTypes = [];
+
+    /**
      * @return void
      */
     protected function setUp()
     {
-        /** @var StoreInterface $store */
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $config = require __DIR__ . '/../../config/validation.php';
+
+        $store->method('isType')->willReturnCallback(function ($type) {
+           return in_array($type, $this->resourceTypes, true);
+        });
 
         $this->errorRepository = new ErrorRepository(new Replacer());
         $this->errorRepository->configure($config);

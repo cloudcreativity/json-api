@@ -2,6 +2,33 @@
 
 This file provides notes on how to upgrade between versions.
 
+## v0.6 to v0.7
+
+### Config
+
+The following new validation error keys need to be added to your `validation.php` config file:
+
+```php
+  /**
+   * When the resource type of a related resource is not recognised.
+   */
+  V::RELATIONSHIP_UNKNOWN_TYPE => [
+      Error::TITLE => 'Invalid Relationship',
+      Error::DETAIL => "Resource type '{actual}' is not recognised.",
+      Error::STATUS => 400,
+  ]
+```
+
+### Store
+
+If you have your own store implementation, you will need to add `Contracts\Store\StoreInterface::isType()` to your
+implementation.
+
+### Validation
+
+If you have your own validation error factory implementation, you will need to add 
+`Contracts\Validators\ValidatorErrorFactoryInterface::relationshipUnknownType()` to your implementation.
+
 ## v0.5 to v0.6
 
 ### Api

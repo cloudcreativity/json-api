@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.7.0] - 2017-02-20
+
+### Added
+- Can now check whether a resource type is known to the store (i.e. is a valid resource type).
+- Relationships validators will now reject a resource identifier if the resource type is not known to the store - i.e.
+is not valid. A specific validation error message is returned when this is encountered.
+
+### Changed
+- The `neomerx/json-api` dependency has been updated to v1.0.
+
+### Removed
+- This package no longer supports PHP 5.5.
+
 ## [0.6.1] - 2017-02-03
 
 ### Added

@@ -31,7 +31,7 @@ use Neomerx\JsonApi\Factories\Factory;
  * Class ApiFactoryTest
  * @package CloudCreativity\JsonApi
  */
-final class ApiFactoryTest extends TestCase
+class ApiFactoryTest extends TestCase
 {
 
     /**
@@ -72,7 +72,7 @@ final class ApiFactoryTest extends TestCase
         $this->codecMatchers = new CodecMatcherRepository();
         $this->schemas = new SchemasRepository();
         $this->store = new Store();
-        $this->requestInterpreter = $this->getMock(RequestInterpreterInterface::class);
+        $this->requestInterpreter = $this->getMockBuilder(RequestInterpreterInterface::class)->getMock();
         $this->httpFactory = new Factory();
 
         $this->factory = new ApiFactory(

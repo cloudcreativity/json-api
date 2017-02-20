@@ -22,8 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
-use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
@@ -40,6 +40,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     const RESOURCE_UNSUPPORTED_ID = 'validation:resource-unsupported-id';
     const RESOURCE_INVALID_ATTRIBUTES = 'validation:resource-invalid-attributes';
     const RESOURCE_INVALID_RELATIONSHIPS = 'validation:resource-invalid-relationships';
+    const RELATIONSHIP_UNKNOWN_TYPE = 'validation:relationshio-unknown-type';
     const RELATIONSHIP_UNSUPPORTED_TYPE = 'validation:relationship-unsupported-type';
     const RELATIONSHIP_HAS_ONE_EXPECTED = 'validation:relationship-has-one-expected';
     const RELATIONSHIP_HAS_MANY_EXPECTED = 'validation:relationship-has-many-expected';
@@ -142,6 +143,18 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         return $this->repository->errorWithPointer(
             self::RESOURCE_INVALID_RELATIONSHIPS,
             P::relationships()
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function relationshipUnknownType($actual, $relationshipKey = null)
+    {
+        return $this->repository->errorWithPointer(
+            self::RELATIONSHIP_UNKNOWN_TYPE,
+            $relationshipKey ? P::relationshipType($relationshipKey) : P::type(),
+            ['actual' => $actual]
         );
     }
 
