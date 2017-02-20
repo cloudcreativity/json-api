@@ -669,9 +669,9 @@ JSON_API;
      */
     private function attributes($valid)
     {
-        $mock = $this->getMock(AttributesValidatorInterface::class);
+        $mock = $this->getMockBuilder(AttributesValidatorInterface::class)->getMock();
         $mock->method('isValid')->willReturn($valid);
-        $mock->method('errors')->willReturn(new ErrorCollection());
+        $mock->method('getErrors')->willReturn(new ErrorCollection());
 
         return $mock;
     }

@@ -99,7 +99,7 @@ final class RequestFactoryTest extends TestCase
 
         $this->codecMatcher = $factory->createCodecMatcher();
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
-        $this->adapter = $this->getMock(AdapterInterface::class);
+        $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $this->adapter->method('recognises')->with('posts')->willReturn(true);
         $store->register($this->adapter);
         $this->api = new Api('v1', $this->interpreter, $this->codecMatcher, $factory->createContainer(), $store);

@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file. This projec
 - Relationships validators will now reject a resource identifier if the resource type is not known to the store - i.e.
 is not valid. A specific validation error message is returned when this is encountered.
 
+### Removed
+- This package no longer support PHP 5.5.
+
 ## [0.6.1] - 2017-02-03
 
 ### Added
