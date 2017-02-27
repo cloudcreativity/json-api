@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.7.2] - 2017-02-27
+
+### Fixed
+- Corrected doc blocks in `RequestHandler`
+
 ## [0.7.1] - 2017-02-22
 
 ### Added
