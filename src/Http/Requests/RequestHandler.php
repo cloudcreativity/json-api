@@ -54,25 +54,25 @@ class RequestHandler implements RequestHandlerInterface
 
     /**
      * @var string[]|null
-     * @see ParsesQueryParameters::allowedIncludePaths()
+     * @see ChecksQueryParameters::allowedIncludePaths()
      */
     protected $allowedIncludePaths = [];
 
     /**
      * @var array|null
-     * @see ParsesQueryParameters::allowedFieldSetTypes()
+     * @see ChecksQueryParameters::allowedFieldSetTypes()
      */
     protected $allowedFieldSetTypes = null;
 
     /**
      * @var string[]|null
-     * @see ParsesQueryParameters::allowedSortParameters()
+     * @see ChecksQueryParameters::allowedSortParameters()
      */
     protected $allowedSortParameters = [];
 
     /**
      * @var string[]|null
-     * @see ParsesQueryParameters::allowedFilteringParameters()
+     * @see ChecksQueryParameters::allowedFilteringParameters()
      */
     protected $allowedFilteringParameters = [];
 
@@ -85,7 +85,7 @@ class RequestHandler implements RequestHandlerInterface
 
     /**
      * @var bool
-     * @see ParsesQueryParameters::allowUnrecognizedParameters()
+     * @see ChecksQueryParameters::allowUnrecognizedParameters()
      */
     protected $allowUnrecognizedParams = false;
 
