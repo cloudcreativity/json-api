@@ -16,16 +16,10 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http\Requests;
+namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
-use CloudCreativity\JsonApi\Exceptions\ValidationException;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 
 /**
  * Class ChecksQueryParameters
@@ -39,7 +33,14 @@ trait ChecksQueryParameters
      *
      * @return bool
      */
-    abstract protected function allowUnrecognizedParameters();
+    protected function allowUnrecognizedParameters()
+    {
+        if (property_exists($this, 'allowUnrecognizedParameters')) {
+            return (bool) $this->allowUnrecognizedParameters;
+        }
+
+        return false;
+    }
 
     /**
      * What include paths the client is allowed to request.
@@ -49,7 +50,14 @@ trait ChecksQueryParameters
      *
      * @return string[]|null
      */
-    abstract protected function allowedIncludePaths();
+    protected function allowedIncludePaths()
+    {
+        if (property_exists($this, 'allowedIncludePaths')) {
+            return $this->allowedIncludePaths;
+        }
+
+        return [];
+    }
 
     /**
      * What field sets the client is allowed to request per JSON API resource object type.
@@ -62,7 +70,14 @@ trait ChecksQueryParameters
      *
      * @return array|null
      */
-    abstract protected function allowedFieldSetTypes();
+    protected function allowedFieldSetTypes()
+    {
+        if (property_exists($this, 'allowedFieldSetTypes')) {
+            return $this->allowedFieldSetTypes;
+        }
+
+        return null;
+    }
 
     /**
      * What sort field names can be sent by the client.
@@ -72,7 +87,14 @@ trait ChecksQueryParameters
      *
      * @return string[]|null
      */
-    abstract protected function allowedSortParameters();
+    protected function allowedSortParameters()
+    {
+        if (property_exists($this, 'allowedSortParameters')) {
+            return $this->allowedSortParameters;
+        }
+
+        return [];
+    }
 
     /**
      * What paging fields can be sent by the client.
@@ -80,10 +102,16 @@ trait ChecksQueryParameters
      * Empty array = clients are not allowed to request paging.
      * Null = clients can specify any paging fields they want.
      *
-     * @param PagingStrategyInterface $strategy
      * @return string[]|null
      */
-    abstract protected function allowedPagingParameters(PagingStrategyInterface $strategy);
+    protected function allowedPagingParameters()
+    {
+        if (property_exists($this, 'allowedPagingParameters')) {
+            return $this->allowedPagingParameters;
+        }
+
+        return [];
+    }
 
     /**
      * What filtering fields can be sent by the client.
@@ -93,59 +121,29 @@ trait ChecksQueryParameters
      *
      * @return string[]|null
      */
-    abstract protected function allowedFilteringParameters();
-
-    /**
-     * @param ApiInterface $api
-     * @param RequestInterface $request
-     * @param FilterValidatorInterface|null $filterValidator
-     */
-    protected function checkQueryParameters(
-        ApiInterface $api,
-        RequestInterface $request,
-        FilterValidatorInterface $filterValidator = null
-    ) {
-        $parameters = $request->getParameters();
-        $this->checkEncodingParameters($api->getHttpFactory(), $parameters, $api);
-
-        if ($filterValidator && $api->getRequestInterpreter()->isIndex()) {
-            $this->checkFilterParameters($filterValidator, $parameters);
+    protected function allowedFilteringParameters()
+    {
+        if (property_exists($this, 'allowedFilteringParameters')) {
+            return $this->allowedFilteringParameters;
         }
+
+        return [];
     }
 
     /**
      * @param HttpFactoryInterface $factory
-     * @param EncodingParametersInterface $parameters
-     * @param ApiInterface $api
-     * @throws JsonApiException
+     * @return QueryCheckerInterface
      */
-    private function checkEncodingParameters(
-        HttpFactoryInterface $factory,
-        EncodingParametersInterface $parameters,
-        ApiInterface $api
-    ) {
-        $checker = $factory->createQueryChecker(
+    protected function createQueryChecker(HttpFactoryInterface $factory)
+    {
+        return $factory->createQueryChecker(
             $this->allowUnrecognizedParameters(),
             $this->allowedIncludePaths(),
             $this->allowedFieldSetTypes(),
             $this->allowedSortParameters(),
-            $this->allowedPagingParameters($api->getPagingStrategy()),
+            $this->allowedPagingParameters(),
             $this->allowedFilteringParameters()
         );
-
-        $checker->checkQuery($parameters);
-    }
-
-    /**
-     * @param FilterValidatorInterface $validator
-     * @param EncodingParametersInterface $parameters
-     * @throws JsonApiException
-     */
-    private function checkFilterParameters(FilterValidatorInterface $validator, EncodingParametersInterface $parameters)
-    {
-        if (!$validator->isValid((array) $parameters->getFilteringParameters())) {
-            throw new ValidationException($validator->getErrors());
-        }
     }
 
 }

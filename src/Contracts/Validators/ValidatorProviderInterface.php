@@ -18,6 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
+
 /**
  * Interface ValidatorProviderInterface
  * @package CloudCreativity\JsonApi
@@ -26,7 +28,7 @@ interface ValidatorProviderInterface
 {
 
     /**
-     * Get a validator for a create resource request is logically valid.
+     * Get a validator for a create resource request.
      *
      * @param string $resourceType
      *      the JSON API resource type that is being created
@@ -35,7 +37,7 @@ interface ValidatorProviderInterface
     public function createResource($resourceType);
 
     /**
-     * Get a validator for an update resource request is logically valid.
+     * Get a validator for an update resource request.
      *
      * @param string $resourceType
      *      the JSON API resource type that is being updated
@@ -64,12 +66,11 @@ interface ValidatorProviderInterface
     public function modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
 
     /**
-     * Get a validator for filtering resources.
+     * Get a query checker for the specified resource type.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being filtered
-     * @return FilterValidatorInterface
+     * @param $resourceType
+     * @return QueryCheckerInterface
      */
-    public function filterResources($resourceType);
+    public function queryChecker($resourceType);
 
 }

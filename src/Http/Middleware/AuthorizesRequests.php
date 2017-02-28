@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http\Requests;
+namespace CloudCreativity\JsonApi\Http\Middleware;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
@@ -35,16 +35,16 @@ trait AuthorizesRequests
      * Authorize the request or throw an exception
      *
      * @param RequestInterpreterInterface $interpreter
-     * @param AuthorizerInterface $authorizer
      * @param RequestInterface $request
+     * @param AuthorizerInterface $authorizer
      * @throws AuthorizationException
      */
     protected function authorize(
         RequestInterpreterInterface $interpreter,
-        AuthorizerInterface $authorizer,
-        RequestInterface $request
+        RequestInterface $request,
+        AuthorizerInterface $authorizer
     ) {
-        $result = $this->checkAuthorization($interpreter, $authorizer, $request);
+        $result = $this->checkAuthorization($interpreter, $request, $authorizer);
 
         if (true !== $result) {
             throw new AuthorizationException($result);
@@ -53,27 +53,28 @@ trait AuthorizesRequests
 
     /**
      * @param RequestInterpreterInterface $interpreter
-     * @param AuthorizerInterface $authorizer
      * @param RequestInterface $request
+     * @param AuthorizerInterface $authorizer
      * @return ErrorCollection|bool
      *      errors if the request is not authorized, true if authorized.
      */
     protected function checkAuthorization(
         RequestInterpreterInterface $interpreter,
-        AuthorizerInterface $authorizer,
-        RequestInterface $request
+        RequestInterface $request,
+        AuthorizerInterface $authorizer
     ) {
         $parameters = $request->getParameters();
         $document = $request->getDocument();
+        $resourceType = $request->getResourceType();
         $record = $request->getRecord();
         $authorized = true;
 
         /** Index */
         if ($interpreter->isIndex()) {
-            $authorized = $authorizer->canReadMany($parameters);
+            $authorized = $authorizer->canReadMany($resourceType, $parameters);
         } /** Create Resource */
         elseif ($interpreter->isCreateResource()) {
-            $authorized = $authorizer->canCreate($document->getResource(), $parameters);
+            $authorized = $authorizer->canCreate($resourceType, $document->getResource(), $parameters);
         } /** Read Resource */
         elseif ($interpreter->isReadResource()) {
             $authorized = $authorizer->canRead($record, $parameters);
