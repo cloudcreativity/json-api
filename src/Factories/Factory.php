@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Factories;
 
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Schema\Container;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
@@ -42,5 +43,17 @@ class Factory extends BaseFactory
         $encoder->setLogger($this->logger);
 
         return $encoder;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createContainer(array $providers = [])
+    {
+        $container = new Container($this, $providers);
+
+        $container->setLogger($this->logger);
+
+        return $container;
     }
 }
