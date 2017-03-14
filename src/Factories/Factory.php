@@ -18,17 +18,21 @@
 
 namespace CloudCreativity\JsonApi\Factories;
 
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Factory
  *
  * @package CloudCreativity\JsonApi
  */
-class Factory extends BaseFactory
+class Factory extends BaseFactory implements FactoryInterface
 {
 
     /**
@@ -43,4 +47,15 @@ class Factory extends BaseFactory
 
         return $encoder;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function createRequest(ApiInterface $api, ServerRequestInterface $httpRequest)
+    {
+        $requestFactory = new RequestFactory($this);
+
+        return $requestFactory->build($api, $httpRequest);
+    }
+
 }

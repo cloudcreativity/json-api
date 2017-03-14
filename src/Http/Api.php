@@ -20,36 +20,24 @@ namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Pagination\PagingStrategy;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
-use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class Api
+ *
  * @package CloudCreativity\JsonApi
  */
 class Api implements ApiInterface
 {
 
-    const CONFIG_URL_PREFIX = 'url-prefix';
-    const CONFIG_ROUTE_PREFIX = 'route-prefix';
-    const CONFIG_SUPPORTED_EXT = 'supported-ext';
-
     /**
      * @var string
      */
     private $namespace;
-
-    /**
-     * @var HttpFactoryInterface
-     */
-    private $httpFactory;
 
     /**
      * @var RequestInterpreterInterface
@@ -72,7 +60,7 @@ class Api implements ApiInterface
     private $store;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $urlPrefix;
 
@@ -82,27 +70,15 @@ class Api implements ApiInterface
     private $supportedExtensions;
 
     /**
-     * @var PagingStrategyInterface
-     */
-    private $pagingStrategy;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-    /**
      * ApiContainer constructor.
+     *
      * @param string $namespace
      * @param RequestInterpreterInterface $interpreter
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
      * @param StoreInterface $store
      * @param SupportedExtensionsInterface|null $supportedExtensions
-     * @param PagingStrategyInterface|null $pagingStrategy
-     * @param HttpFactoryInterface|null $httpFactory
      * @param string|null $urlPrefix
-     * @param array $options
      */
     public function __construct(
         $namespace,
@@ -111,10 +87,7 @@ class Api implements ApiInterface
         SchemaContainerInterface $schemaContainer,
         StoreInterface $store,
         SupportedExtensionsInterface $supportedExtensions = null,
-        PagingStrategyInterface $pagingStrategy = null,
-        HttpFactoryInterface $httpFactory = null,
-        $urlPrefix = null,
-        array $options = []
+        $urlPrefix = null
     ) {
         $this->namespace = $namespace;
         $this->interpreter = $interpreter;
@@ -122,10 +95,7 @@ class Api implements ApiInterface
         $this->schemas = $schemaContainer;
         $this->store = $store;
         $this->supportedExtensions = $supportedExtensions;
-        $this->pagingStrategy = $pagingStrategy ?: new PagingStrategy();
-        $this->httpFactory = $httpFactory ?: new Factory();
         $this->urlPrefix = $urlPrefix;
-        $this->options = $options;
     }
 
     /**
@@ -134,14 +104,6 @@ class Api implements ApiInterface
     public function getNamespace()
     {
         return $this->namespace;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHttpFactory()
-    {
-        return $this->httpFactory;
     }
 
     /**
@@ -206,21 +168,5 @@ class Api implements ApiInterface
     public function getSupportedExts()
     {
         return $this->supportedExtensions;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPagingStrategy()
-    {
-        return $this->pagingStrategy;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getOptions()
-    {
-        return $this->options;
     }
 }

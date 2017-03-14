@@ -2,6 +2,68 @@
 
 This file provides notes on how to upgrade between versions.
 
+## v0.7 to v0.8
+
+### Factories
+
+We have removed the API factory, because we feel it is better for each framework-specific package to implement its
+own methodology of creating APIs. This allows the API to be defined in the way that best suites each framework.
+
+We have created a single factory interface that extends the `neomerx/json-api` factory interface. This extended 
+interface contains adds the methods that cover the capabilities added by this package. The extended contract
+can be found at `Contracts\Factories\FactoryInterface` and this is used by `Factories\Factory`. 
+
+These changes mean the following have been removed:
+
+- `Contracts\Http\ApiFactoryInterface`
+- `Http\ApiFactory`
+- `Contracts\Http\Requests\RequestFactoryInterface`
+
+### API
+
+The following methods have been removed from the `Contracts\Http\ApiInterface`:
+
+- `getHttpFactory`: if you need a factory, you should dependency inject `Contracts\Factories\FactoryInterface` instead.
+- `getPagingStrategy`: we are refactoring so that paging is a per-resource concern, rather than an API concern. This is
+because different resources, and resource has-many relationships, can independently use different strategies.
+- `getOptions`: framework-specific options are no longer the concern of the API class.
+
+### Authorizers
+
+The `Contracts\Authorizer\AuthorizerInterface` has been amended to add a `$resourceType` function argument 
+to `canReadMany()` and `canCreate()`. This allows an Authorizer to be used for multiple resource types.
+
+### Request Handlers
+
+To reduce the number of units that need creating per resource type, we have removed the Request handler. In effect
+this handler was doing four things:
+
+1. Checking the relationship name in the URL was valid. This should be moved to route registration (i.e. only register
+routes for valid relationships).
+2. Triggering authorization via an Authorizer instance. This should be moved to middleware.
+3. Validating request query parameters. This has been moved to the validator provider (see *Validators* below).
+4. Triggering content validation via a Validator provider instance. This should also be moved to middleware.
+
+To aid with middleware implementations, two traits have been created:
+
+- `Http\Middleware\AuthorizesRequests::authorize()`
+- `Http\Middleware\ValidatesRequests::validate()`
+
+As a result of these changes, we have removed the following:
+
+- `Contracts\Http\Requests\RequestHandlerInterface`
+- `Http\Requests\RequestHandler`
+
+### Validators
+
+We have amended the `Contracts\Validators\ValidatorProviderInterface`, removing `filterResources()` and adding
+`queryChecker()`. This new method returns an instance of the `QueryCheckerInterface` from the `neomerx/json-api`
+package, which better reflects that the validator provider is able to provide a validator instance for checking
+all query parameters.
+
+The `Contracts\Validators\FilterValidatorInterface` has been removed as a result. Filter validation should be 
+achieved by the query checker instance returned by the validator provider.
+
 ## v0.6 to v0.7
 
 ### Config
