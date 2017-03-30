@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
@@ -38,11 +37,6 @@ class Api implements ApiInterface
      * @var string
      */
     private $namespace;
-
-    /**
-     * @var RequestInterpreterInterface
-     */
-    private $interpreter;
 
     /**
      * @var CodecMatcherInterface
@@ -73,7 +67,6 @@ class Api implements ApiInterface
      * ApiContainer constructor.
      *
      * @param string $namespace
-     * @param RequestInterpreterInterface $interpreter
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
      * @param StoreInterface $store
@@ -82,7 +75,6 @@ class Api implements ApiInterface
      */
     public function __construct(
         $namespace,
-        RequestInterpreterInterface $interpreter,
         CodecMatcherInterface $codecMatcher,
         SchemaContainerInterface $schemaContainer,
         StoreInterface $store,
@@ -90,7 +82,6 @@ class Api implements ApiInterface
         $urlPrefix = null
     ) {
         $this->namespace = $namespace;
-        $this->interpreter = $interpreter;
         $this->codecMatcher = $codecMatcher;
         $this->schemas = $schemaContainer;
         $this->store = $store;
@@ -104,14 +95,6 @@ class Api implements ApiInterface
     public function getNamespace()
     {
         return $this->namespace;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRequestInterpreter()
-    {
-        return $this->interpreter;
     }
 
     /**

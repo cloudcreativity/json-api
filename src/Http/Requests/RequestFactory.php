@@ -55,19 +55,29 @@ class RequestFactory
     }
 
     /**
-     * @inheritdoc
+     * @param ServerRequestInterface $request
+     *      the inbound HTTP request
+     * @param RequestInterpreterInterface $interpreter
+     *      the intepreter to analyze the request.
+     * @param ApiInterface $api
+     *      the API that is receiving the request.
+     * @return Request
+     * @throws JsonApiException
+     *      if the request fails content negotiation for the API.
      */
-    public function build(ApiInterface $api, ServerRequestInterface $request)
-    {
+    public function build(
+        ServerRequestInterface $request,
+        RequestInterpreterInterface $interpreter,
+        ApiInterface $api
+    ) {
         $this->doContentNegotiation($request, $codecMatcher = $api->getCodecMatcher());
-        $interpreter = $api->getRequestInterpreter();
 
         return new Request(
             $interpreter->getResourceType(),
             $this->parseParameters($request),
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
-            $this->parseDocument($request, $interpreter, $api->getCodecMatcher()),
+            $this->parseDocument($request, $interpreter, $codecMatcher),
             $this->locateRecord($interpreter, $api->getStore())
         );
     }

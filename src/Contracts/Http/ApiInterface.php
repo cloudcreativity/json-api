@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
@@ -27,6 +26,7 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterf
 
 /**
  * Interface ApiInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface ApiInterface
@@ -38,13 +38,6 @@ interface ApiInterface
      * @return string
      */
     public function getNamespace();
-
-    /**
-     * Get the request interpreter to use for this API instance.
-     *
-     * @return RequestInterpreterInterface
-     */
-    public function getRequestInterpreter();
 
     /**
      * Get the codec matcher for this API.

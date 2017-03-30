@@ -2,7 +2,7 @@
 
 This file provides notes on how to upgrade between versions.
 
-## v0.7 to v0.8
+## v0.7 to v0.8 (Unreleased)
 
 ### Factories
 
@@ -24,6 +24,8 @@ These changes mean the following have been removed:
 The following methods have been removed from the `Contracts\Http\ApiInterface`:
 
 - `getHttpFactory`: if you need a factory, you should dependency inject `Contracts\Factories\FactoryInterface` instead.
+- `getRequestInterpreter`: this has been moved to `Contracts\Http\HttpServiceInterface` as there is no need for an
+interpreter on a per-API basis.
 - `getPagingStrategy`: we are refactoring so that paging is a per-resource concern, rather than an API concern. This is
 because different resources, and resource has-many relationships, can independently use different strategies.
 - `getOptions`: framework-specific options are no longer the concern of the API class.
@@ -32,6 +34,11 @@ because different resources, and resource has-many relationships, can independen
 
 The `Contracts\Authorizer\AuthorizerInterface` has been amended to add a `$resourceType` function argument 
 to `canReadMany()` and `canCreate()`. This allows an Authorizer to be used for multiple resource types.
+
+### HTTP Service
+
+You will need to add the method `getRequestInterpreter()` to your class that implements 
+`Contracts\Http\HttpServiceInterface`.
 
 ### Request Handlers
 

@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Factories;
 
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
@@ -51,11 +52,14 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createRequest(ApiInterface $api, ServerRequestInterface $httpRequest)
-    {
+    public function createRequest(
+        ServerRequestInterface $httpRequest,
+        RequestInterpreterInterface $intepreter,
+        ApiInterface $api
+    ) {
         $requestFactory = new RequestFactory($this);
 
-        return $requestFactory->build($api, $httpRequest);
+        return $requestFactory->build($httpRequest, $intepreter, $api);
     }
 
 }

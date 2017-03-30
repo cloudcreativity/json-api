@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ class RequestFactoryTest extends TestCase
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $this->adapter->method('recognises')->with('posts')->willReturn(true);
         $store->register($this->adapter);
-        $this->api = new Api('v1', $this->interpreter, $this->codecMatcher, $this->factory->createContainer(), $store);
+        $this->api = new Api('v1', $this->codecMatcher, $this->factory->createContainer(), $store);
         $this->withMediaType();
     }
 
@@ -232,7 +232,7 @@ JSON_API;
      */
     private function doBuild()
     {
-        $request = $this->factory->createRequest($this->api, $this->serverRequest);
+        $request = $this->factory->createRequest($this->serverRequest, $this->interpreter, $this->api);
 
         if (!$request instanceof RequestInterface) {
             $this->fail('No request built.');

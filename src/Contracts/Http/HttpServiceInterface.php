@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use Exception;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
  * Interface HttpServiceInterface
@@ -29,10 +30,17 @@ interface HttpServiceInterface
 {
 
     /**
+     * Get the interpreter to use to analyze the inbound HTTP request.
+     *
+     * @return RequestInterpreterInterface
+     */
+    public function getRequestInterpreter();
+
+    /**
      * Get the JSON API that is handling the current HTTP request.
      *
      * @return ApiInterface
-     * @throws Exception
+     * @throws RuntimeException
      *      if there is no current JSON API
      */
     public function getApi();
@@ -48,7 +56,7 @@ interface HttpServiceInterface
      * Get the JSON API request sent by the client.
      *
      * @return RequestInterface
-     * @throws Exception
+     * @throws RuntimeException
      *      if there is no current valid JSON API request
      */
     public function getRequest();
