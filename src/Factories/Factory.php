@@ -23,6 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
+use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
@@ -60,6 +61,20 @@ class Factory extends BaseFactory implements FactoryInterface
         $requestFactory = new RequestFactory($this);
 
         return $requestFactory->build($httpRequest, $intepreter, $api);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createConfiguredCodecMatcher(ContainerInterface $schemas, array $codecs, $urlPrefix = null)
+    {
+        $repository = new CodecMatcherRepository($this);
+        $repository->configure($codecs);
+
+        return $repository
+            ->registerSchemas($schemas)
+            ->registerUrlPrefix($urlPrefix)
+            ->getCodecMatcher();
     }
 
 }

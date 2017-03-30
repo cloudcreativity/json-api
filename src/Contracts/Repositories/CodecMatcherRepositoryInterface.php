@@ -24,7 +24,9 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
  * Interface CodecMatcherRepositoryInterface
+ *
  * @package CloudCreativity\JsonApi
+ * @deprecated
  */
 interface CodecMatcherRepositoryInterface extends ConfigurableInterface
 {

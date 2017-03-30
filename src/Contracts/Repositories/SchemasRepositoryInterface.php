@@ -23,7 +23,9 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 
 /**
  * Interface SchemaRepositoryInterface
+ *
  * @package CloudCreativity\JsonApi
+ * @deprecated
  */
 interface SchemasRepositoryInterface extends ConfigurableInterface
 {
