@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Store;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
@@ -28,18 +29,32 @@ use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * Class StoreTest
+ *
  * @package CloudCreativity\JsonApi
  */
-final class StoreTest extends TestCase
+class StoreTest extends TestCase
 {
+
+    /**
+     * @var Factory
+     */
+    private $factory;
+
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        $this->factory = new Factory();
+    }
 
     public function testExists()
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willExist($identifier)
+            'posts' => $this->adapter(),
+            'users' => $this->willExist('99')
         ]);
 
         $this->assertTrue($store->isType('users'));
@@ -51,8 +66,8 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willNotExist($identifier)
+            'posts' => $this->adapter(),
+            'users' => $this->willNotExist('99')
         ]);
 
         $this->assertTrue($store->isType('users'));
@@ -64,10 +79,10 @@ final class StoreTest extends TestCase
         /** @var AdapterInterface $adapter */
         $adapter = $this->adapter();
         $identifier = ResourceIdentifier::create('users', '99');
-        $store = $this->store([$adapter]);
+        $store = $this->store(['posts' => $adapter]);
 
         $this->assertFalse($store->isType('users'));
-        $this->setExpectedException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $store->exists($identifier);
     }
 
@@ -77,8 +92,8 @@ final class StoreTest extends TestCase
         $expected = new StandardObject();
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willFind($identifier, $expected)
+            'posts' => $this->adapter(),
+            'users' => $this->willFind('99', $expected)
         ]);
 
         $this->assertSame($expected, $store->find($identifier));
@@ -90,12 +105,13 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willNotFind($identifier)
+            'posts' => $this->adapter(),
+            'users' => $this->willNotFind('99')
         ]);
 
         $this->assertNull($store->find($identifier));
-        $this->setExpectedException(RecordNotFoundException::class, 'users:99');
+        $this->expectException(RecordNotFoundException::class);
+        $this->expectExceptionMessage('users:99');
         $store->findRecord($identifier);
     }
 
@@ -107,8 +123,8 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willExist($identifier, true, $this->once())
+            'posts' => $this->adapter(),
+            'users' => $this->willExist('99', true, $this->once())
         ]);
 
         $this->assertTrue($store->exists($identifier));
@@ -124,8 +140,8 @@ final class StoreTest extends TestCase
         $expected = new StandardObject();
 
         $store = $this->store([
-            $this->adapter(),
-            $this->willFind($identifier, $expected, $this->once()),
+            'posts' => $this->adapter(),
+            'users' => $this->willFind('99', $expected, $this->once()),
         ]);
 
         $this->assertSame($expected, $store->find($identifier));
@@ -141,11 +157,11 @@ final class StoreTest extends TestCase
         $identifier = ResourceIdentifier::create('users', '99');
         $expected = new StandardObject();
 
-        $mock = $this->adapter($identifier->getType());
+        $mock = $this->adapter();
         $mock->expects($this->never())->method('exists');
-        $mock->method('find')->with($identifier)->willReturn($expected);
+        $mock->method('find')->with('99')->willReturn($expected);
 
-        $store = $this->store([$mock]);
+        $store = $this->store(['users' => $mock]);
         $this->assertSame($expected, $store->find($identifier));
         $this->assertTrue($store->exists($identifier));
     }
@@ -158,10 +174,10 @@ final class StoreTest extends TestCase
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
-        $mock = $this->adapter($identifier->getType());
+        $mock = $this->adapter();
         $mock->expects($this->never())->method('exists');
 
-        $store = $this->store([$mock]);
+        $store = $this->store(['users' => $mock]);
         $this->assertNull($store->find($identifier));
         $this->assertFalse($store->exists($identifier));
     }
@@ -174,11 +190,11 @@ final class StoreTest extends TestCase
     {
         $identifier = ResourceIdentifier::create('users', '99');
 
-        $mock = $this->adapter($identifier->getType());
-        $mock->expects($this->once())->method('exists')->with($identifier)->willReturn(false);
-        $mock->expects($this->never())->method('find')->with($identifier);
+        $mock = $this->adapter();
+        $mock->expects($this->once())->method('exists')->with('99')->willReturn(false);
+        $mock->expects($this->never())->method('find');
 
-        $store = $this->store([$mock]);
+        $store = $this->store(['users' => $mock]);
         $this->assertFalse($store->exists($identifier));
         $this->assertNull($store->find($identifier));
     }
@@ -189,85 +205,72 @@ final class StoreTest extends TestCase
      */
     private function store(array $adapters)
     {
-        $store = new Store();
-        $store->registerMany($adapters);
+        $container = $this->factory->createAdapterContainer($adapters);
 
-        return $store;
+        return $this->factory->createStore($container);
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param string $resourceId
      * @param bool $exists
      * @param $expectation
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willExist(ResourceIdentifier $identifier, $exists = true, $expectation = null)
+    private function willExist($resourceId, $exists = true, $expectation = null)
     {
         $expectation = $expectation ?: $this->any();
 
-        $mock = $this->adapter($identifier->getType());
+        $mock = $this->adapter();
         $mock->expects($expectation)
             ->method('exists')
-            ->with($identifier)
+            ->with($resourceId)
             ->willReturn($exists);
 
         return $mock;
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param $resourceId
      * @param $expectation
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willNotExist(ResourceIdentifier $identifier, $expectation = null)
+    private function willNotExist($resourceId, $expectation = null)
     {
-        return $this->willExist($identifier, false, $expectation);
+        return $this->willExist($resourceId, false, $expectation);
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param $resourceId
      * @param $object
      * @param $expectation
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willFind(ResourceIdentifier $identifier, $object, $expectation = null)
+    private function willFind($resourceId, $object, $expectation = null)
     {
-        $expectation = $expectation ?: $this->any();
-
-        $mock = $this->adapter($identifier->getType());
-        $mock->expects($expectation)
+        $mock = $this->adapter();
+        $mock->expects($expectation ?: $this->any())
             ->method('find')
-            ->with($identifier)
+            ->with($resourceId)
             ->willReturn($object);
 
         return $mock;
     }
 
     /**
-     * @param ResourceIdentifier $identifier
+     * @param $resourceId
      * @param $expectation
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willNotFind(ResourceIdentifier $identifier, $expectation = null)
+    private function willNotFind($resourceId, $expectation = null)
     {
-        return $this->willFind($identifier, null, $expectation);
+        return $this->willFind($resourceId, null, $expectation);
     }
 
     /**
-     * @param array|null $types
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function adapter($types = null)
+    private function adapter()
     {
-        if (is_string($types)) {
-            $types = [[$types, true]];
-        } elseif (!is_array($types)) {
-            $types = [['posts', true]];
-        }
-
-        $mock = $this->getMockBuilder(AdapterInterface::class)->getMock();
-        $mock->method('recognises')->willReturnMap($types);
-
-        return $mock;
+        return $this->getMockBuilder(AdapterInterface::class)->getMock();
     }
 }

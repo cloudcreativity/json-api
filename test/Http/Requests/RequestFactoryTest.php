@@ -25,8 +25,6 @@ use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Http\Api;
 use CloudCreativity\JsonApi\Object\Document;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Store\Store;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
@@ -94,14 +92,12 @@ class RequestFactoryTest extends TestCase
      */
     protected function setUp()
     {
-        $store = new Store();
         $this->factory = new Factory();
 
         $this->codecMatcher = $this->factory->createCodecMatcher();
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
-        $this->adapter->method('recognises')->with('posts')->willReturn(true);
-        $store->register($this->adapter);
+        $store = $this->factory->createStore($this->factory->createAdapterContainer(['posts' => $this->adapter]));
         $this->api = new Api('v1', $this->codecMatcher, $this->factory->createContainer(), $store);
         $this->withMediaType();
     }
@@ -324,9 +320,8 @@ JSON_API;
     private function withRecord($resourceId)
     {
         $this->expectedRecord = new stdClass();
-        $identifier = ResourceIdentifier::create('posts', $resourceId);
-        $this->adapter->method('exists')->with($identifier)->willReturn(true);
-        $this->adapter->method('find')->with($identifier)->willReturn($this->expectedRecord);
+        $this->adapter->method('exists')->with($resourceId)->willReturn(true);
+        $this->adapter->method('find')->with($resourceId)->willReturn($this->expectedRecord);
 
         return $this;
     }

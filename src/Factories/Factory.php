@@ -21,10 +21,13 @@ namespace CloudCreativity\JsonApi\Factories;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use CloudCreativity\JsonApi\Store\Container as AdapterContainer;
+use CloudCreativity\JsonApi\Store\Store;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
 use Psr\Http\Message\ServerRequestInterface;
@@ -38,11 +41,11 @@ class Factory extends BaseFactory implements FactoryInterface
 {
 
     /**
-     * @param ContainerInterface $container
+     * @param SchemaContainerInterface $container
      * @param EncoderOptions|null $encoderOptions
      * @return Encoder
      */
-    public function createEncoder(ContainerInterface $container, EncoderOptions $encoderOptions = null)
+    public function createEncoder(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null)
     {
         $encoder = new Encoder($this, $container, $encoderOptions);
         $encoder->setLogger($this->logger);
@@ -66,7 +69,7 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createConfiguredCodecMatcher(ContainerInterface $schemas, array $codecs, $urlPrefix = null)
+    public function createConfiguredCodecMatcher(SchemaContainerInterface $schemas, array $codecs, $urlPrefix = null)
     {
         $repository = new CodecMatcherRepository($this);
         $repository->configure($codecs);
@@ -75,6 +78,25 @@ class Factory extends BaseFactory implements FactoryInterface
             ->registerSchemas($schemas)
             ->registerUrlPrefix($urlPrefix)
             ->getCodecMatcher();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createStore(AdapterContainerInterface $adapters)
+    {
+        return new Store($adapters);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createAdapterContainer(array $adapters)
+    {
+        $container = new AdapterContainer();
+        $container->registerMany($adapters);
+
+        return $container;
     }
 
 }

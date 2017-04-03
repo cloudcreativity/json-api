@@ -21,9 +21,11 @@ namespace CloudCreativity\JsonApi\Contracts\Factories;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -57,10 +59,22 @@ interface FactoryInterface extends BaseFactoryInterface
     /**
      * Create a codec matcher that is configured using the supplied codecs array.
      *
-     * @param ContainerInterface $schemas
+     * @param SchemaContainerInterface $schemas
      * @param array $codecs
      * @param string|null $urlPrefix
      * @return CodecMatcherInterface
      */
-    public function createConfiguredCodecMatcher(ContainerInterface $schemas, array $codecs, $urlPrefix = null);
+    public function createConfiguredCodecMatcher(SchemaContainerInterface $schemas, array $codecs, $urlPrefix = null);
+
+    /**
+     * @param AdapterContainerInterface $adapters
+     * @return StoreInterface
+     */
+    public function createStore(AdapterContainerInterface $adapters);
+
+    /**
+     * @param array $adapters
+     * @return AdapterContainerInterface
+     */
+    public function createAdapterContainer(array $adapters);
 }

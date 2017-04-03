@@ -71,6 +71,23 @@ all query parameters.
 The `Contracts\Validators\FilterValidatorInterface` has been removed as a result. Filter validation should be 
 achieved by the query checker instance returned by the validator provider.
 
+### Store and Adapters
+
+We have refactored adapters so that they relate to one resource. This fits our plan to ultimately use the adapter
+to also filter resources, filter relationships etc. I.e. the adapter will contain a lot of search logic that will be
+very specific to a particular resource type.
+
+The store is now injected with a container that holds lazily-loads all adapters, along the same lines as the schema
+container from the `neomerx/json-api` package.
+
+To upgrade, convert any adapters that handle multiple resource types into a container that implements
+`Contracts\Store\ContainerInterface`, returning a class that implements the updated 
+`Contracts\Store\AdapterInterface` for each resource type.
+
+If you need to use a multiple adapter containers, wrap them in the `Store\ContainerIterator` implementation. This
+allows you to load multiple containers into a single container class. The iterator will loop over the containers and
+return the first adapter that is created.
+
 ## v0.6 to v0.7
 
 ### Config

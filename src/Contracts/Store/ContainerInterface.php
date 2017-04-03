@@ -19,27 +19,18 @@
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
 /**
- * Interface AdapterInterface
+ * Interface AdapterContainerInterface
  *
  * @package CloudCreativity\JsonApi
  */
-interface AdapterInterface
+interface ContainerInterface
 {
 
     /**
-     * Does a record that relates to the specified JSON API resource id exist?
-     *
-     * @param $resourceId
-     * @return bool
+     * @param string $resourceType
+     * @return AdapterInterface|null
+     *      the resource type's adapter, or null if no adapter exists.
      */
-    public function exists($resourceId);
-
-    /**
-     * Get the record that relates to the specified JSON API resource id, if it exists.
-     *
-     * @param string $resourceId
-     * @return object|null
-     */
-    public function find($resourceId);
+    public function getAdapterByResourceType($resourceType);
 
 }
