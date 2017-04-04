@@ -21,12 +21,22 @@ namespace CloudCreativity\JsonApi\Factories;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Http\Api;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
+use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Store\Container as AdapterContainer;
 use CloudCreativity\JsonApi\Store\Store;
+use CloudCreativity\JsonApi\Utils\Replacer;
+use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory;
+use CloudCreativity\JsonApi\Validators\ValidatorFactory;
+use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
@@ -51,6 +61,29 @@ class Factory extends BaseFactory implements FactoryInterface
         $encoder->setLogger($this->logger);
 
         return $encoder;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createApi(
+        $namespace,
+        CodecMatcherInterface $codecMatcher,
+        SchemaContainerInterface $schemaContainer,
+        StoreInterface $store,
+        ErrorRepositoryInterface $errorRepository,
+        SupportedExtensionsInterface $supportedExtensions = null,
+        $urlPrefix = null
+    ) {
+        return new Api(
+            $namespace,
+            $codecMatcher,
+            $schemaContainer,
+            $store,
+            $errorRepository,
+            $supportedExtensions,
+            $urlPrefix
+        );
     }
 
     /**
@@ -97,6 +130,41 @@ class Factory extends BaseFactory implements FactoryInterface
         $container->registerMany($adapters);
 
         return $container;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createErrorRepository(array $errors)
+    {
+        $repository = new ErrorRepository($this->createReplacer());
+        $repository->configure($errors);
+
+        return $repository;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createReplacer()
+    {
+        return new Replacer();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createValidatorFactory(ValidatorErrorFactoryInterface $errors, StoreInterface $store)
+    {
+        return new ValidatorFactory($errors, $store);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createValidatorErrorFactory(ErrorRepositoryInterface $errors)
+    {
+        return new ValidatorErrorFactory($errors);
     }
 
 }

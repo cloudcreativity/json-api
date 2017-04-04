@@ -55,6 +55,12 @@ class RequestFactory
     }
 
     /**
+     * Create a JSON API request using the supplied server request, interpreter and API settings.
+     *
+     * Note the building the request will require a decoder to be available via the API's codec
+     * matcher, if the request contains body content. This means that the API's codec matcher
+     * must have been used for content negotiation prior to constructing the JSON API request.
+     *
      * @param ServerRequestInterface $request
      *      the inbound HTTP request
      * @param RequestInterpreterInterface $interpreter
@@ -62,37 +68,20 @@ class RequestFactory
      * @param ApiInterface $api
      *      the API that is receiving the request.
      * @return Request
-     * @throws JsonApiException
-     *      if the request fails content negotiation for the API.
      */
     public function build(
         ServerRequestInterface $request,
         RequestInterpreterInterface $interpreter,
         ApiInterface $api
     ) {
-        $this->doContentNegotiation($request, $codecMatcher = $api->getCodecMatcher());
-
         return new Request(
             $interpreter->getResourceType(),
             $this->parseParameters($request),
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
-            $this->parseDocument($request, $interpreter, $codecMatcher),
+            $this->parseDocument($request, $interpreter, $api->getCodecMatcher()),
             $this->locateRecord($interpreter, $api->getStore())
         );
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param CodecMatcherInterface $codecMatcher
-     * @throws JsonApiException
-     */
-    protected function doContentNegotiation(ServerRequestInterface $request, CodecMatcherInterface $codecMatcher)
-    {
-        $parser = $this->httpFactory->createHeaderParametersParser();
-        $checker = $this->httpFactory->createHeadersChecker($codecMatcher);
-
-        $checker->checkHeaders($parser->parse($request));
     }
 
     /**

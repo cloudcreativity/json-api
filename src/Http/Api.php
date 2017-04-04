@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Http;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
@@ -54,6 +55,11 @@ class Api implements ApiInterface
     private $store;
 
     /**
+     * @var ErrorRepositoryInterface
+     */
+    private $errors;
+
+    /**
      * @var string|null
      */
     private $urlPrefix;
@@ -70,6 +76,7 @@ class Api implements ApiInterface
      * @param CodecMatcherInterface $codecMatcher
      * @param SchemaContainerInterface $schemaContainer
      * @param StoreInterface $store
+     * @param ErrorRepositoryInterface $errorRepository
      * @param SupportedExtensionsInterface|null $supportedExtensions
      * @param string|null $urlPrefix
      */
@@ -78,6 +85,7 @@ class Api implements ApiInterface
         CodecMatcherInterface $codecMatcher,
         SchemaContainerInterface $schemaContainer,
         StoreInterface $store,
+        ErrorRepositoryInterface $errorRepository,
         SupportedExtensionsInterface $supportedExtensions = null,
         $urlPrefix = null
     ) {
@@ -85,6 +93,7 @@ class Api implements ApiInterface
         $this->codecMatcher = $codecMatcher;
         $this->schemas = $schemaContainer;
         $this->store = $store;
+        $this->errors = $errorRepository;
         $this->supportedExtensions = $supportedExtensions;
         $this->urlPrefix = $urlPrefix;
     }
@@ -135,6 +144,14 @@ class Api implements ApiInterface
     public function getStore()
     {
         return $this->store;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     /**

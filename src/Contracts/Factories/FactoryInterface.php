@@ -21,10 +21,15 @@ namespace CloudCreativity\JsonApi\Contracts\Factories;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -38,6 +43,26 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 interface FactoryInterface extends BaseFactoryInterface
 {
+
+    /**
+     * @param $namespace
+     * @param CodecMatcherInterface $codecMatcher
+     * @param SchemaContainerInterface $schemaContainer
+     * @param StoreInterface $store
+     * @param ErrorRepositoryInterface $errorRepository
+     * @param SupportedExtensionsInterface|null $supportedExtensions
+     * @param string|null $urlPrefix
+     * @return ApiInterface
+     */
+    public function createApi(
+        $namespace,
+        CodecMatcherInterface $codecMatcher,
+        SchemaContainerInterface $schemaContainer,
+        StoreInterface $store,
+        ErrorRepositoryInterface $errorRepository,
+        SupportedExtensionsInterface $supportedExtensions = null,
+        $urlPrefix = null
+    );
 
     /**
      * Build a JSON API request object from an API definition and an HTTP request.
@@ -77,4 +102,28 @@ interface FactoryInterface extends BaseFactoryInterface
      * @return AdapterContainerInterface
      */
     public function createAdapterContainer(array $adapters);
+
+    /**
+     * @param array $errors
+     * @return ErrorRepositoryInterface $errors
+     */
+    public function createErrorRepository(array $errors);
+
+    /**
+     * @return ReplacerInterface
+     */
+    public function createReplacer();
+
+    /**
+     * @param ValidatorErrorFactoryInterface $errors
+     * @param StoreInterface $store
+     * @return ValidatorFactoryInterface
+     */
+    public function createValidatorFactory(ValidatorErrorFactoryInterface $errors, StoreInterface $store);
+
+    /**
+     * @param ErrorRepositoryInterface $errors
+     * @return ValidatorErrorFactoryInterface
+     */
+    public function createValidatorErrorFactory(ErrorRepositoryInterface $errors);
 }

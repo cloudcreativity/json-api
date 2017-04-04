@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Http\Api;
+use CloudCreativity\JsonApi\Http\Middleware\NegotiatesContent;
 use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
@@ -41,6 +42,8 @@ use stdClass;
  */
 class RequestFactoryTest extends TestCase
 {
+
+    use NegotiatesContent;
 
     /**
      * @var Api
@@ -98,7 +101,13 @@ class RequestFactoryTest extends TestCase
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $store = $this->factory->createStore($this->factory->createAdapterContainer(['posts' => $this->adapter]));
-        $this->api = new Api('v1', $this->codecMatcher, $this->factory->createContainer(), $store);
+        $this->api = $this->factory->createApi(
+            'v1',
+            $this->codecMatcher,
+            $this->factory->createContainer(),
+            $store,
+            $this->factory->createErrorRepository([])
+        );
         $this->withMediaType();
     }
 
@@ -228,6 +237,8 @@ JSON_API;
      */
     private function doBuild()
     {
+        /** We expect content negotiation to have been performed before creating a request. */
+        $this->doContentNegotiation($this->factory, $this->serverRequest, $this->api->getCodecMatcher());
         $request = $this->factory->createRequest($this->serverRequest, $this->interpreter, $this->api);
 
         if (!$request instanceof RequestInterface) {
