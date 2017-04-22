@@ -154,17 +154,11 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createValidatorFactory(ValidatorErrorFactoryInterface $errors, StoreInterface $store)
+    public function createValidatorFactory(ErrorRepositoryInterface $errors, StoreInterface $store)
     {
-        return new ValidatorFactory($errors, $store);
-    }
+        $errors = new ValidatorErrorFactory($errors);
 
-    /**
-     * @inheritDoc
-     */
-    public function createValidatorErrorFactory(ErrorRepositoryInterface $errors)
-    {
-        return new ValidatorErrorFactory($errors);
+        return new ValidatorFactory($errors, $store);
     }
 
 }

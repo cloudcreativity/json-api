@@ -18,10 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
+use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
@@ -39,21 +41,19 @@ class ResponseFactory implements ResponseFactoryInterface
     private $responses;
 
     /**
-     * @var ErrorRepositoryInterface
+     * @var HttpServiceInterface
      */
-    private $errors;
+    private $httpService;
 
     /**
      * ResponseFactory constructor.
      * @param ResponsesInterface $responses
      * @param ErrorRepositoryInterface $errors
      */
-    public function __construct(
-        ResponsesInterface $responses,
-        ErrorRepositoryInterface $errors
-    ) {
+    public function __construct(ResponsesInterface $responses, HttpServiceInterface $httpService)
+    {
         $this->responses = $responses;
-        $this->errors = $errors;
+        $this->httpService = $httpService;
     }
 
     /**
@@ -127,8 +127,8 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     public function error($errors, $defaultStatusCode = null, array $headers = [])
     {
-        if (is_string($errors) && !empty($errors)) {
-            $errors = $this->errors->error($errors);
+        if (is_string($errors)) {
+            $errors = $this->httpService->getApi()->getErrors()->error($errors);
         }
 
         $response = new ErrorResponse($errors, $defaultStatusCode, $headers);
@@ -193,4 +193,5 @@ class ResponseFactory implements ResponseFactoryInterface
     {
         return array_replace($existing, $merge);
     }
+
 }

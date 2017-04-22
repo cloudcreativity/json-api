@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorReporterInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
@@ -92,7 +92,7 @@ interface ApiInterface
     /**
      * Get the errors that this API can return.
      *
-     * @return ErrorReporterInterface
+     * @return ErrorRepositoryInterface
      */
     public function getErrors();
 

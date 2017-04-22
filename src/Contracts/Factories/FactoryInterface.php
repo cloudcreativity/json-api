@@ -25,7 +25,6 @@ use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
@@ -115,15 +114,11 @@ interface FactoryInterface extends BaseFactoryInterface
     public function createReplacer();
 
     /**
-     * @param ValidatorErrorFactoryInterface $errors
+     * Create a validator factory for the supplied API.
+     *
+     * @param ErrorRepositoryInterface $errors
      * @param StoreInterface $store
      * @return ValidatorFactoryInterface
      */
-    public function createValidatorFactory(ValidatorErrorFactoryInterface $errors, StoreInterface $store);
-
-    /**
-     * @param ErrorRepositoryInterface $errors
-     * @return ValidatorErrorFactoryInterface
-     */
-    public function createValidatorErrorFactory(ErrorRepositoryInterface $errors);
+    public function createValidatorFactory(ErrorRepositoryInterface $errors, StoreInterface $store);
 }
