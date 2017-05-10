@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 /**
  * Class Page
+ *
  * @package CloudCreativity\JsonApi
  */
-final class Page implements PageInterface
+class Page implements PageInterface
 {
 
     /**
@@ -34,30 +35,66 @@ final class Page implements PageInterface
     private $data;
 
     /**
+     * @var LinkInterface|null
+     */
+    private $first;
+
+    /**
+     * @var LinkInterface|null
+     */
+    private $previous;
+
+    /**
+     * @var LinkInterface|null
+     */
+    private $next;
+
+    /**
+     * @var LinkInterface|null
+     */
+    private $last;
+
+    /**
      * @var array|null|object
      */
     private $meta;
 
     /**
-     * @var LinkInterface[]
+     * @var string|null
      */
-    private $links;
+    private $metaKey;
 
     /**
      * Page constructor.
-     * @param mixed $data
+     *
+     * @param $data
+     * @param LinkInterface|null $first
+     * @param LinkInterface|null $previous
+     * @param LinkInterface|null $next
+     * @param LinkInterface|null $last
      * @param object|array|null $meta
-     * @param LinkInterface[] $links
+     * @param string|null $metaKey
      */
-    public function __construct($data, $meta = null, array $links = [])
-    {
+    public function __construct(
+        $data,
+        LinkInterface $first = null,
+        LinkInterface $previous = null,
+        LinkInterface $next = null,
+        LinkInterface $last = null,
+        $meta = null,
+        $metaKey = null
+    ) {
         $this->data = $data;
+        $this->first = $first;
+        $this->previous = $previous;
+        $this->next = $next;
+        $this->last = $last;
         $this->meta = $meta;
-        $this->links = $links;
+        $this->metaKey = $metaKey;
     }
 
     /**
-     * @return mixed
+     * @inheritDoc
      */
     public function getData()
     {
@@ -65,7 +102,39 @@ final class Page implements PageInterface
     }
 
     /**
-     * @return array|null|object
+     * @inheritDoc
+     */
+    public function getFirstLink()
+    {
+        return $this->first;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPreviousLink()
+    {
+        return $this->previous;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNextLink()
+    {
+        return $this->next;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLastLink()
+    {
+        return $this->last;
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getMeta()
     {
@@ -73,10 +142,12 @@ final class Page implements PageInterface
     }
 
     /**
-     * @return LinkInterface[]
+     * @inheritDoc
      */
-    public function getLinks()
+    public function getMetaKey()
     {
-        return $this->links;
+        return $this->metaKey;
     }
+
+
 }

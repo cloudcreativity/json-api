@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
-use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
-use CloudCreativity\JsonApi\Document\Error;
-use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 
 /**
@@ -48,7 +45,7 @@ class ResponseFactory implements ResponseFactoryInterface
     /**
      * ResponseFactory constructor.
      * @param ResponsesInterface $responses
-     * @param ErrorRepositoryInterface $errors
+     * @param HttpServiceInterface $httpService
      */
     public function __construct(ResponsesInterface $responses, HttpServiceInterface $httpService)
     {
@@ -154,44 +151,47 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     private function extractPage(PageInterface $page, $meta, $links)
     {
-        $key = QueryParametersParserInterface::PARAM_PAGE;
-
         return [
             $page->getData(),
-            $this->mergeMeta($meta, $key, $page->getMeta()),
-            $this->mergeLinks($links, $page->getLinks()),
+            $this->mergePageMeta($meta, $page),
+            $this->mergePageLinks($links, $page),
         ];
     }
 
     /**
-     * @param $existing
-     * @param $key
-     * @param $value
+     * @param object|array|null $existing
+     * @param PageInterface $page
      * @return array
      */
-    private function mergeMeta($existing, $key, $value)
+    private function mergePageMeta($existing, PageInterface $page)
     {
-        $existing = $existing ?: [];
-
-        if (is_array($existing)) {
-            $existing[$key] = $value;
-        } elseif (is_object($existing)) {
-            $existing->{$key} = $value;
-        } else {
-            throw new InvalidArgumentException('Meta is not a valid value - expecting an array or object.');
+        if (!$merge = $page->getMeta()) {
+            return $existing;
         }
 
-        return $existing;
+        $existing = (array) $existing ?: [];
+
+        if ($key = $page->getMetaKey()) {
+            $existing[$key] = $merge;
+            return $existing;
+        }
+
+        return array_replace($existing, (array) $merge);
     }
 
     /**
      * @param array $existing
-     * @param array $merge
+     * @param PageInterface $page
      * @return array
      */
-    private function mergeLinks(array $existing, array $merge)
+    private function mergePageLinks(array $existing, PageInterface $page)
     {
-        return array_replace($existing, $merge);
+        return array_replace($existing, array_filter([
+            DocumentInterface::KEYWORD_FIRST => $page->getFirstLink(),
+            DocumentInterface::KEYWORD_PREV => $page->getPreviousLink(),
+            DocumentInterface::KEYWORD_NEXT => $page->getNextLink(),
+            DocumentInterface::KEYWORD_LAST => $page->getLastLink(),
+        ]));
     }
 
 }

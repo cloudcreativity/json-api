@@ -48,6 +48,26 @@ class StoreTest extends TestCase
         $this->factory = new Factory();
     }
 
+    public function testQuery()
+    {
+        $params = $this->factory->createQueryParameters();
+        $expected = $this->factory->createPage([]);
+
+        $store = $this->store([
+            'posts' => $this->willNotQuery(),
+            'users' => $this->willQuery($params, $expected),
+        ]);
+
+        $this->assertSame($expected, $store->query('users', $params));
+    }
+
+    public function testCannotQuery()
+    {
+        $store = $this->store(['posts' => $this->willNotQuery()]);
+        $this->expectException(RuntimeException::class);
+        $store->query('users', $this->factory->createQueryParameters());
+    }
+
     public function testExists()
     {
         $identifier = ResourceIdentifier::create('users', '99');
@@ -76,10 +96,8 @@ class StoreTest extends TestCase
 
     public function testCannotDetermineExistence()
     {
-        /** @var AdapterInterface $adapter */
-        $adapter = $this->adapter();
         $identifier = ResourceIdentifier::create('users', '99');
-        $store = $this->store(['posts' => $adapter]);
+        $store = $this->store(['posts' => $this->adapter()]);
 
         $this->assertFalse($store->isType('users'));
         $this->expectException(RuntimeException::class);
@@ -264,6 +282,35 @@ class StoreTest extends TestCase
     private function willNotFind($resourceId, $expectation = null)
     {
         return $this->willFind($resourceId, null, $expectation);
+    }
+
+    /**
+     * @param $params
+     * @param $results
+     * @param null $expectation
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function willQuery($params, $results, $expectation = null)
+    {
+        $mock = $this->adapter();
+        $mock->expects($expectation ?: $this->any())
+            ->method('query')
+            ->with($params)
+            ->willReturn($results);
+
+        return $mock;
+    }
+
+    /**
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function willNotQuery()
+    {
+        $mock = $this->adapter();
+        $mock->expects($this->never())
+            ->method('query');
+
+        return $mock;
     }
 
     /**

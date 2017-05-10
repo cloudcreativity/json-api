@@ -18,6 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Traversable;
+
 /**
  * Interface AdapterInterface
  *
@@ -25,6 +29,12 @@ namespace CloudCreativity\JsonApi\Contracts\Store;
  */
 interface AdapterInterface
 {
+
+    /**
+     * @param EncodingParametersInterface $parameters
+     * @return Traversable|array|PageInterface|object|null
+     */
+    public function query(EncodingParametersInterface $parameters);
 
     /**
      * Does a record that relates to the specified JSON API resource id exist?

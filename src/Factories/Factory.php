@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Factories;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
@@ -28,6 +29,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Api;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
+use CloudCreativity\JsonApi\Pagination\Page;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Store\Container as AdapterContainer;
@@ -36,6 +38,7 @@ use CloudCreativity\JsonApi\Utils\Replacer;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory;
 use CloudCreativity\JsonApi\Validators\ValidatorFactory;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
@@ -159,6 +162,21 @@ class Factory extends BaseFactory implements FactoryInterface
         $errors = new ValidatorErrorFactory($errors);
 
         return new ValidatorFactory($errors, $store);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createPage(
+        $data,
+        LinkInterface $first = null,
+        LinkInterface $previous = null,
+        LinkInterface $next = null,
+        LinkInterface $last = null,
+        $meta = null,
+        $metaKey = null
+    ) {
+        return new Page($data, $first, $previous, $next, $last, $meta, $metaKey);
     }
 
 }

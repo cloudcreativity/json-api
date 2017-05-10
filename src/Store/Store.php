@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
  * Class Store
@@ -60,6 +61,16 @@ class Store implements StoreInterface
     public function isType($resourceType)
     {
         return !!$this->container->getAdapterByResourceType($resourceType);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function query($resourceType, EncodingParametersInterface $params)
+    {
+        return $this
+            ->adapterFor($resourceType)
+            ->query($params);
     }
 
     /**

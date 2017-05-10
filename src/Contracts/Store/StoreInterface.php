@@ -19,7 +19,10 @@
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Traversable;
 
 /**
  * Interface StoreInterface
@@ -36,6 +39,15 @@ interface StoreInterface
      * @return bool
      */
     public function isType($resourceType);
+
+    /**
+     * Query the store for records using the supplied parameters.
+     *
+     * @param $resourceType
+     * @param EncodingParametersInterface $params
+     * @return Traversable|array|PageInterface|object|null
+     */
+    public function query($resourceType, EncodingParametersInterface $params);
 
     /**
      * Does the record this resource identifier refers to exist?

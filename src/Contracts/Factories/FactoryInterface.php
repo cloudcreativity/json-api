@@ -21,12 +21,14 @@ namespace CloudCreativity\JsonApi\Contracts\Factories;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
@@ -121,4 +123,24 @@ interface FactoryInterface extends BaseFactoryInterface
      * @return ValidatorFactoryInterface
      */
     public function createValidatorFactory(ErrorRepositoryInterface $errors, StoreInterface $store);
+
+    /**
+     * @param mixed $data
+     * @param LinkInterface|null $first
+     * @param LinkInterface|null $previous
+     * @param LinkInterface|null $next
+     * @param LinkInterface|null $last
+     * @param object|array|null $meta
+     * @param string|null $metaKey
+     * @return PageInterface
+     */
+    public function createPage(
+        $data,
+        LinkInterface $first = null,
+        LinkInterface $previous = null,
+        LinkInterface $next = null,
+        LinkInterface $last = null,
+        $meta = null,
+        $metaKey = null
+    );
 }
