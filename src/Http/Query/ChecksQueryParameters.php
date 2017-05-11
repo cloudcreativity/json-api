@@ -18,6 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Http\Query;
 
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
+
 /**
  * Class ChecksQueryParameters
  *
@@ -126,6 +130,24 @@ trait ChecksQueryParameters
         }
 
         return [];
+    }
+
+    /**
+     * @param FactoryInterface $factory
+     * @param QueryValidatorInterface|null $queryValidator
+     * @return QueryCheckerInterface
+     */
+    protected function createQueryChecker(FactoryInterface $factory, QueryValidatorInterface $queryValidator = null)
+    {
+        return $factory->createExtendedQueryChecker(
+            $this->allowUnrecognizedParameters(),
+            $this->allowedIncludePaths(),
+            $this->allowedFieldSetTypes(),
+            $this->allowedSortParameters(),
+            $this->allowedPagingParameters(),
+            $this->allowedFilteringParameters(),
+            $queryValidator
+        );
     }
 
 }
