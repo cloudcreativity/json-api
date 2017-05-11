@@ -29,25 +29,46 @@ use Exception;
 class DocumentDecoderTest extends TestCase
 {
 
-    public function testInvalidJson()
+    /**
+     * @return array
+     */
+    public function invalidProvider()
     {
-        $content = <<<JSON_API
-        {
-            "data": {
-                "type": "foo"
-        }
-JSON_API;
+        return [
+            'parse error' => ['{ "data": { "type": "foo" }', true],
+            'empty string' => [''],
+            'null' => ['NULL'],
+            'integer' => ['1'],
+            'bool' => ['true'],
+            'string' => ['foo'],
+        ];
+    }
 
+    /**
+     * @param $content
+     * @param bool $jsonError
+     * @dataProvider invalidProvider
+     */
+    public function testInvalidJson($content, $jsonError = false)
+    {
         $decoder = new DocumentDecoder();
 
         try {
             $decoder->decode($content);
             $this->fail('No exception thrown.');
-        } catch (Exception $ex) {
-            $this->assertInstanceOf(InvalidJsonException::class, $ex);
-            /** @var InvalidJsonException $ex */
-            $this->assertEquals(json_last_error(), $ex->getJsonError());
-            $this->assertEquals(json_last_error_msg(), $ex->getJsonErrorMessage());
+        } catch (InvalidJsonException $ex) {
+            if ($jsonError) {
+                $this->assertJsonError($ex);
+            }
         }
+    }
+
+    /**
+     * @param InvalidJsonException $ex
+     */
+    private function assertJsonError(InvalidJsonException $ex)
+    {
+        $this->assertEquals(json_last_error(), $ex->getJsonError());
+        $this->assertEquals(json_last_error_msg(), $ex->getJsonErrorMessage());
     }
 }

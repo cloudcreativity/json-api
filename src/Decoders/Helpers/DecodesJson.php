@@ -43,6 +43,14 @@ trait DecodesJson
             throw InvalidJsonException::create();
         }
 
+        if (!$assoc && !is_object($parsed)) {
+            throw new InvalidJsonException(null, 'JSON is not an object.');
+        }
+
+        if ($assoc && !is_array($parsed)) {
+            throw new InvalidJsonException(null, 'JSON is not an object or array.');
+        }
+
         return $parsed;
     }
 }
