@@ -26,11 +26,13 @@ use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -123,6 +125,28 @@ interface FactoryInterface extends BaseFactoryInterface
      * @return ValidatorFactoryInterface
      */
     public function createValidatorFactory(ErrorRepositoryInterface $errors, StoreInterface $store);
+
+    /**
+     * Create an extended query parameters checker.
+     *
+     * @param bool|false $allowUnrecognized
+     * @param array|null $includePaths
+     * @param array|null $fieldSetTypes
+     * @param array|null $sortParameters
+     * @param array|null $pagingParameters
+     * @param array|null $filteringParameters
+     * @param QueryValidatorInterface|null $validator
+     * @return QueryCheckerInterface
+     */
+    public function createExtendedQueryChecker(
+        $allowUnrecognized = false,
+        array $includePaths = null,
+        array $fieldSetTypes = null,
+        array $sortParameters = null,
+        array $pagingParameters = null,
+        array $filteringParameters = null,
+        QueryValidatorInterface $validator = null
+    );
 
     /**
      * @param mixed $data

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validators;
+namespace CloudCreativity\JsonApi\Http\Query;
 
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 
 /**
  * Class ChecksQueryParameters
+ *
  * @package CloudCreativity\JsonApi
  */
 trait ChecksQueryParameters
 {
+
+    /**
+     * @return QueryValidatorInterface|null
+     */
+    abstract protected function getParameterValidator();
 
     /**
      * Whether unrecognized parameters should be allowed.
@@ -131,18 +138,19 @@ trait ChecksQueryParameters
     }
 
     /**
-     * @param HttpFactoryInterface $factory
+     * @param FactoryInterface $factory
      * @return QueryCheckerInterface
      */
-    protected function createQueryChecker(HttpFactoryInterface $factory)
+    protected function createQueryChecker(FactoryInterface $factory)
     {
-        return $factory->createQueryChecker(
+        return $factory->createExtendedQueryChecker(
             $this->allowUnrecognizedParameters(),
             $this->allowedIncludePaths(),
             $this->allowedFieldSetTypes(),
             $this->allowedSortParameters(),
             $this->allowedPagingParameters(),
-            $this->allowedFilteringParameters()
+            $this->allowedFilteringParameters(),
+            $this->getParameterValidator()
         );
     }
 

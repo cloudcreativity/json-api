@@ -25,9 +25,11 @@ use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Api;
+use CloudCreativity\JsonApi\Http\Query\ValidationQueryChecker;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use CloudCreativity\JsonApi\Pagination\Page;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
@@ -40,6 +42,7 @@ use CloudCreativity\JsonApi\Validators\ValidatorFactory;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
@@ -162,6 +165,30 @@ class Factory extends BaseFactory implements FactoryInterface
         $errors = new ValidatorErrorFactory($errors);
 
         return new ValidatorFactory($errors, $store);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createExtendedQueryChecker(
+        $allowUnrecognized = false,
+        array $includePaths = null,
+        array $fieldSetTypes = null,
+        array $sortParameters = null,
+        array $pagingParameters = null,
+        array $filteringParameters = null,
+        QueryValidatorInterface $validator = null
+    ) {
+        $checker = $this->createQueryChecker(
+            $allowUnrecognized,
+            $includePaths,
+            $fieldSetTypes,
+            $sortParameters,
+            $pagingParameters,
+            $filteringParameters
+        );
+
+        return new ValidationQueryChecker($checker, $validator);
     }
 
     /**
