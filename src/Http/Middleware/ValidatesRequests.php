@@ -57,7 +57,7 @@ trait ValidatesRequests
      */
     protected function checkQueryParameters(RequestInterface $request, ValidatorProviderInterface $validators)
     {
-        $checker = $validators->queryChecker($request->getResourceType());
+        $checker = $validators->queryChecker();
         $checker->checkQuery($request->getParameters());
     }
 
@@ -95,20 +95,19 @@ trait ValidatesRequests
         RequestInterpreterInterface $interpreter,
         RequestInterface $request
     ) {
-        $resourceType = $request->getResourceType();
         $resourceId = $interpreter->getResourceId();
         $relationshipName = $interpreter->getRelationshipName();
         $record = $request->getRecord();
 
         /** Create Resource */
         if ($interpreter->isCreateResource()) {
-            return $validators->createResource($resourceType);
+            return $validators->createResource();
         } /** Update Resource */
         elseif ($interpreter->isUpdateResource()) {
-            return $validators->updateResource($resourceType, $resourceId, $record);
+            return $validators->updateResource($resourceId, $record);
         } /** Replace Relationship */
         elseif ($interpreter->isModifyRelationship()) {
-            return $validators->modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
+            return $validators->modifyRelationship($resourceId, $relationshipName, $record);
         }
 
         return null;

@@ -30,30 +30,24 @@ interface ValidatorProviderInterface
     /**
      * Get a validator for a create resource request.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being created
      * @return DocumentValidatorInterface
      */
-    public function createResource($resourceType);
+    public function createResource();
 
     /**
      * Get a validator for an update resource request.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being updated
      * @param string $resourceId
      *      the JSON API resource id that is being updated
      * @param object $record
      *      the domain record that is being updated
      * @return DocumentValidatorInterface
      */
-    public function updateResource($resourceType, $resourceId, $record);
+    public function updateResource($resourceId, $record);
 
     /**
      * Get a validator for modifying a relationship.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being modified
      * @param string $resourceId
      *      the JSON API resource id that is being modified
      * @param string $relationshipName
@@ -63,14 +57,13 @@ interface ValidatorProviderInterface
      *
      * @return DocumentValidatorInterface
      */
-    public function modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
+    public function modifyRelationship($resourceId, $relationshipName, $record);
 
     /**
      * Get a query checker for the specified resource type.
      *
-     * @param $resourceType
      * @return QueryCheckerInterface
      */
-    public function queryChecker($resourceType);
+    public function queryChecker();
 
 }
