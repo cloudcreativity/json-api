@@ -32,7 +32,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canReadMany(EncodingParametersInterface $parameters)
+    public function canReadMany($resourceType, EncodingParametersInterface $parameters)
     {
         return true;
     }
@@ -40,7 +40,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters)
+    public function canCreate($resourceType, ResourceInterface $resource, EncodingParametersInterface $parameters)
     {
         return false;
     }

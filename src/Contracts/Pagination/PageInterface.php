@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,17 +34,52 @@ interface PageInterface
     const LINK_LAST = DocumentInterface::KEYWORD_LAST;
 
     /**
+     * Get the page's data.
+     *
      * @return mixed
      */
     public function getData();
 
     /**
+     * Get a link to the first page.
+     *
+     * @return LinkInterface|null
+     */
+    public function getFirstLink();
+
+    /**
+     * Get a link to the previous page.
+     *
+     * @return LinkInterface|null
+     */
+    public function getPreviousLink();
+
+    /**
+     * Get a link to the next page.
+     *
+     * @return LinkInterface|null
+     */
+    public function getNextLink();
+
+    /**
+     * Get a link to the last page.
+     *
+     * @return LinkInterface|null
+     */
+    public function getLastLink();
+
+    /**
+     * Get pagination meta.
+     *
      * @return object|array|null
      */
     public function getMeta();
 
     /**
-     * @return LinkInterface[]
+     * Get the key into which page meta must be placed.
+     *
+     * @return string|null
      */
-    public function getLinks();
+    public function getMetaKey();
+
 }

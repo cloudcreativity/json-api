@@ -36,22 +36,26 @@ interface AuthorizerInterface extends ErrorsAwareInterface
      * Encoding parameters are provided in case the parameters such as
      * filtering or inclusion paths affect whether the resources can be read.
      *
+     * @param string $resourceType
+     *      the requested resource type.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      */
-    public function canReadMany(EncodingParametersInterface $parameters);
+    public function canReadMany($resourceType, EncodingParametersInterface $parameters);
 
     /**
      * Can the client create the provided resource?
      *
+     * @param string $resourceType
+     *      the resource type being created.
      * @param ResourceInterface $resource
      *      the resource provided by the client.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      */
-    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters);
+    public function canCreate($resourceType, ResourceInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified record?

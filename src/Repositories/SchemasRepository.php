@@ -25,7 +25,9 @@ use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepository
+ *
  * @package CloudCreativity\JsonApi
+ * @deprecated
  *
  * Example provided config array:
  *

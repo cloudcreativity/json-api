@@ -50,14 +50,14 @@ class InvalidJsonException extends JsonApiException
 
     /**
      * InvalidJsonException constructor.
-     * @param int $jsonError
-     * @param string $jsonErrorMessage
+     * @param int|null $jsonError
+     * @param string|null $jsonErrorMessage
      * @param int $defaultHttpCode
      * @param Exception|null $previous
      */
     public function __construct(
-        $jsonError,
-        $jsonErrorMessage,
+        $jsonError = null,
+        $jsonErrorMessage = null,
         $defaultHttpCode = self::HTTP_CODE_BAD_REQUEST,
         Exception $previous = null
     ) {
@@ -67,7 +67,7 @@ class InvalidJsonException extends JsonApiException
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getJsonError()
     {
@@ -75,7 +75,7 @@ class InvalidJsonException extends JsonApiException
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getJsonErrorMessage()
     {

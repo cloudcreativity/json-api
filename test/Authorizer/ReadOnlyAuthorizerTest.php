@@ -29,7 +29,7 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
  * Class ReadOnlyAuthorizerTest
  * @package CloudCreativity\JsonApi
  */
-final class ReadOnlyAuthorizerTest extends TestCase
+class ReadOnlyAuthorizerTest extends TestCase
 {
 
     public function testReadOnly()
@@ -39,13 +39,13 @@ final class ReadOnlyAuthorizerTest extends TestCase
         $authorizer = new ReadOnlyAuthorizer(new ErrorRepository());
         $record = new StandardObject();
 
-        $this->assertTrue($authorizer->canReadMany($parameters));
+        $this->assertTrue($authorizer->canReadMany('posts', $parameters));
         $this->assertTrue($authorizer->canRead($record, $parameters));
-        $this->assertTrue($authorizer->canReadRelationship('posts', $record, $parameters));
+        $this->assertTrue($authorizer->canReadRelationship('comments', $record, $parameters));
 
-        $this->assertFalse($authorizer->canCreate(new Resource(), $parameters));
+        $this->assertFalse($authorizer->canCreate('posts', new Resource(), $parameters));
         $this->assertFalse($authorizer->canUpdate($record, new Resource(), $parameters));
         $this->assertFalse($authorizer->canDelete($record, $parameters));
-        $this->assertFalse($authorizer->canModifyRelationship('posts', $record, new Relationship(), $parameters));
+        $this->assertFalse($authorizer->canModifyRelationship('comments', $record, new Relationship(), $parameters));
     }
 }

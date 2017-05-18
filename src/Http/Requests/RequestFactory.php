@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,104 +19,100 @@
 namespace CloudCreativity\JsonApi\Http\Requests;
 
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Exceptions\ValidationException;
 use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Validators\ValidatorFactory;
+use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class RequestFactory
+ *
  * @package CloudCreativity\JsonApi
  */
-class RequestFactory implements RequestFactoryInterface
+class RequestFactory
 {
 
     /**
-     * @var ValidatorFactory
+     * @var HttpFactoryInterface
      */
-    private $validators;
+    private $httpFactory;
 
     /**
      * RequestFactory constructor.
-     * @param ValidatorFactoryInterface|null $validators
+     *
+     * @param HttpFactoryInterface $httpFactory
      */
-    public function __construct(ValidatorFactoryInterface $validators = null)
+    public function __construct(HttpFactoryInterface $httpFactory)
     {
-        $this->validators = $validators ?: new ValidatorFactory();
+        $this->httpFactory = $httpFactory;
     }
 
     /**
-     * @inheritdoc
+     * Create a JSON API request using the supplied server request, interpreter and API settings.
+     *
+     * Note the building the request will require a decoder to be available via the API's codec
+     * matcher, if the request contains body content. This means that the API's codec matcher
+     * must have been used for content negotiation prior to constructing the JSON API request.
+     *
+     * @param ServerRequestInterface $request
+     *      the inbound HTTP request
+     * @param RequestInterpreterInterface $interpreter
+     *      the intepreter to analyze the request.
+     * @param ApiInterface $api
+     *      the API that is receiving the request.
+     * @return Request
      */
-    public function build(ApiInterface $api, ServerRequestInterface $request)
-    {
-        $this->doContentNegotiation($api, $request);
-        $params = $this->parseParameters($api, $request);
-        $document = $this->parseDocument($api, $request);
-        $interpreter = $api->getRequestInterpreter();
-        $record = $this->locateRecord($api);
-
+    public function build(
+        ServerRequestInterface $request,
+        RequestInterpreterInterface $interpreter,
+        ApiInterface $api
+    ) {
         return new Request(
             $interpreter->getResourceType(),
-            $params,
+            $this->parseParameters($request),
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
-            $document,
-            $record
+            $this->parseDocument($request, $interpreter, $api->getCodecMatcher()),
+            $this->locateRecord($interpreter, $api->getStore())
         );
     }
 
     /**
-     * @param ApiInterface $api
-     * @param ServerRequestInterface $request
-     * @throws JsonApiException
-     */
-    protected function doContentNegotiation(ApiInterface $api, ServerRequestInterface $request)
-    {
-        $httpFactory = $api->getHttpFactory();
-        $parser = $httpFactory->createHeaderParametersParser();
-        $checker = $httpFactory->createHeadersChecker($api->getCodecMatcher());
-
-        $checker->checkHeaders($parser->parse($request));
-    }
-
-    /**
-     * @param ApiInterface $api
      * @param ServerRequestInterface $request
      * @return EncodingParametersInterface
      * @throws JsonApiException
      */
-    protected function parseParameters(ApiInterface $api, ServerRequestInterface $request)
+    protected function parseParameters(ServerRequestInterface $request)
     {
-        $parser = $api->getHttpFactory()->createQueryParametersParser();
-
-        return $parser->parse($request);
+        return $this->httpFactory->createQueryParametersParser()->parse($request);
     }
 
     /**
-     * @param ApiInterface $api
      * @param ServerRequestInterface $request
+     * @param RequestInterpreterInterface $interpreter
+     * @param CodecMatcherInterface $codecMatcher
      * @return DocumentInterface
-     * @throws JsonApiException
      */
-    protected function parseDocument(ApiInterface $api, ServerRequestInterface $request)
-    {
-        $interpreter = $api->getRequestInterpreter();
-
+    protected function parseDocument(
+        ServerRequestInterface $request,
+        RequestInterpreterInterface $interpreter,
+        CodecMatcherInterface $codecMatcher
+    ) {
         if (!$interpreter->isExpectingDocument()) {
             return null;
         }
 
-        $decoder = $api->getCodecMatcher()->getDecoder();
+        if (!$decoder = $codecMatcher->getDecoder()) {
+            throw new RuntimeException('No matching decoder');
+        }
+
         $document = $decoder->decode((string) $request->getBody());
 
         if (!is_object($document)) {
@@ -124,37 +120,21 @@ class RequestFactory implements RequestFactoryInterface
         }
 
         $document = ($document instanceof DocumentInterface) ? $document : new Document($document);
-        $this->validateDocument($document, $interpreter);
 
         return $document;
     }
 
     /**
-     * @param DocumentInterface $document
      * @param RequestInterpreterInterface $interpreter
-     */
-    protected function validateDocument(DocumentInterface $document, RequestInterpreterInterface $interpreter)
-    {
-        $validator = $this->documentValidator($interpreter);
-
-        if (!$validator->isValid($document)) {
-            throw new ValidationException($validator->getErrors());
-        }
-    }
-
-    /**
-     * @param ApiInterface $api
+     * @param StoreInterface $store
      * @return object
      */
-    protected function locateRecord(ApiInterface $api)
+    protected function locateRecord(RequestInterpreterInterface $interpreter, StoreInterface $store)
     {
-        $interpreter = $api->getRequestInterpreter();
-
         if (!$id = $interpreter->getResourceId()) {
             return null;
         }
 
-        $store = $api->getStore();
         $identifier = ResourceIdentifier::create($interpreter->getResourceType(), $id);
         $record = $store->find($identifier);
 
@@ -165,20 +145,4 @@ class RequestFactory implements RequestFactoryInterface
         return $record;
     }
 
-    /**
-     * @param RequestInterpreterInterface $interpreter
-     * @return DocumentValidatorInterface
-     */
-    private function documentValidator(RequestInterpreterInterface $interpreter)
-    {
-        if ($interpreter->isModifyRelationship()) {
-            return $this->validators->relationshipDocument();
-        }
-
-        $validator = $this
-            ->validators
-            ->resource($interpreter->getResourceType(), $interpreter->getResourceId());
-
-        return $this->validators->resourceDocument($validator);
-    }
 }

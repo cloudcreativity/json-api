@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,22 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Validators;
+namespace CloudCreativity\JsonApi\Contracts\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Validators\FilterValidatorInterface;
-use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
+use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
- * Class FilterValidator
+ * Interface QueryValidatorInterface
+ *
  * @package CloudCreativity\JsonApi
  */
-final class FilterValidator implements FilterValidatorInterface
+interface QueryValidatorInterface extends ErrorsAwareInterface
 {
 
-    use ErrorsAwareTrait;
-
     /**
-     * @inheritDoc
+     * @param EncodingParametersInterface $parameters
+     * @return bool
      */
-    public function isValid(array $filters)
-    {
-        return true;
-    }
-
+    public function isValid(EncodingParametersInterface $parameters);
 }

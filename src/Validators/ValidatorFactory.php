@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
-use CloudCreativity\JsonApi\Store\Store;
 
 /**
  * Class ValidatorFactory
@@ -50,12 +49,10 @@ class ValidatorFactory implements ValidatorFactoryInterface
      * @param ValidatorErrorFactoryInterface $validationErrors
      * @param StoreInterface $store
      */
-    public function __construct(
-        ValidatorErrorFactoryInterface $validationErrors = null,
-        StoreInterface $store = null
-    ) {
-        $this->validationErrors = $validationErrors ?: new ValidatorErrorFactory();
-        $this->store = $store ?: new Store();
+    public function __construct(ValidatorErrorFactoryInterface $validationErrors, StoreInterface $store)
+    {
+        $this->validationErrors = $validationErrors;
+        $this->store = $store;
     }
 
     /**
