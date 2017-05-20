@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
@@ -146,7 +146,7 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
     /**
      * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource, $record = null)
+    public function isValid(ResourceObjectInterface $resource, $record = null)
     {
         $relationships = $resource->getRelationships();
         $valid = true;
@@ -189,14 +189,14 @@ class RelationshipsValidator implements RelationshipsValidatorInterface
     /**
      * @param $key
      * @param RelationshipsInterface $relationships
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object|null $record
      * @return bool
      */
     protected function validateRelationship(
         $key,
         RelationshipsInterface $relationships,
-        ResourceInterface $resource,
+        ResourceObjectInterface $resource,
         $record = null
     ) {
         if (!is_object($relationships->get($key))) {

@@ -65,7 +65,7 @@ class Document extends StandardObject implements DocumentInterface
             throw new RuntimeException('Data member is not an object.');
         }
 
-        return new Resource($data);
+        return new ResourceObjectObject($data);
     }
 
     /**
@@ -79,7 +79,7 @@ class Document extends StandardObject implements DocumentInterface
             throw new RuntimeException('Data member is not an array.');
         }
 
-        return ResourceCollection::create($data);
+        return ResourceObjectCollection::create($data);
     }
 
 

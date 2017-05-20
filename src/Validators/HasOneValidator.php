@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 
 /**
  * Class HasOneValidator
@@ -36,7 +36,7 @@ class HasOneValidator extends AbstractRelationshipValidator
         RelationshipInterface $relationship,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         $this->reset();
 

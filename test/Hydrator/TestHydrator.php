@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Hydrator\HydratesRelatedInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\Utils\Str;
 
@@ -61,7 +61,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
      * @todo an equivalent method for this needs to be on the `RelatedHydratorTrait`
      * @see https://github.com/cloudcreativity/json-api/issues/28
      */
-    public function hydrateRelated(ResourceInterface $resource, $record)
+    public function hydrateRelated(ResourceObjectInterface $resource, $record)
     {
         $results = [];
         $attributes = $resource->getAttributes();

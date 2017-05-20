@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
 use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
@@ -28,7 +28,7 @@ use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
  *
  * @package CloudCreativity\JsonApi
  */
-class Resource extends StandardObject implements ResourceInterface
+class ResourceObjectObject extends StandardObject implements ResourceObjectInterface
 {
 
     use IdentifiableTrait,

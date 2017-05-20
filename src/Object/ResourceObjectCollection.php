@@ -19,9 +19,9 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use ArrayIterator;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceCollectionInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
@@ -30,22 +30,22 @@ use CloudCreativity\JsonApi\Exceptions\RuntimeException;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourceCollection implements ResourceCollectionInterface
+class ResourceObjectCollection implements ResourceObjectCollectionInterface
 {
 
     /**
-     * @var ResourceInterface[]
+     * @var ResourceObjectInterface[]
      */
     private $stack = [];
 
     /**
      * @param array $resources
-     * @return ResourceCollection
+     * @return ResourceObjectCollection
      */
     public static function create(array $resources)
     {
         $resources = array_map(function ($resource) {
-            return ($resource instanceof ResourceInterface) ? $resource : new Resource($resource);
+            return ($resource instanceof ResourceObjectInterface) ? $resource : new ResourceObjectObject($resource);
         }, $resources);
 
         return new self($resources);
@@ -74,7 +74,7 @@ class ResourceCollection implements ResourceCollectionInterface
      */
     public function has(ResourceIdentifierInterface $identifier)
     {
-        /** @var ResourceInterface $resource */
+        /** @var ResourceObjectInterface $resource */
         foreach ($this as $resource) {
 
             if ($identifier->isSame($resource->getIdentifier())) {
@@ -90,7 +90,7 @@ class ResourceCollection implements ResourceCollectionInterface
      */
     public function get(ResourceIdentifierInterface $identifier)
     {
-        /** @var ResourceInterface $resource */
+        /** @var ResourceObjectInterface $resource */
         foreach ($this as $resource) {
 
             if ($identifier->isSame($resource->getIdentifier())) {
@@ -116,7 +116,7 @@ class ResourceCollection implements ResourceCollectionInterface
     {
         $collection = new ResourceIdentifierCollection();
 
-        /** @var ResourceInterface $resource */
+        /** @var ResourceObjectInterface $resource */
         foreach ($this as $resource) {
             $collection->add($resource->getIdentifier());
         }
@@ -141,10 +141,10 @@ class ResourceCollection implements ResourceCollectionInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @return $this
      */
-    public function add(ResourceInterface $resource)
+    public function add(ResourceObjectInterface $resource)
     {
         if (!$this->has($resource->getIdentifier())) {
             $this->stack[] = $resource;
@@ -161,7 +161,7 @@ class ResourceCollection implements ResourceCollectionInterface
     {
         foreach ($resources as $resource) {
 
-            if (!$resource instanceof ResourceInterface) {
+            if (!$resource instanceof ResourceObjectInterface) {
                 throw new InvalidArgumentException('Expecting only resource objects.');
             }
 

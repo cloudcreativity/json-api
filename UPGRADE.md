@@ -2,7 +2,21 @@
 
 This file provides notes on how to upgrade between versions.
 
-## v0.8 to v0.9
+## v0.8 to v0.9 (Unreleased)
+
+### Renaming `Resource`
+
+The `Object\Resource` class has been renamed because it is a reserved word in PHP 7. Also, the JSON API spec refers
+to `resource objects` rather than `resources`.
+
+The following have therefore been renamed:
+
+- `Contracts\Object\ResourceInterface` to `Contracts\Object\ResourceObjectInterface`
+- `Object\Resource` to `Object\ResourceObject`
+- `Contracts\Object\ResourceCollectionInterface` to `Contracts\Object\ResourceObjectCollectionInterface`
+- `Object\ResourceCollection` to `Object\ResourceObjectCollection`.
+- `Testing\ResourceTester` to `Testing\ResourceObjectTester`.
+- `Testing\ResourcesTester` to `Testing\ResourceObjectsTester`.
 
 ### Validator Error Factory
 

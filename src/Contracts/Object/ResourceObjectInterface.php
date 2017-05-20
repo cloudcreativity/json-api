@@ -26,7 +26,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInter
  *
  * @package CloudCreativity\JsonApi
  */
-interface ResourceInterface extends StandardObjectInterface, MetaMemberInterface
+interface ResourceObjectInterface extends StandardObjectInterface, MetaMemberInterface
 {
 
     const TYPE = NeomerxDocumentInterface::KEYWORD_TYPE;

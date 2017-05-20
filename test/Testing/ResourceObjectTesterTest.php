@@ -23,7 +23,7 @@ namespace CloudCreativity\JsonApi\Testing;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourceTesterTest extends TestCase
+class ResourceObjectTesterTest extends TestCase
 {
 
     public function testNoType()
@@ -103,7 +103,7 @@ JSON_API;
     }
 
     /**
-     * @return ResourceTester
+     * @return ResourceObjectTester
      */
     public function testAttributes()
     {
@@ -141,10 +141,10 @@ JSON_API;
     }
 
     /**
-     * @param ResourceTester $resource
+     * @param ResourceObjectTester $resource
      * @depends testAttributes
      */
-    public function testAttributesSubset(ResourceTester $resource)
+    public function testAttributesSubset(ResourceObjectTester $resource)
     {
         $resource->assertAttributesSubset([
             'title' => 'My First Post',

@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Hydrator;
 use CloudCreativity\JsonApi\Contracts\Hydrator\HydratorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
@@ -45,11 +45,11 @@ abstract class AbstractHydrator implements HydratorInterface
     /**
      * Transfer data from a resource to a record.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object $record
      * @return object
      */
-    public function hydrate(ResourceInterface $resource, $record)
+    public function hydrate(ResourceObjectInterface $resource, $record)
     {
         $this->hydrating($resource, $record);
         $this->hydrateAttributes($resource->getAttributes(), $record);
@@ -94,11 +94,11 @@ abstract class AbstractHydrator implements HydratorInterface
      *
      * Child classes can overload this method if they need to do any logic pre-hydration.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param $record
      * @return void
      */
-    protected function hydrating(ResourceInterface $resource, $record)
+    protected function hydrating(ResourceObjectInterface $resource, $record)
     {
     }
 
@@ -107,11 +107,11 @@ abstract class AbstractHydrator implements HydratorInterface
      *
      * Child classes can overload this method if they need to do any logic post-hydration.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param $record
      * @return void
      */
-    protected function hydrated(ResourceInterface $resource, $record)
+    protected function hydrated(ResourceObjectInterface $resource, $record)
     {
     }
 }

@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceCollectionInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectCollectionInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Resource as ResourceObject;
+use CloudCreativity\JsonApi\Object\ResourceObjectObject as ResourceObject;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
@@ -29,7 +29,7 @@ use stdClass;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourceCollectionTest extends TestCase
+class ResourceObjectCollectionTest extends TestCase
 {
 
     public function testCreate()
@@ -58,45 +58,45 @@ JSON_API;
         $document = new Document(json_decode($document));
         $resources = $document->getResources();
 
-        $this->assertInstanceOf(ResourceCollectionInterface::class, $resources);
+        $this->assertInstanceOf(ResourceObjectCollectionInterface::class, $resources);
 
         return $resources;
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testHas(ResourceCollection $resources)
+    public function testHas(ResourceObjectCollection $resources)
     {
         $this->assertTrue($resources->has(ResourceIdentifier::create('posts', '456')));
         $this->assertFalse($resources->has(ResourceIdentifier::create('comments', '456')));
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testGet(ResourceCollection $resources)
+    public function testGet(ResourceObjectCollection $resources)
     {
         $this->assertEquals($this->resourceA(), $resources->get(ResourceIdentifier::create('posts', '123')));
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testGetMissingResource(ResourceCollection $resources)
+    public function testGetMissingResource(ResourceObjectCollection $resources)
     {
         $this->setExpectedException(RuntimeException::class);
         $resources->get(ResourceIdentifier::create('posts', '999'));
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testAllAndIterator(ResourceCollection $resources)
+    public function testAllAndIterator(ResourceObjectCollection $resources)
     {
         $expected = [$this->resourceA(), $this->resourceB()];
         $this->assertEquals($expected, $resources->getAll());
@@ -104,29 +104,29 @@ JSON_API;
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testCount(ResourceCollection $resources)
+    public function testCount(ResourceObjectCollection $resources)
     {
         $this->assertEquals(2, count($resources));
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testIsEmpty(ResourceCollection $resources)
+    public function testIsEmpty(ResourceObjectCollection $resources)
     {
         $this->assertFalse($resources->isEmpty());
-        $this->assertTrue((new ResourceCollection())->isEmpty());
+        $this->assertTrue((new ResourceObjectCollection())->isEmpty());
     }
 
     /**
-     * @param ResourceCollection $resources
+     * @param ResourceObjectCollection $resources
      * @depends testCreate
      */
-    public function testGetIds(ResourceCollection $resources)
+    public function testGetIds(ResourceObjectCollection $resources)
     {
         $expected = [$this->resourceA()->getIdentifier(), $this->resourceB()->getIdentifier()];
 
@@ -134,7 +134,7 @@ JSON_API;
     }
 
     /**
-     * @return ResourceObject
+     * @return ResourceObjectObject
      */
     private function resourceA()
     {
@@ -144,11 +144,11 @@ JSON_API;
         $resource->attributes = new stdClass();
         $resource->attributes->title = 'My First Post';
 
-        return new ResourceObject($resource);
+        return new ResourceObjectObject($resource);
     }
 
     /**
-     * @return ResourceObject
+     * @return ResourceObjectObject
      */
     private function resourceB()
     {
@@ -158,6 +158,6 @@ JSON_API;
         $resource->attributes = new stdClass();
         $resource->attributes->title = 'My Last Post';
 
-        return new ResourceObject($resource);
+        return new ResourceObjectObject($resource);
     }
 }

@@ -28,7 +28,7 @@ use stdClass;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourceTester
+class ResourceObjectTester
 {
 
     /**

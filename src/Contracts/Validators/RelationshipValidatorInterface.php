@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 
 /**
@@ -38,7 +38,7 @@ interface RelationshipValidatorInterface extends ErrorsAwareInterface
      *      the domain object that owns the relationships.
      * @param string|null $key
      *      if a full resource is being validated, the key of the relationship.
-     * @param ResourceInterface|null $resource
+     * @param ResourceObjectInterface|null $resource
      *      if a full resource is being validated, the resource for context.
      * @return bool
      */
@@ -46,7 +46,7 @@ interface RelationshipValidatorInterface extends ErrorsAwareInterface
         RelationshipInterface $relationship,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     );
 
 }

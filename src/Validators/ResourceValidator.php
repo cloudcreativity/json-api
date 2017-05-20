@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
@@ -96,7 +96,7 @@ class ResourceValidator implements ResourceValidatorInterface
     /**
      * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource, $record = null)
+    public function isValid(ResourceObjectInterface $resource, $record = null)
     {
         $this->reset();
 
@@ -135,18 +135,18 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @return bool
      */
-    protected function validateType(ResourceInterface $resource)
+    protected function validateType(ResourceObjectInterface $resource)
     {
         /** Type is required */
-        if (!$resource->has(ResourceInterface::TYPE)) {
-            $this->addError($this->errorFactory->memberRequired(ResourceInterface::TYPE, P::data()));
+        if (!$resource->has(ResourceObjectInterface::TYPE)) {
+            $this->addError($this->errorFactory->memberRequired(ResourceObjectInterface::TYPE, P::data()));
             return false;
         }
 
-        $type = $resource->get(ResourceInterface::TYPE);
+        $type = $resource->get(ResourceObjectInterface::TYPE);
 
         /** Must be the expected type */
         if (empty($type) || !$this->isSupportedType($type)) {
@@ -158,14 +158,14 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @return bool
      */
-    protected function validateId(ResourceInterface $resource)
+    protected function validateId(ResourceObjectInterface $resource)
     {
         /** If expecting an id, one must be provided */
-        if (!is_null($this->expectedId) && !$resource->has(ResourceInterface::ID)) {
-            $this->addError($this->errorFactory->memberRequired(ResourceInterface::ID, P::data()));
+        if (!is_null($this->expectedId) && !$resource->has(ResourceObjectInterface::ID)) {
+            $this->addError($this->errorFactory->memberRequired(ResourceObjectInterface::ID, P::data()));
             return false;
         }
 
@@ -182,18 +182,18 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object|null $record
      * @return bool
      */
-    protected function validateAttributes(ResourceInterface $resource, $record = null)
+    protected function validateAttributes(ResourceObjectInterface $resource, $record = null)
     {
-        $raw = $resource->get(ResourceInterface::ATTRIBUTES);
+        $raw = $resource->get(ResourceObjectInterface::ATTRIBUTES);
 
         /** Attributes member must be an object. */
-        if ($resource->has(ResourceInterface::ATTRIBUTES) && !is_object($raw)) {
+        if ($resource->has(ResourceObjectInterface::ATTRIBUTES) && !is_object($raw)) {
             $this->addError($this->errorFactory->memberObjectExpected(
-                ResourceInterface::ATTRIBUTES,
+                ResourceObjectInterface::ATTRIBUTES,
                 P::attributes()
             ));
             return false;
@@ -215,18 +215,18 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object|null $record
      * @return bool
      */
-    protected function validateRelationships(ResourceInterface $resource, $record = null)
+    protected function validateRelationships(ResourceObjectInterface $resource, $record = null)
     {
-        $raw = $resource->get(ResourceInterface::RELATIONSHIPS);
+        $raw = $resource->get(ResourceObjectInterface::RELATIONSHIPS);
 
         /** Relationships member must be an object. */
-        if ($resource->has(ResourceInterface::RELATIONSHIPS) && !is_object($raw)) {
+        if ($resource->has(ResourceObjectInterface::RELATIONSHIPS) && !is_object($raw)) {
             $this->addError($this->errorFactory->memberObjectExpected(
-                ResourceInterface::RELATIONSHIPS,
+                ResourceObjectInterface::RELATIONSHIPS,
                 P::relationships()
             ));
             return false;
@@ -248,11 +248,11 @@ class ResourceValidator implements ResourceValidatorInterface
     }
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object|null $record
      * @return bool
      */
-    protected function validateContext(ResourceInterface $resource, $record = null)
+    protected function validateContext(ResourceObjectInterface $resource, $record = null)
     {
         if (!$this->context || $this->context->isValid($resource, $record)) {
             return true;

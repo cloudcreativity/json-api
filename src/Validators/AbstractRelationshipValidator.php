@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Validators;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipValidatorInterface;
@@ -165,14 +165,14 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * @param RelationshipInterface $relationship
      * @param null $record
      * @param null $key
-     * @param ResourceInterface|null $resource
+     * @param ResourceObjectInterface|null $resource
      * @return bool
      */
     protected function validateHasOne(
         RelationshipInterface $relationship,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         if (!$relationship->isHasOne()) {
             $this->addError($this->errorFactory->relationshipHasOneExpected($key));
@@ -209,14 +209,14 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * @param RelationshipInterface $relationship
      * @param null $record
      * @param null $key
-     * @param ResourceInterface|null $resource
+     * @param ResourceObjectInterface|null $resource
      * @return bool
      */
     protected function validateHasMany(
         RelationshipInterface $relationship,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         if (!$relationship->isHasMany()) {
             $this->addError($this->errorFactory->relationshipHasManyExpected($key));
@@ -275,14 +275,14 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * @param ResourceIdentifierCollectionInterface $identifiers
      * @param object|null $record
      * @param string|null $key
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @return bool
      */
     protected function validateIdentifiers(
         ResourceIdentifierCollectionInterface $identifiers,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         /** @var ResourceIdentifierInterface $identifier */
         foreach ($identifiers as $identifier) {
@@ -322,14 +322,14 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
      * @param ResourceIdentifierInterface $identifier
      * @param object|null
      * @param string|null $key
-     * @param ResourceInterface|null $resource
+     * @param ResourceObjectInterface|null $resource
      * @return bool
      */
     protected function validateAcceptable(
         ResourceIdentifierInterface $identifier,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         $result = ($this->acceptable) ? $this->acceptable->accept($identifier, $record, $key, $resource) : true;
 
