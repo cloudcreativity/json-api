@@ -27,6 +27,7 @@ use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 
 /**
  * Class ResponseFactory
+ *
  * @package CloudCreativity\JsonApi
  */
 class ResponseFactory implements ResponseFactoryInterface
@@ -44,6 +45,7 @@ class ResponseFactory implements ResponseFactoryInterface
 
     /**
      * ResponseFactory constructor.
+     *
      * @param ResponsesInterface $responses
      * @param HttpServiceInterface $httpService
      */

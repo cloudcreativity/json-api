@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use stdClass;
 
 /**
  * Class RelatedHydratorTrait
+ *
  * @package CloudCreativity\JsonApi
  */
 trait RelatedHydratorTrait
@@ -58,6 +59,7 @@ trait RelatedHydratorTrait
 
         /**
          * Temporary fix for standard object iteration
+         *
          * @see https://github.com/cloudcreativity/json-api/issues/30
          * @todo change this when that bug is fixed.
          */

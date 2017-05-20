@@ -23,6 +23,7 @@ use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 
 /**
  * Interface PageInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface PageInterface

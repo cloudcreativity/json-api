@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class ResourceValidator
+ *
  * @package CloudCreativity\JsonApi
  */
 class ResourceValidator implements ResourceValidatorInterface
@@ -68,6 +69,7 @@ class ResourceValidator implements ResourceValidatorInterface
 
     /**
      * ResourceValidator constructor.
+     *
      * @param ValidatorErrorFactoryInterface $errorFactory
      * @param string|null $expectedType
      * @param string|int|null $expectedId

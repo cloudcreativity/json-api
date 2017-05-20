@@ -2,7 +2,7 @@
 
 This file provides notes on how to upgrade between versions.
 
-## v0.7 to v0.8 (Unreleased)
+## v0.7 to v0.8
 
 ### Factories
 
@@ -29,6 +29,9 @@ interpreter on a per-API basis.
 - `getPagingStrategy`: we are refactoring so that paging is a per-resource concern, rather than an API concern. This is
 because different resources, and resource has-many relationships, can independently use different strategies.
 - `getOptions`: framework-specific options are no longer the concern of the API class.
+
+We have added `getErrors()` to the interface to return an errors repository as errors are highly likely to be specific
+to a particular API.
 
 ### Authorizers
 

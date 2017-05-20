@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Object\Helpers\ObjectUtils;
-use stdClass;
-use PHPUnit_Framework_Assert as PHPUnit;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as Keys;
+use PHPUnit_Framework_Assert as PHPUnit;
+use stdClass;
 
 /**
  * Class ResourceTester
+ *
  * @package CloudCreativity\JsonApi
  */
 class ResourceTester
@@ -42,6 +43,7 @@ class ResourceTester
 
     /**
      * ResourceTester constructor.
+     *
      * @param stdClass $resource
      * @param int|null $index
      *      if the resource appears within a collection, its index within that collection.

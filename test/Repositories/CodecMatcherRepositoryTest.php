@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;
-use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\AcceptHeader;
@@ -31,6 +30,7 @@ use Neomerx\JsonApi\Http\Headers\Header;
 
 /**
  * Class CodecMatcherRepositoryTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class CodecMatcherRepositoryTest extends TestCase
@@ -53,7 +53,7 @@ class CodecMatcherRepositoryTest extends TestCase
             'application/vnd.api+json',
             'application/json' => ArrayDecoder::class,
         ],
-	];
+    ];
 
     private $encoderA;
     private $encoderB;

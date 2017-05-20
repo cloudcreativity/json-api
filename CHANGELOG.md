@@ -2,6 +2,29 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.8.0] - 2017-05-20
+
+### Added
+- A query parameter validator interface that can be injected into a new validation query checker class. This allows
+integration of framework specific validators into the query checking process.
+- Traits to apply to HTTP middleware are now available in the `Http\Middleware` namespace.
+
+### Changed
+- Resource type is now passed to authorizer methods that do not receive a record instance. 
+- The `ApiInterface` no longer returns a factory, paging strategy or options. It now returns an errors repository
+as errors are specifically scoped to an API.
+- Store adapters are now tied to a specific resource type rather than handling multiple. This allows them to deal
+with querying (index routes) many resources at once - i.e. filter, pagination logic.
+- Pagination has been removed as it is too framework-specific. This package now only contains a single interface -
+`PageInterface` - that indicates that data is paginated. The response factory handles this to merge the paginated
+data into the encoded response.
+- Refactored factories to bring them more in line with the `neomerx/json-api` factory approach.
+
+### Removed
+- The `RequestHandlerInterface` and related classes. This helps reduce the number of units per resource-type, as
+the functions of this class can be implemented as HTTP middleware.
+- The filter validator has been removed in preference of query parameter validation.
+
 ## [0.7.2] - 2017-02-27
 
 ### Fixed

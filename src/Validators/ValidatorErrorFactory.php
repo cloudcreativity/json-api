@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class ValidatorErrorFactory
+ *
  * @package CloudCreativity\JsonApi
  */
 class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
@@ -55,6 +56,7 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 
     /**
      * ValidatorErrorFactory constructor.
+     *
      * @param ErrorRepositoryInterface|null $repository
      */
     public function __construct(ErrorRepositoryInterface $repository = null)

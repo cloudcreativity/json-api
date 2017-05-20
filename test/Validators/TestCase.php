@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * Class TestCase
+ *
  * @package CloudCreativity\JsonApi
  */
 class TestCase extends BaseTestCase
@@ -67,7 +68,7 @@ class TestCase extends BaseTestCase
         $config = require __DIR__ . '/../../config/validation.php';
 
         $store->method('isType')->willReturnCallback(function ($type) {
-           return in_array($type, $this->resourceTypes, true);
+            return in_array($type, $this->resourceTypes, true);
         });
 
         $this->errorRepository = new ErrorRepository(new Replacer());
