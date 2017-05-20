@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Class InvalidJsonException
+ *
  * @package CloudCreativity\JsonApi
  */
 class InvalidJsonException extends JsonApiException
@@ -50,14 +51,15 @@ class InvalidJsonException extends JsonApiException
 
     /**
      * InvalidJsonException constructor.
-     * @param int $jsonError
-     * @param string $jsonErrorMessage
+     *
+     * @param int|null $jsonError
+     * @param string|null $jsonErrorMessage
      * @param int $defaultHttpCode
      * @param Exception|null $previous
      */
     public function __construct(
-        $jsonError,
-        $jsonErrorMessage,
+        $jsonError = null,
+        $jsonErrorMessage = null,
         $defaultHttpCode = self::HTTP_CODE_BAD_REQUEST,
         Exception $previous = null
     ) {
@@ -67,7 +69,7 @@ class InvalidJsonException extends JsonApiException
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getJsonError()
     {
@@ -75,7 +77,7 @@ class InvalidJsonException extends JsonApiException
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getJsonErrorMessage()
     {

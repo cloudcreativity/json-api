@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,16 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http;
 
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
-use CloudCreativity\JsonApi\Contracts\Pagination\PagingStrategyInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 
 /**
  * Interface ApiInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface ApiInterface
@@ -40,20 +39,6 @@ interface ApiInterface
      * @return string
      */
     public function getNamespace();
-
-    /**
-     * Get the HTTP factory for this API instance
-     *
-     * @return HttpFactoryInterface
-     */
-    public function getHttpFactory();
-
-    /**
-     * Get the request interpreter to use for this API instance.
-     *
-     * @return RequestInterpreterInterface
-     */
-    public function getRequestInterpreter();
 
     /**
      * Get the codec matcher for this API.
@@ -105,18 +90,10 @@ interface ApiInterface
     public function getStore();
 
     /**
-     * Get the paging strategy that is being used for this API.
+     * Get the errors that this API can return.
      *
-     * @return PagingStrategyInterface
+     * @return ErrorRepositoryInterface
      */
-    public function getPagingStrategy();
+    public function getErrors();
 
-    /**
-     * Get other options for this API
-     *
-     * This allows injection of options for any framework-specific components as needed.
-     *
-     * @return array
-     */
-    public function getOptions();
 }

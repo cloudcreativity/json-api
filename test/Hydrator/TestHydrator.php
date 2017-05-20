@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ use CloudCreativity\JsonApi\Utils\Str;
 
 /**
  * Class TestHydrator
+ *
  * @package CloudCreativity\JsonApi
  */
 class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
@@ -67,6 +68,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
 
         /**
          * Have to iterate over keys because the standard object iteration has a bug.
+         *
          * @see https://github.com/cloudcreativity/json-api/issues/30
          * @todo change this when that issue is fixed.
          */

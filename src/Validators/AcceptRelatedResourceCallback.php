@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 
 /**
  * Class AcceptRelatedResourceCallback
+ *
  * @package CloudCreativity\JsonApi
  */
 class AcceptRelatedResourceCallback implements AcceptRelatedResourceInterface
@@ -36,6 +37,7 @@ class AcceptRelatedResourceCallback implements AcceptRelatedResourceInterface
 
     /**
      * AcceptRelatedResourceCallback constructor.
+     *
      * @param callable $callback
      */
     public function __construct(callable $callback)

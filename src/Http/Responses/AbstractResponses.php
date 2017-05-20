@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use Neomerx\JsonApi\Http\Responses;
 
 /**
  * Class Responses
+ *
  * @package CloudCreativity\JsonApi
  */
 abstract class AbstractResponses extends Responses
@@ -37,6 +38,7 @@ abstract class AbstractResponses extends Responses
 
     /**
      * AbstractResponses constructor.
+     *
      * @param HttpServiceInterface $service
      */
     public function __construct(HttpServiceInterface $service)

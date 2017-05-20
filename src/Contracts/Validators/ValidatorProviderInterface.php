@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,40 +18,37 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
+
 /**
  * Interface ValidatorProviderInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface ValidatorProviderInterface
 {
 
     /**
-     * Get a validator for a create resource request is logically valid.
+     * Get a validator for a create resource request.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being created
      * @return DocumentValidatorInterface
      */
-    public function createResource($resourceType);
+    public function createResource();
 
     /**
-     * Get a validator for an update resource request is logically valid.
+     * Get a validator for an update resource request.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being updated
      * @param string $resourceId
      *      the JSON API resource id that is being updated
      * @param object $record
      *      the domain record that is being updated
      * @return DocumentValidatorInterface
      */
-    public function updateResource($resourceType, $resourceId, $record);
+    public function updateResource($resourceId, $record);
 
     /**
      * Get a validator for modifying a relationship.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being modified
      * @param string $resourceId
      *      the JSON API resource id that is being modified
      * @param string $relationshipName
@@ -61,15 +58,13 @@ interface ValidatorProviderInterface
      *
      * @return DocumentValidatorInterface
      */
-    public function modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
+    public function modifyRelationship($resourceId, $relationshipName, $record);
 
     /**
-     * Get a validator for filtering resources.
+     * Get a query checker for the specified resource type.
      *
-     * @param string $resourceType
-     *      the JSON API resource type that is being filtered
-     * @return FilterValidatorInterface
+     * @return QueryCheckerInterface
      */
-    public function filterResources($resourceType);
+    public function queryChecker();
 
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,38 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Traversable;
 
 /**
  * Interface AdapterInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface AdapterInterface
 {
 
     /**
-     * Is this adapter responsible for the supplied resource type?
+     * @param EncodingParametersInterface $parameters
+     * @return Traversable|array|PageInterface|object|null
+     */
+    public function query(EncodingParametersInterface $parameters);
+
+    /**
+     * Does a record that relates to the specified JSON API resource id exist?
      *
-     * @param $resourceType
+     * @param $resourceId
      * @return bool
      */
-    public function recognises($resourceType);
+    public function exists($resourceId);
 
     /**
-     * @param ResourceIdentifierInterface $identifier
-     * @return bool
-     */
-    public function exists(ResourceIdentifierInterface $identifier);
-
-    /**
-     * @param ResourceIdentifierInterface $identifier
+     * Get the record that relates to the specified JSON API resource id, if it exists.
+     *
+     * @param string $resourceId
      * @return object|null
-     *      the record, or null if it does not exist.
      */
-    public function find(ResourceIdentifierInterface $identifier);
+    public function find($resourceId);
+
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,24 @@ namespace CloudCreativity\JsonApi\Store;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
  * Class Store
+ *
  * @package CloudCreativity\JsonApi
  */
 class Store implements StoreInterface
 {
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * @var IdentityMap
@@ -38,15 +45,13 @@ class Store implements StoreInterface
     private $identityMap;
 
     /**
-     * @var AdapterInterface[]
-     */
-    private $adapters = [];
-
-    /**
      * Store constructor.
+     *
+     * @param ContainerInterface $container
      */
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         $this->identityMap = new IdentityMap();
     }
 
@@ -55,14 +60,17 @@ class Store implements StoreInterface
      */
     public function isType($resourceType)
     {
-        /** @var AdapterInterface $adapter */
-        foreach ($this->adapters as $adapter) {
-            if ($adapter->recognises($resourceType)) {
-                return true;
-            }
-        }
+        return !!$this->container->getAdapterByResourceType($resourceType);
+    }
 
-        return false;
+    /**
+     * @inheritDoc
+     */
+    public function query($resourceType, EncodingParametersInterface $params)
+    {
+        return $this
+            ->adapterFor($resourceType)
+            ->query($params);
     }
 
     /**
@@ -78,7 +86,7 @@ class Store implements StoreInterface
 
         $exists = $this
             ->adapterFor($identifier->getType())
-            ->exists($identifier);
+            ->exists($identifier->getId());
 
         $this->identityMap->add($identifier, $exists);
 
@@ -100,7 +108,7 @@ class Store implements StoreInterface
 
         $record = $this
             ->adapterFor($identifier->getType())
-            ->find($identifier);
+            ->find($identifier->getId());
 
         $this->identityMap->add($identifier, is_object($record) ? $record : false);
 
@@ -112,35 +120,11 @@ class Store implements StoreInterface
      */
     public function findRecord(ResourceIdentifierInterface $identifier)
     {
-        $record = $this->find($identifier);
-
-        if (!$record) {
+        if (!$record = $this->find($identifier)) {
             throw new RecordNotFoundException($identifier);
         }
 
         return $record;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function register(AdapterInterface $adapter)
-    {
-        $this->adapters[] = $adapter;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function registerMany(array $adapters)
-    {
-        foreach ($adapters as $adapter) {
-            if (!$adapter instanceof AdapterInterface) {
-                throw new InvalidArgumentException('Expecting an array of adapter instances.');
-            }
-
-            $this->register($adapter);
-        }
     }
 
     /**
@@ -149,13 +133,10 @@ class Store implements StoreInterface
      */
     protected function adapterFor($resourceType)
     {
-        /** @var AdapterInterface $adapter */
-        foreach ($this->adapters as $adapter) {
-            if ($adapter->recognises($resourceType)) {
-                return $adapter;
-            }
+        if (!$adapter = $this->container->getAdapterByResourceType($resourceType)) {
+            throw new RuntimeException("No adapter for resource type: $resourceType");
         }
 
-        throw new RuntimeException("No adapter for resource type: $resourceType");
+        return $adapter;
     }
 }

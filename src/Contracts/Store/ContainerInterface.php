@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Http;
+namespace CloudCreativity\JsonApi\Contracts\Store;
 
 /**
- * Interface ApiFactoryInterface
+ * Interface AdapterContainerInterface
+ *
  * @package CloudCreativity\JsonApi
  */
-interface ApiFactoryInterface
+interface ContainerInterface
 {
 
     /**
-     * @param $namespace
-     * @param string|null $host
-     *      the HTTP scheme and host
-     * @return ApiInterface
+     * @param string $resourceType
+     * @return AdapterInterface|null
+     *      the resource type's adapter, or null if no adapter exists.
      */
-    public function createApi($namespace, $host = null);
+    public function getAdapterByResourceType($resourceType);
 
 }

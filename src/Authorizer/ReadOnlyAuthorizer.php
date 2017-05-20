@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
  * Class ReadOnlyAuthorizer
+ *
  * @package CloudCreativity\JsonApi
  */
 class ReadOnlyAuthorizer extends AbstractAuthorizer
@@ -32,7 +33,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canReadMany(EncodingParametersInterface $parameters)
+    public function canReadMany($resourceType, EncodingParametersInterface $parameters)
     {
         return true;
     }
@@ -40,7 +41,7 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     /**
      * @inheritdoc
      */
-    public function canCreate(ResourceInterface $resource, EncodingParametersInterface $parameters)
+    public function canCreate($resourceType, ResourceInterface $resource, EncodingParametersInterface $parameters)
     {
         return false;
     }
@@ -80,6 +81,5 @@ class ReadOnlyAuthorizer extends AbstractAuthorizer
     ) {
         return false;
     }
-
 
 }

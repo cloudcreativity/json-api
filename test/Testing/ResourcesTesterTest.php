@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ namespace CloudCreativity\JsonApi\Testing;
 
 /**
  * Class ResourcesTesterTest
+ *
  * @package CloudCreativity\JsonApi
  */
-final class ResourcesTesterTest extends TestCase
+class ResourcesTesterTest extends TestCase
 {
 
     public function testTypes()
@@ -54,7 +55,7 @@ JSON_API;
             ->assertResourceCollection()
             ->assertTypes('posts');
 
-        $this->willFail(function () use ($collection ) {
+        $this->willFail(function () use ($collection) {
             $collection->assertTypes('comments');
         });
 
@@ -137,7 +138,7 @@ JSON_API;
             ->assertResourceCollection()
             ->assertTypes(['posts', 'comments']);
 
-        $this->willFail(function () use ($collection ) {
+        $this->willFail(function () use ($collection) {
             $collection->assertTypes(['posts', 'users']);
         });
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,55 @@ namespace CloudCreativity\JsonApi\Decoders;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 use CloudCreativity\JsonApi\TestCase;
-use Exception;
 
 /**
  * Class DocumentDecoderTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class DocumentDecoderTest extends TestCase
 {
 
-    public function testInvalidJson()
+    /**
+     * @return array
+     */
+    public function invalidProvider()
     {
-        $content = <<<JSON_API
-        {
-            "data": {
-                "type": "foo"
-        }
-JSON_API;
+        return [
+            'parse error' => ['{ "data": { "type": "foo" }', true],
+            'empty string' => [''],
+            'null' => ['NULL'],
+            'integer' => ['1'],
+            'bool' => ['true'],
+            'string' => ['foo'],
+        ];
+    }
 
+    /**
+     * @param $content
+     * @param bool $jsonError
+     * @dataProvider invalidProvider
+     */
+    public function testInvalidJson($content, $jsonError = false)
+    {
         $decoder = new DocumentDecoder();
 
         try {
             $decoder->decode($content);
             $this->fail('No exception thrown.');
-        } catch (Exception $ex) {
-            $this->assertInstanceOf(InvalidJsonException::class, $ex);
-            /** @var InvalidJsonException $ex */
-            $this->assertEquals(json_last_error(), $ex->getJsonError());
-            $this->assertEquals(json_last_error_msg(), $ex->getJsonErrorMessage());
+        } catch (InvalidJsonException $ex) {
+            if ($jsonError) {
+                $this->assertJsonError($ex);
+            }
         }
+    }
+
+    /**
+     * @param InvalidJsonException $ex
+     */
+    private function assertJsonError(InvalidJsonException $ex)
+    {
+        $this->assertEquals(json_last_error(), $ex->getJsonError());
+        $this->assertEquals(json_last_error_msg(), $ex->getJsonErrorMessage());
     }
 }

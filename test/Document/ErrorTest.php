@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 namespace CloudCreativity\JsonApi\Document;
 
 use CloudCreativity\JsonApi\TestCase;
-use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Document\Error as BaseError;
+use Neomerx\JsonApi\Document\Link;
 
 /**
  * Class ErrorTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class ErrorTest extends TestCase

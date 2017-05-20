@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http\Requests;
+namespace CloudCreativity\JsonApi\Http\Middleware;
 
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
@@ -26,26 +26,54 @@ use CloudCreativity\JsonApi\Exceptions\ValidationException;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
- * Class ChecksDocuments
+ * Class ValidatesRequests
+ *
  * @package CloudCreativity\JsonApi
  */
-trait ChecksDocuments
+trait ValidatesRequests
 {
 
     /**
-     * @param ValidatorProviderInterface $validators
      * @param RequestInterpreterInterface $interpreter
      * @param RequestInterface $request
+     * @param ValidatorProviderInterface $validators
+     */
+    protected function validate(
+        RequestInterpreterInterface $interpreter,
+        RequestInterface $request,
+        ValidatorProviderInterface $validators
+    ) {
+        /** Check request parameters are acceptable */
+        $this->checkQueryParameters($request, $validators);
+
+        /** Check the document content is acceptable */
+        $this->checkDocumentIsAcceptable($interpreter, $request, $validators);
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param ValidatorProviderInterface $validators
+     * @throws JsonApiException
+     */
+    protected function checkQueryParameters(RequestInterface $request, ValidatorProviderInterface $validators)
+    {
+        $checker = $validators->queryChecker();
+        $checker->checkQuery($request->getParameters());
+    }
+
+
+    /**
+     * @param RequestInterpreterInterface $interpreter
+     * @param RequestInterface $request
+     * @param ValidatorProviderInterface $validators
      * @throws JsonApiException
      */
     protected function checkDocumentIsAcceptable(
-        ValidatorProviderInterface $validators,
         RequestInterpreterInterface $interpreter,
-        RequestInterface $request
+        RequestInterface $request,
+        ValidatorProviderInterface $validators
     ) {
-        $document = $request->getDocument();
-
-        if (!$document) {
+        if (!$document = $request->getDocument()) {
             return;
         }
 
@@ -62,25 +90,24 @@ trait ChecksDocuments
      * @param RequestInterface $request
      * @return DocumentValidatorInterface|null
      */
-    private function documentAcceptanceValidator(
+    protected function documentAcceptanceValidator(
         ValidatorProviderInterface $validators,
         RequestInterpreterInterface $interpreter,
         RequestInterface $request
     ) {
-        $resourceType = $request->getResourceType();
         $resourceId = $interpreter->getResourceId();
         $relationshipName = $interpreter->getRelationshipName();
         $record = $request->getRecord();
 
         /** Create Resource */
         if ($interpreter->isCreateResource()) {
-            return $validators->createResource($resourceType);
+            return $validators->createResource();
         } /** Update Resource */
         elseif ($interpreter->isUpdateResource()) {
-            return $validators->updateResource($resourceType, $resourceId, $record);
+            return $validators->updateResource($resourceId, $record);
         } /** Replace Relationship */
         elseif ($interpreter->isModifyRelationship()) {
-            return $validators->modifyRelationship($resourceType, $resourceId, $relationshipName, $record);
+            return $validators->modifyRelationship($resourceId, $relationshipName, $record);
         }
 
         return null;

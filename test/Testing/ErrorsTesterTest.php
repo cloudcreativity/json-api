@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ namespace CloudCreativity\JsonApi\Testing;
 
 /**
  * Class ErrorsTesterTest
+ *
  * @package CloudCreativity\JsonApi
  */
-final class ErrorsTesterTest extends TestCase
+class ErrorsTesterTest extends TestCase
 {
 
     public function testNoErrors()
@@ -175,7 +176,7 @@ JSON_API;
         $content = '{"errors": []}';
         $errors = DocumentTester::create($content)->assertErrors();
 
-        $this->willFail(function () use ($errors){
+        $this->willFail(function () use ($errors) {
             $errors->assertOne();
         });
     }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Validators;
 
 /**
  * Interface ValidatorFactoryInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface ValidatorFactoryInterface
@@ -46,7 +47,7 @@ interface ValidatorFactoryInterface
     /**
      * Create a validator for a resource object.
      *
-     * @param $expectedType|null
+     * @param string|null $expectedType
      *      the expected resource type or null to accept any type
      * @param string|int|null $expectedId
      *      the expected resource id, or null if none expected (create request).

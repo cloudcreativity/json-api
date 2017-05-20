@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,29 @@ use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
+use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Http\Api;
+use CloudCreativity\JsonApi\Http\Middleware\NegotiatesContent;
 use CloudCreativity\JsonApi\Object\Document;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Store\Store;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 use stdClass;
 
 /**
  * Class RequestFactoryTest
+ *
  * @package CloudCreativity\JsonApi
  */
-final class RequestFactoryTest extends TestCase
+class RequestFactoryTest extends TestCase
 {
+
+    use NegotiatesContent;
 
     /**
      * @var Api
@@ -70,11 +72,6 @@ final class RequestFactoryTest extends TestCase
     private $adapter;
 
     /**
-     * @var RequestFactory
-     */
-    private $requestFactory;
-
-    /**
      * @var array|null
      */
     private $expectedUri;
@@ -90,27 +87,34 @@ final class RequestFactoryTest extends TestCase
     private $expectedRecord;
 
     /**
+     * @var Factory
+     */
+    private $factory;
+
+    /**
      * @return void
      */
     protected function setUp()
     {
-        $store = new Store();
-        $factory = new Factory();
+        $this->factory = new Factory();
 
-        $this->codecMatcher = $factory->createCodecMatcher();
+        $this->codecMatcher = $this->factory->createCodecMatcher();
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
-        $this->adapter->method('recognises')->with('posts')->willReturn(true);
-        $store->register($this->adapter);
-        $this->api = new Api('v1', $this->interpreter, $this->codecMatcher, $factory->createContainer(), $store);
-        $this->requestFactory = new RequestFactory();
+        $store = $this->factory->createStore($this->factory->createAdapterContainer(['posts' => $this->adapter]));
+        $this->api = $this->factory->createApi(
+            'v1',
+            $this->codecMatcher,
+            $this->factory->createContainer(),
+            $store,
+            $this->factory->createErrorRepository([])
+        );
         $this->withMediaType();
     }
 
     public function testIndex()
     {
-        $this->withRequest()
-            ->doBuild();
+        $this->withRequest()->doBuild();
     }
 
     public function testCreateResource()
@@ -176,7 +180,7 @@ JSON_API;
 }
 JSON_API;
 
-        $this->withRequest('GET', '123', 'author')
+        $this->withRequest('PATCH', '123', 'author', $content)
             ->withRecord('123')
             ->doBuild();
     }
@@ -223,24 +227,6 @@ JSON_API;
             ->doFailure(400);
     }
 
-    public function testInvalidJsonApiContent()
-    {
-        $content = <<<JSON_API
-{
-    "data": {
-        "type": "",
-        "attributes": {
-            "title": "My first post",
-            "content": "..."
-        }
-    }
-}
-JSON_API;
-
-        $this->withRequest('POST')
-            ->doFailure(400);
-    }
-
     public function testNoContent()
     {
         $this->withRequest('POST')
@@ -252,7 +238,9 @@ JSON_API;
      */
     private function doBuild()
     {
-        $request = $this->requestFactory->build($this->api, $this->serverRequest);
+        /** We expect content negotiation to have been performed before creating a request. */
+        $this->doContentNegotiation($this->factory, $this->serverRequest, $this->api->getCodecMatcher());
+        $request = $this->factory->createRequest($this->serverRequest, $this->interpreter, $this->api);
 
         if (!$request instanceof RequestInterface) {
             $this->fail('No request built.');
@@ -344,9 +332,8 @@ JSON_API;
     private function withRecord($resourceId)
     {
         $this->expectedRecord = new stdClass();
-        $identifier = ResourceIdentifier::create('posts', $resourceId);
-        $this->adapter->method('exists')->with($identifier)->willReturn(true);
-        $this->adapter->method('find')->with($identifier)->willReturn($this->expectedRecord);
+        $this->adapter->method('exists')->with($resourceId)->willReturn(true);
+        $this->adapter->method('find')->with($resourceId)->willReturn($this->expectedRecord);
 
         return $this;
     }

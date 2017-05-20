@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@ use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepository
+ *
  * @package CloudCreativity\JsonApi
+ * @deprecated
  *
  * Example provided config array:
  *

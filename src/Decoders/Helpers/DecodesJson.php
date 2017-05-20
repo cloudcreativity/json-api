@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 
 /**
  * Class DecodesJson
+ *
  * @package CloudCreativity\JsonApi
  */
 trait DecodesJson
@@ -41,6 +42,14 @@ trait DecodesJson
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw InvalidJsonException::create();
+        }
+
+        if (!$assoc && !is_object($parsed)) {
+            throw new InvalidJsonException(null, 'JSON is not an object.');
+        }
+
+        if ($assoc && !is_array($parsed)) {
+            throw new InvalidJsonException(null, 'JSON is not an object or array.');
         }
 
         return $parsed;
