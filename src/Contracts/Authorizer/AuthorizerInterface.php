@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Authorizer;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
@@ -50,13 +50,13 @@ interface AuthorizerInterface extends ErrorsAwareInterface
      *
      * @param string $resourceType
      *      the resource type being created.
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      *      the resource provided by the client.
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      */
-    public function canCreate($resourceType, ResourceInterface $resource, EncodingParametersInterface $parameters);
+    public function canCreate($resourceType, ResourceObjectInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client read the specified record?
@@ -74,13 +74,13 @@ interface AuthorizerInterface extends ErrorsAwareInterface
      *
      * @param object $record
      *      the record that the client is trying to update.
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      *      the resource provided by the client
      * @param EncodingParametersInterface $parameters
      *      the parameters provided by the client
      * @return bool
      */
-    public function canUpdate($record, ResourceInterface $resource, EncodingParametersInterface $parameters);
+    public function canUpdate($record, ResourceObjectInterface $resource, EncodingParametersInterface $parameters);
 
     /**
      * Can the client delete the specified record?

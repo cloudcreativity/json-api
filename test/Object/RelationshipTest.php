@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Object;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
+use CloudCreativity\Utils\Object\StandardObject;
 
 /**
  * Class RelationshipTest
@@ -117,7 +118,7 @@ class RelationshipTest extends TestCase
         $input->meta = new stdClass();
         $input->meta->foo = 'bar';
 
-        $object->setProxy($input);
+        $object = new Relationship($input);
 
         $this->assertTrue($object->hasMeta());
         $this->assertEquals(new StandardObject($input->meta), $object->getMeta());

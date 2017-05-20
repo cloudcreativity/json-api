@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 
 /**
  * Interface HydratorInterface
@@ -32,11 +32,11 @@ interface HydratorInterface
     /**
      * Transfer data from a resource to a record.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object $record
      * @return void
      */
-    public function hydrate(ResourceInterface $resource, $record);
+    public function hydrate(ResourceObjectInterface $resource, $record);
 
     /**
      * Transfer data from a resource relationship to a record.

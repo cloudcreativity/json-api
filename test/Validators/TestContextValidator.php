@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ResourceValidatorInterface;
 use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 
@@ -50,7 +50,7 @@ class TestContextValidator implements ResourceValidatorInterface
     /**
      * @inheritdoc
      */
-    public function isValid(ResourceInterface $resource, $record = null)
+    public function isValid(ResourceObjectInterface $resource, $record = null)
     {
         $callback = $this->callback;
 

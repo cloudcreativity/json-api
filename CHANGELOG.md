@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file. This projec
 - Validation error messages for invalid attributes and query parameters can now be created via the validator error
 factory.
 
+### Changed
+- Renamed `Resource` to `ResourceObject`, along with associated interfaces, collections and testers. This is because
+`resource` is a reserved name in PHP.
+
+### Removed
+- Separated out the standard object implementation into a `cloudcreativity/utils-object` package and removed the
+classes, interfaces and utilities from this package.
+- Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
+
+### Fixed
+- [#30] Attributes that are objects are now cast as standard obejcts when iterating over attributes.
+
 ## [0.8.0] - 2017-05-20
 
 ### Added

@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Object;
 
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Interface RelationshipInterface

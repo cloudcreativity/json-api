@@ -27,7 +27,7 @@ use IteratorAggregate;
  *
  * @package CloudCreativity\JsonApi
  */
-interface ResourceCollectionInterface extends IteratorAggregate, Countable
+interface ResourceObjectCollectionInterface extends IteratorAggregate, Countable
 {
 
     /**
@@ -42,7 +42,7 @@ interface ResourceCollectionInterface extends IteratorAggregate, Countable
      * Get the resource with the supplied identifier.
      *
      * @param ResourceIdentifierInterface $identifier
-     * @return ResourceInterface
+     * @return ResourceObjectInterface
      * @throws RuntimeException
      *      if the collection does not contain a resource that matches the supplied identifier.
      */
@@ -51,7 +51,7 @@ interface ResourceCollectionInterface extends IteratorAggregate, Countable
     /**
      * Get the collection as an array.
      *
-     * @return ResourceInterface[]
+     * @return ResourceObjectInterface[]
      */
     public function getAll();
 

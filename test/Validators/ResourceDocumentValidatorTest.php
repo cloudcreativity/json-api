@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
@@ -562,7 +562,7 @@ JSON_API;
         $called = false;
         $record = new stdClass();
 
-        $context = function (ResourceInterface $resource, $obj) use (&$called, $record) {
+        $context = function (ResourceObjectInterface $resource, $obj) use (&$called, $record) {
             $this->assertSame($record, $obj);
             $this->assertEquals('posts', $resource->getType());
             $this->assertEquals('123', $resource->getId());

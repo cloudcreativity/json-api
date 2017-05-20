@@ -18,17 +18,17 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
-use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
+use CloudCreativity\Utils\Object\StandardObject;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class Resource
  *
  * @package CloudCreativity\JsonApi
  */
-class Resource extends StandardObject implements ResourceInterface
+class ResourceObject extends StandardObject implements ResourceObjectInterface
 {
 
     use IdentifiableTrait,
@@ -47,13 +47,13 @@ class Resource extends StandardObject implements ResourceInterface
      */
     public function getAttributes()
     {
-        $attributes = $this->get(self::ATTRIBUTES);
+        $attributes = $this->hasAttributes() ? $this->get(self::ATTRIBUTES) : new StandardObject();
 
-        if ($this->has(self::ATTRIBUTES) && !is_object($attributes)) {
+        if (!$attributes instanceof StandardObjectInterface) {
             throw new RuntimeException('Attributes member is not an object.');
         }
 
-        return new StandardObject($attributes);
+        return $attributes;
     }
 
     /**
@@ -69,9 +69,9 @@ class Resource extends StandardObject implements ResourceInterface
      */
     public function getRelationships()
     {
-        $relationships = $this->get(self::RELATIONSHIPS);
+        $relationships = $this->hasRelationships() ? $this->{self::RELATIONSHIPS} : null;
 
-        if ($this->has(self::RELATIONSHIPS) && !is_object($relationships)) {
+        if (!is_null($relationships) && !is_object($relationships)) {
             throw new RuntimeException('Relationships member is not an object.');
         }
 

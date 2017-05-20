@@ -26,7 +26,7 @@ use PHPUnit_Framework_Assert as PHPUnit;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourcesTester extends AbstractTraversableTester
+class ResourceObjectsTester extends AbstractTraversableTester
 {
 
     /**
@@ -55,7 +55,7 @@ class ResourcesTester extends AbstractTraversableTester
                 PHPUnit::fail(sprintf('Encountered a resource that is not an object at index %d', $index));
             }
 
-            yield $index => new ResourceTester($resource, $index);
+            yield $index => new ResourceObjectTester($resource, $index);
         }
     }
 
@@ -80,7 +80,7 @@ class ResourcesTester extends AbstractTraversableTester
      */
     public function getIdentifiers()
     {
-        $identifiers = $this->reduce(function (array $carry, ResourceTester $resource) {
+        $identifiers = $this->reduce(function (array $carry, ResourceObjectTester $resource) {
             $type = $resource->getType();
 
             if (!isset($carry[$type])) {
@@ -106,7 +106,7 @@ class ResourcesTester extends AbstractTraversableTester
         $expected = array_combine((array) $types, (array) $types);
         $actual = [];
 
-        /** @var ResourceTester $resource */
+        /** @var ResourceObjectTester $resource */
         foreach ($this as $resource) {
             $type = $resource->getType();
             $actual[$type] = $type;
@@ -138,13 +138,13 @@ class ResourcesTester extends AbstractTraversableTester
      * @param string $type
      * @param string|int $id
      * @param string|null $message
-     * @return ResourceTester|null
+     * @return ResourceObjectTester|null
      */
     public function assertResource($type, $id, $message = null)
     {
         $match = null;
 
-        /** @var ResourceTester $resource */
+        /** @var ResourceObjectTester $resource */
         foreach ($this as $resource) {
             if ($resource->is($type, $id)) {
                 $match = $resource;

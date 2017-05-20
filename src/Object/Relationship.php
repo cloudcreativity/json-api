@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
+use CloudCreativity\Utils\Object\StandardObject;
 
 /**
  * Class Relationship
@@ -56,7 +56,7 @@ class Relationship extends StandardObject implements RelationshipInterface
             throw new RuntimeException('No data member or data member is not a valid has-one relationship.');
         }
 
-        $data = $this->get(self::DATA);
+        $data = $this->{self::DATA};
 
         if (!$data) {
             throw new RuntimeException('No resource identifier - relationship is empty.');
@@ -70,9 +70,7 @@ class Relationship extends StandardObject implements RelationshipInterface
      */
     public function hasIdentifier()
     {
-        $data = $this->get(self::DATA);
-
-        return is_object($data);
+        return is_object($this->{self::DATA});
     }
 
     /**
@@ -84,7 +82,7 @@ class Relationship extends StandardObject implements RelationshipInterface
             return false;
         }
 
-        $data = $this->get(self::DATA);
+        $data = $this->{self::DATA};
 
         return is_null($data) || is_object($data);
     }
@@ -98,7 +96,7 @@ class Relationship extends StandardObject implements RelationshipInterface
             throw new RuntimeException('No data member of data member is not a valid has-many relationship.');
         }
 
-        return ResourceIdentifierCollection::create($this->get(self::DATA));
+        return ResourceIdentifierCollection::create($this->{self::DATA});
     }
 
     /**
@@ -106,6 +104,6 @@ class Relationship extends StandardObject implements RelationshipInterface
      */
     public function isHasMany()
     {
-        return is_array($this->get(self::DATA));
+        return is_array($this->{self::DATA});
     }
 }

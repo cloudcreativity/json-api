@@ -102,7 +102,7 @@ class DocumentTester
      * Assert that the data member is an object and return a resource tester.
      *
      * @param string|null $message
-     * @return ResourceTester
+     * @return ResourceObjectTester
      */
     public function assertResource($message = null)
     {
@@ -111,14 +111,14 @@ class DocumentTester
 
         PHPUnit::assertInternalType('object', $resource, $message);
 
-        return new ResourceTester($resource);
+        return new ResourceObjectTester($resource);
     }
 
     /**
      * Assert that the data member is a collection, and return it as a resource collection tester.
      *
      * @param string|null $message
-     * @return ResourcesTester
+     * @return ResourceObjectsTester
      */
     public function assertResourceCollection($message = null)
     {
@@ -127,21 +127,21 @@ class DocumentTester
 
         PHPUnit::assertInternalType('array', $collection, $message);
 
-        return new ResourcesTester($collection);
+        return new ResourceObjectsTester($collection);
     }
 
     /**
      * Assert that the included member is an array, and return it as a resource collection tester.
      *
      * @param string|null $message
-     * @return ResourcesTester
+     * @return ResourceObjectsTester
      */
     public function assertIncluded($message = null)
     {
         $message = $message ?: 'Document does not contain an included member.';
         PHPUnit::assertObjectHasAttribute(Keys::KEYWORD_INCLUDED, $this->document, $message);
 
-        return new ResourcesTester((array) $this->document->{Keys::KEYWORD_INCLUDED});
+        return new ResourceObjectsTester((array) $this->document->{Keys::KEYWORD_INCLUDED});
     }
 
     /**
