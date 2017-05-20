@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Helpers;
+namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
@@ -28,19 +28,6 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
  */
 trait IdentifiableTrait
 {
-
-    /**
-     * @param $key
-     * @param $default
-     * @return mixed
-     */
-    abstract public function get($key, $default = null);
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    abstract public function has($key);
 
     /**
      * @return string

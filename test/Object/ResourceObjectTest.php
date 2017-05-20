@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\TestCase;
+use CloudCreativity\Utils\Object\StandardObject;
 use stdClass;
 
 /**
@@ -37,35 +38,35 @@ class ResourceObjectTest extends TestCase
     protected function setUp()
     {
         $data = new stdClass();
-        $data->{ResourceObjectObject::TYPE} = self::TYPE;
-        $data->{ResourceObjectObject::ID} = self::ID;
-        $data->{ResourceObjectObject::ATTRIBUTES} = new stdClass();
-        $data->{ResourceObjectObject::ATTRIBUTES}->foo = 'bar';
-        $data->{ResourceObjectObject::RELATIONSHIPS} = new stdClass();
-        $data->{ResourceObjectObject::RELATIONSHIPS}->baz = null;
-        $data->{ResourceObjectObject::META} = new stdClass();
-        $data->{ResourceObjectObject::META}->bat = 'foobar';
+        $data->{ResourceObject::TYPE} = self::TYPE;
+        $data->{ResourceObject::ID} = self::ID;
+        $data->{ResourceObject::ATTRIBUTES} = new stdClass();
+        $data->{ResourceObject::ATTRIBUTES}->foo = 'bar';
+        $data->{ResourceObject::RELATIONSHIPS} = new stdClass();
+        $data->{ResourceObject::RELATIONSHIPS}->baz = null;
+        $data->{ResourceObject::META} = new stdClass();
+        $data->{ResourceObject::META}->bat = 'foobar';
 
         $this->data = $data;
     }
 
     public function testGetType()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertSame(self::TYPE, $object->getType());
     }
 
     public function testGetId()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertSame(self::ID, $object->getId());
     }
 
     public function testHasId()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertTrue($object->hasId());
-        unset($this->data->{ResourceObjectObject::ID});
+        unset($this->data->{ResourceObject::ID});
         $this->assertFalse($object->hasId());
     }
 
@@ -73,61 +74,61 @@ class ResourceObjectTest extends TestCase
     {
         $expected = ResourceIdentifier::create(self::TYPE, self::ID);
 
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertEquals($expected, $object->getIdentifier());
     }
 
     public function testGetAttributes()
     {
-        $object = new ResourceObjectObject($this->data);
-        $expected = new StandardObject($this->data->{ResourceObjectObject::ATTRIBUTES});
+        $object = new ResourceObject($this->data);
+        $expected = new StandardObject($this->data->{ResourceObject::ATTRIBUTES});
 
         $this->assertEquals($expected, $object->getAttributes());
     }
 
     public function testGetEmptyAttributes()
     {
-        unset($this->data->{ResourceObjectObject::ATTRIBUTES});
-        $object = new ResourceObjectObject($this->data);
+        unset($this->data->{ResourceObject::ATTRIBUTES});
+        $object = new ResourceObject($this->data);
         $this->assertEquals(new StandardObject(), $object->getAttributes());
     }
 
     public function testHasAttributes()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertTrue($object->hasAttributes());
-        unset($this->data->{ResourceObjectObject::ATTRIBUTES});
+        unset($this->data->{ResourceObject::ATTRIBUTES});
         $this->assertFalse($object->hasAttributes());
     }
 
     public function testGetRelationships()
     {
-        $expected = new Relationships($this->data->{ResourceObjectObject::RELATIONSHIPS});
-        $object = new ResourceObjectObject($this->data);
+        $expected = new Relationships($this->data->{ResourceObject::RELATIONSHIPS});
+        $object = new ResourceObject($this->data);
 
         $this->assertEquals($expected, $object->getRelationships());
     }
 
     public function testHasRelationships()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertTrue($object->hasRelationships());
-        unset($this->data->{ResourceObjectObject::RELATIONSHIPS});
+        unset($this->data->{ResourceObject::RELATIONSHIPS});
         $this->assertFalse($object->hasRelationships());
     }
 
     public function getMeta()
     {
-        $expected = new StandardObject($this->data->{ResourceObjectObject::META});
-        $object = new ResourceObjectObject($this->data);
+        $expected = new StandardObject($this->data->{ResourceObject::META});
+        $object = new ResourceObject($this->data);
         $this->assertEquals($expected, $object->getMeta());
     }
 
     public function testHasMeta()
     {
-        $object = new ResourceObjectObject($this->data);
+        $object = new ResourceObject($this->data);
         $this->assertTrue($object->hasMeta());
-        unset($this->data->{ResourceObjectObject::META});
+        unset($this->data->{ResourceObject::META});
         $this->assertFalse($object->hasMeta());
     }
 }

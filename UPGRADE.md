@@ -14,9 +14,20 @@ The following have therefore been renamed:
 - `Contracts\Object\ResourceInterface` to `Contracts\Object\ResourceObjectInterface`
 - `Object\Resource` to `Object\ResourceObject`
 - `Contracts\Object\ResourceCollectionInterface` to `Contracts\Object\ResourceObjectCollectionInterface`
-- `Object\ResourceCollection` to `Object\ResourceObjectCollection`.
-- `Testing\ResourceTester` to `Testing\ResourceObjectTester`.
-- `Testing\ResourcesTester` to `Testing\ResourceObjectsTester`.
+- `Object\ResourceCollection` to `Object\ResourceObjectCollection`
+- `Testing\ResourceTester` to `Testing\ResourceObjectTester`
+- `Testing\ResourcesTester` to `Testing\ResourceObjectsTester`
+
+## Standard Object
+
+The standard object implementation has been separated out into its own package: `cloudcreativity/utils-object`. 
+The following no longer exist in this package and need to be namespaced to the new package:
+
+- `Contracts\Object\StandardObjectInterface` to `\CloudCreativity\Utils\Object\StandardObjectInterface`
+- `Object\StandardObject` to `\CloudCreativity\Utils\Object\StandardObject`
+
+The method signatures and some of the method names have been changed on the new interface so you may need to 
+rename method calls appropriately: refer to the new interface.
 
 ### Validator Error Factory
 

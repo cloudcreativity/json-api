@@ -21,8 +21,9 @@ namespace CloudCreativity\JsonApi\Hydrator;
 use CloudCreativity\JsonApi\Contracts\Hydrator\HydratesRelatedInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\Utils\Str;
+use CloudCreativity\Utils\Object\StandardObject;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class TestHydrator
@@ -132,8 +133,10 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
      */
     protected function hydrateRelatedAuthor(StandardObject $object, $record)
     {
-        return $object->transformKeys(function ($key) {
+        $object->transformKeys(function ($key) {
             return Str::underscore($key);
-        })->getProxy();
+        });
+
+        return (object) $object->toArray();
     }
 }

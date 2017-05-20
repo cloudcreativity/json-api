@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\TestCase;
+use CloudCreativity\Utils\Object\StandardObject;
 use stdClass;
 
 /**

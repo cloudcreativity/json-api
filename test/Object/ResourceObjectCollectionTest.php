@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectCollectionInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\ResourceObjectObject as ResourceObject;
+use CloudCreativity\JsonApi\Object\ResourceObject as ResourceObject;
 use CloudCreativity\JsonApi\TestCase;
 use stdClass;
 
@@ -134,7 +134,7 @@ JSON_API;
     }
 
     /**
-     * @return ResourceObjectObject
+     * @return ResourceObject
      */
     private function resourceA()
     {
@@ -144,11 +144,11 @@ JSON_API;
         $resource->attributes = new stdClass();
         $resource->attributes->title = 'My First Post';
 
-        return new ResourceObjectObject($resource);
+        return new ResourceObject($resource);
     }
 
     /**
-     * @return ResourceObjectObject
+     * @return ResourceObject
      */
     private function resourceB()
     {
@@ -158,6 +158,6 @@ JSON_API;
         $resource->attributes = new stdClass();
         $resource->attributes->title = 'My Last Post';
 
-        return new ResourceObjectObject($resource);
+        return new ResourceObject($resource);
     }
 }

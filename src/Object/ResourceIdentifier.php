@@ -20,8 +20,7 @@ namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Helpers\IdentifiableTrait;
-use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
+use CloudCreativity\Utils\Object\StandardObject;
 
 /**
  * Class ResourceIdentifier
@@ -105,6 +104,5 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     {
         return sprintf('%s:%s', $this->getType(), $this->getId());
     }
-
 
 }

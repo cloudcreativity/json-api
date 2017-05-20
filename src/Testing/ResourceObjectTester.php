@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use CloudCreativity\JsonApi\Object\Helpers\ObjectUtils;
+use CloudCreativity\Utils\Object\Obj;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as Keys;
 use PHPUnit_Framework_Assert as PHPUnit;
 use stdClass;
@@ -212,8 +212,8 @@ class ResourceObjectTester
      */
     public function assertAttributesSubset($expected, $message = null)
     {
-        $expected = ObjectUtils::toArray($expected);
-        $actual = ObjectUtils::toArray($this->getAttributes() ?: []);
+        $expected = Obj::toArray($expected);
+        $actual = Obj::toArray($this->getAttributes() ?: []);
         $message = $message ?
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource attributes') . ': ' . json_encode($actual);
@@ -241,8 +241,8 @@ class ResourceObjectTester
      */
     public function assertRelationshipsSubset($expected, $message = null)
     {
-        $expected = ObjectUtils::toArray($expected);
-        $actual = ObjectUtils::toArray($this->getRelationships() ?: []);
+        $expected = Obj::toArray($expected);
+        $actual = Obj::toArray($this->getRelationships() ?: []);
         $message = $message ?
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource relationships') . ': ' . json_encode($actual);

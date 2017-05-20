@@ -45,7 +45,7 @@ class ResourceObjectCollection implements ResourceObjectCollectionInterface
     public static function create(array $resources)
     {
         $resources = array_map(function ($resource) {
-            return ($resource instanceof ResourceObjectInterface) ? $resource : new ResourceObjectObject($resource);
+            return ($resource instanceof ResourceObjectInterface) ? $resource : new ResourceObject($resource);
         }, $resources);
 
         return new self($resources);

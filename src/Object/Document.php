@@ -20,7 +20,8 @@ namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Helpers\MetaMemberTrait;
+use CloudCreativity\Utils\Object\StandardObject;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class Document
@@ -47,11 +48,11 @@ class Document extends StandardObject implements DocumentInterface
             return $data;
         }
 
-        if (!is_object($data)) {
+        if ($data instanceof StandardObjectInterface) {
             throw new RuntimeException('Data member is not an object or null.');
         }
 
-        return new StandardObject($data);
+        return $data;
     }
 
     /**
@@ -59,13 +60,13 @@ class Document extends StandardObject implements DocumentInterface
      */
     public function getResource()
     {
-        $data = $this->get(self::DATA);
+        $data = $this->{self::DATA};
 
         if (!is_object($data)) {
             throw new RuntimeException('Data member is not an object.');
         }
 
-        return new ResourceObjectObject($data);
+        return new ResourceObject($data);
     }
 
     /**
@@ -88,6 +89,6 @@ class Document extends StandardObject implements DocumentInterface
      */
     public function getRelationship()
     {
-        return new Relationship($this->getProxy());
+        return new Relationship($this->proxy);
     }
 }

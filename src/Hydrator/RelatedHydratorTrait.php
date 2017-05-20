@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\Utils\Str;
+use CloudCreativity\Utils\Object\StandardObject;
 use stdClass;
 
 /**

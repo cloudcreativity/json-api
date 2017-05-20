@@ -23,8 +23,8 @@ use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use CloudCreativity\JsonApi\TestCase;
+use CloudCreativity\Utils\Object\StandardObject;
 use PHPUnit_Framework_MockObject_MockObject;
 
 /**

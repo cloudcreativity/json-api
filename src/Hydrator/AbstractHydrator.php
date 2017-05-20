@@ -22,8 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Hydrator\HydratorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class AbstractHydrator

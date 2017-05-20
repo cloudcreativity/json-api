@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 use DateTime;
 
 /**
