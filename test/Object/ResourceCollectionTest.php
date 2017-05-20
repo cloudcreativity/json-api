@@ -29,7 +29,7 @@ use stdClass;
  *
  * @package CloudCreativity\JsonApi
  */
-final class ResourceCollectionTest extends TestCase
+class ResourceCollectionTest extends TestCase
 {
 
     public function testCreate()

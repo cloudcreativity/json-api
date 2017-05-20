@@ -28,7 +28,7 @@ use Neomerx\JsonApi\Exceptions\ErrorCollection;
  *
  * @package CloudCreativity\JsonApi
  */
-final class MutableErrorCollectionTest extends TestCase
+class MutableErrorCollectionTest extends TestCase
 {
 
     public function testIterator()

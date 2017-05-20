@@ -23,7 +23,7 @@ namespace CloudCreativity\JsonApi\Testing;
  *
  * @package CloudCreativity\JsonApi
  */
-final class ResourcesTesterTest extends TestCase
+class ResourcesTesterTest extends TestCase
 {
 
     public function testTypes()

@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\TestCase;
  *
  * @package CloudCreativity\JsonApi
  */
-final class AuthorizationExceptionTest extends TestCase
+class AuthorizationExceptionTest extends TestCase
 {
 
     public function testDefaultStatus()

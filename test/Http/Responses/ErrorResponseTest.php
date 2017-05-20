@@ -27,7 +27,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  *
  * @package CloudCreativity\JsonApi
  */
-final class ErrorResponseTest extends TestCase
+class ErrorResponseTest extends TestCase
 {
 
     public function testResolveErrorStatusNoStatus()

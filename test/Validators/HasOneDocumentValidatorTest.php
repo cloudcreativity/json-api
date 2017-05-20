@@ -32,7 +32,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
  *
  * @package CloudCreativity\JsonApi
  */
-final class HasOneDocumentValidatorTest extends TestCase
+class HasOneDocumentValidatorTest extends TestCase
 {
 
     /**

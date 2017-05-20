@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\Exceptions\InvalidArgumentException;
  *
  * @package CloudCreativity\JsonApi
  */
-final class IdentityMap
+class IdentityMap
 {
 
     /**

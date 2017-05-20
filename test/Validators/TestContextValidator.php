@@ -27,7 +27,7 @@ use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
  *
  * @package CloudCreativity\JsonApi
  */
-final class TestContextValidator implements ResourceValidatorInterface
+class TestContextValidator implements ResourceValidatorInterface
 {
 
     use ErrorsAwareTrait;

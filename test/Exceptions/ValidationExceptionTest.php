@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\TestCase;
  *
  * @package CloudCreativity\JsonApi
  */
-final class ValidationExceptionTest extends TestCase
+class ValidationExceptionTest extends TestCase
 {
 
     public function testDefaultStatus()

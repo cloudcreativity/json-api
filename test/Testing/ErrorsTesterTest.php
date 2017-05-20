@@ -23,7 +23,7 @@ namespace CloudCreativity\JsonApi\Testing;
  *
  * @package CloudCreativity\JsonApi
  */
-final class ErrorsTesterTest extends TestCase
+class ErrorsTesterTest extends TestCase
 {
 
     public function testNoErrors()

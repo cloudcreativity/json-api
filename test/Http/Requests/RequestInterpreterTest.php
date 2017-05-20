@@ -26,7 +26,7 @@ use CloudCreativity\JsonApi\TestCase;
  *
  * @package CloudCreativity\JsonApi
  */
-final class RequestInterpreterTest extends TestCase
+class RequestInterpreterTest extends TestCase
 {
 
     /**

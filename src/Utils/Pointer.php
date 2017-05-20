@@ -25,7 +25,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface as Keys;
  *
  * @package CloudCreativity\JsonApi
  */
-final class Pointer
+class Pointer
 {
 
     /**
