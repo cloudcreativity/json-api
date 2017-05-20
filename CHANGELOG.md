@@ -15,6 +15,10 @@ factory.
 ### Removed
 - Separated out the standard object implementation into a `cloudcreativity/utils-object` package and removed the
 classes, interfaces and utilities from this package.
+- Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
+
+### Fixed
+- [#30] Attributes that are objects are now cast as standard obejcts when iterating over attributes.
 
 ## [0.8.0] - 2017-05-20
 

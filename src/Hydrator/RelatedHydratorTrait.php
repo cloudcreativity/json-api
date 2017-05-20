@@ -20,8 +20,6 @@ namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Utils\Str;
-use CloudCreativity\Utils\Object\StandardObject;
-use stdClass;
 
 /**
  * Class RelatedHydratorTrait
@@ -30,18 +28,6 @@ use stdClass;
  */
 trait RelatedHydratorTrait
 {
-
-    /**
-     * @param $relationshipKey
-     * @param RelationshipInterface $relationship
-     * @param $record
-     * @return false|null|\object[]
-     * @deprecated use `callHydrateRelatedRelationship` instead
-     */
-    protected function callHydrateRelated($relationshipKey, RelationshipInterface $relationship, $record)
-    {
-        return $this->callHydrateRelatedRelationship($relationshipKey, $relationship, $record);
-    }
 
     /**
      * @param $attributeKey
@@ -57,16 +43,7 @@ trait RelatedHydratorTrait
             return null;
         }
 
-        /**
-         * Temporary fix for standard object iteration
-         *
-         * @see https://github.com/cloudcreativity/json-api/issues/30
-         * @todo change this when that bug is fixed.
-         */
-        $value = ($attributeValue instanceof stdClass) ?
-            new StandardObject($attributeValue) : $attributeValue;
-
-        return call_user_func([$this, $method], $value, $record);
+        return call_user_func([$this, $method], $attributeValue, $record);
     }
 
     /**

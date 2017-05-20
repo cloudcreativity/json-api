@@ -79,7 +79,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
 
         /** @var RelationshipInterface $relationship */
         foreach ($resource->getRelationships()->getAll() as $key => $relationship) {
-            $result = $this->callHydrateRelated($key, $relationship, $record);
+            $result = $this->callHydrateRelatedRelationship($key, $relationship, $record);
 
             if (is_array($result)) {
                 $results = array_merge($results, $result);
@@ -127,11 +127,11 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
     }
 
     /**
-     * @param StandardObject $object
+     * @param StandardObjectInterface $object
      * @param $record
      * @return object
      */
-    protected function hydrateRelatedAuthor(StandardObject $object, $record)
+    protected function hydrateRelatedAuthor(StandardObjectInterface $object, $record)
     {
         $object->transformKeys(function ($key) {
             return Str::underscore($key);
