@@ -60,6 +60,15 @@ return [
     ],
 
     /**
+     * Used when generating JSON API errors from validation messages (usually from a framework specific validator)
+     * for the attributes member of a resource object.
+     */
+    V::RESOURCE_INVALID_ATTRIBUTES_MESSAGES => [
+        Error::TITLE => 'Invalid Attribute',
+        Error::STATUS => 422,
+    ],
+
+    /**
      * Used when relationships are invalid but there are no validation error messages in the relationships validator.
      */
     V::RESOURCE_INVALID_RELATIONSHIPS => [
@@ -129,6 +138,14 @@ return [
     V::RELATIONSHIP_UNSUPPORTED_TYPE => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => "Resource '{actual}' is not among the type(s) supported by this relationship. Expecting only '{expected}' resources.",
+        Error::STATUS => 400,
+    ],
+
+    /**
+     * Used when creating messages about the query parameters, usually from a framework specific validator.
+     */
+    V::QUERY_PARAMETERS_MESSAGES => [
+        Error::TITLE => 'Invalid Query Parameter',
         Error::STATUS => 400,
     ],
 ];

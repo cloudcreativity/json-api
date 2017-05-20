@@ -2,6 +2,16 @@
 
 This file provides notes on how to upgrade between versions.
 
+## v0.8 to v0.9
+
+### Validator Error Factory
+
+If you are implementing the validator error factory interface anywhere in your code, you will need to add the 
+following new methods:
+
+- `resourceInvalidAttributesMessages()`
+- `queryParametersMessages()`
+
 ## v0.7 to v0.8
 
 ### Factories

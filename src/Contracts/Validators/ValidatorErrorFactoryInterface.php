@@ -192,4 +192,24 @@ interface ValidatorErrorFactoryInterface
         $relationshipKey = null,
         $errors = null
     );
+
+    /**
+     * @param mixed $messages
+     *      validation messages
+     * @param string|null $prefix
+     *      a prefix if the validation messages relate to a nested attribute.
+     * @param int $statusCode
+     * @return ErrorCollection
+     */
+    public function resourceInvalidAttributesMessages($messages, $prefix = null, $statusCode = 422);
+
+    /**
+     * @param mixed $messages
+     *      validation messages
+     * @param string|null $prefix
+     *      a prefix if the validation messages relate to a nested parameter.
+     * @param int $statusCode
+     * @return ErrorCollection
+     */
+    public function queryParametersMessages($messages, $prefix = null, $statusCode = 400);
 }
