@@ -29,6 +29,7 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 
 /**
  * Class ValidatorFactory
+ *
  * @package CloudCreativity\JsonApi
  */
 class ValidatorFactory implements ValidatorFactoryInterface
@@ -46,6 +47,7 @@ class ValidatorFactory implements ValidatorFactoryInterface
 
     /**
      * ValidatorFactory constructor.
+     *
      * @param ValidatorErrorFactoryInterface $validationErrors
      * @param StoreInterface $store
      */

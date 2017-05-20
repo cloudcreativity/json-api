@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 
 /**
  * Class InterpretsHttpRequests
+ *
  * @package CloudCreativity\JsonApi
  */
 abstract class AbstractRequestInterpreter implements RequestInterpreterInterface
@@ -174,10 +175,10 @@ abstract class AbstractRequestInterpreter implements RequestInterpreterInterface
     public function isExpectingDocument()
     {
         return $this->isCreateResource() ||
-        $this->isUpdateResource() ||
-        $this->isReplaceRelationship() ||
-        $this->isAddToRelationship() ||
-        $this->isRemoveFromRelationship();
+            $this->isUpdateResource() ||
+            $this->isReplaceRelationship() ||
+            $this->isAddToRelationship() ||
+            $this->isRemoveFromRelationship();
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**
  * Class HasManyDocumentValidatorTest
+ *
  * @package CloudCreativity\JsonApi
  */
 final class HasManyDocumentValidatorTest extends TestCase
@@ -230,7 +231,9 @@ JSON_API;
      */
     public function testDataNotAcceptable(Document $document)
     {
-        $validator = $this->hasMany(false, true, function () { return false; });
+        $validator = $this->hasMany(false, true, function () {
+            return false;
+        });
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::RELATIONSHIP_NOT_ACCEPTABLE);

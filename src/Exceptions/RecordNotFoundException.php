@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ use Exception;
 
 /**
  * Class RecordNotFoundException
+ *
  * @package CloudCreativity\JsonApi
  */
 class RecordNotFoundException extends RuntimeException
@@ -35,6 +36,7 @@ class RecordNotFoundException extends RuntimeException
 
     /**
      * RecordNotFoundException constructor.
+     *
      * @param ResourceIdentifierInterface $identifier
      * @param int $code
      * @param Exception|null $previous

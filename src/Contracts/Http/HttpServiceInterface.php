@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
  * Interface HttpServiceInterface
+ *
  * @package CloudCreativity\JsonApi
  */
 interface HttpServiceInterface

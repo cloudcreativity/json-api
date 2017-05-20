@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use stdClass;
 
 /**
  * Class ErrorTester
+ *
  * @package CloudCreativity\JsonApi
  */
 class ErrorTester
@@ -42,6 +43,7 @@ class ErrorTester
 
     /**
      * ErrorTester constructor.
+     *
      * @param stdClass $error
      * @param int $index
      *      the index within the error collection at which this error exists.

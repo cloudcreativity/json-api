@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 
 /**
  * Class RelationshipDocumentValidator
+ *
  * @package CloudCreativity\JsonApi
  */
 class RelationshipDocumentValidator implements DocumentValidatorInterface
@@ -45,6 +46,7 @@ class RelationshipDocumentValidator implements DocumentValidatorInterface
 
     /**
      * RelationshipDocumentValidator constructor.
+     *
      * @param ValidatorErrorFactoryInterface $errorFactory
      * @param RelationshipValidatorInterface $validator
      */

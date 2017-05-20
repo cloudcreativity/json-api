@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ use PHPUnit_Framework_Assert as PHPUnit;
 
 /**
  * Class ResourcesTester
+ *
  * @package CloudCreativity\JsonApi
  */
 class ResourcesTester extends AbstractTraversableTester
@@ -35,6 +36,7 @@ class ResourcesTester extends AbstractTraversableTester
 
     /**
      * ResourcesTester constructor.
+     *
      * @param array $resources
      */
     public function __construct(array $resources)

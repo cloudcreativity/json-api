@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ use CloudCreativity\JsonApi\Utils\Pointer as P;
 
 /**
  * Class AbstractRelationshipValidator
+ *
  * @package CloudCreativity\JsonApi
  */
 abstract class AbstractRelationshipValidator implements RelationshipValidatorInterface
@@ -66,6 +67,7 @@ abstract class AbstractRelationshipValidator implements RelationshipValidatorInt
 
     /**
      * HasOneValidator constructor.
+     *
      * @param ValidatorErrorFactoryInterface $errorFactory
      * @param StoreInterface $store
      * @param string|string[]|null $expectedType

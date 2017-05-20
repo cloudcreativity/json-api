@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ use stdClass;
 
 /**
  * Class ResourceDocumentValidatorTest
+ *
  * @package CloudCreativity\JsonApi
  */
-final class ResourceDocumentValidatorTest extends TestCase
+class ResourceDocumentValidatorTest extends TestCase
 {
 
     /**
@@ -372,8 +373,9 @@ JSON_API;
         $validator = $this->validator('posts', '1');
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->getErrors(), '/data/relationships', Keys::MEMBER_OBJECT_EXPECTED);
-        $this->assertDetailContains($validator->getErrors(), '/data/relationships', DocumentInterface::KEYWORD_RELATIONSHIPS);
+        $errors = $validator->getErrors();
+        $this->assertErrorAt($errors, '/data/relationships', Keys::MEMBER_OBJECT_EXPECTED);
+        $this->assertDetailContains($errors, '/data/relationships', DocumentInterface::KEYWORD_RELATIONSHIPS);
     }
 
     public function testDataRelationshipNotObject()
@@ -419,8 +421,9 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::MEMBER_REQUIRED);
-        $this->assertDetailContains($validator->getErrors(), '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
+        $errors = $validator->getErrors();
+        $this->assertErrorAt($errors, '/data/relationships/user', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($errors, '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
     }
 
     public function testDataRelationshipInvalidData()
@@ -445,8 +448,9 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->getErrors(), '/data/relationships/user', Keys::MEMBER_RELATIONSHIP_EXPECTED);
-        $this->assertDetailContains($validator->getErrors(), '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
+        $errors = $validator->getErrors();
+        $this->assertErrorAt($errors, '/data/relationships/user', Keys::MEMBER_RELATIONSHIP_EXPECTED);
+        $this->assertDetailContains($errors, '/data/relationships/user', DocumentInterface::KEYWORD_DATA);
     }
 
     public function testDataNonExistingRelationship()
@@ -673,6 +677,7 @@ JSON_API;
         $mock->method('isValid')->willReturn($valid);
         $mock->method('getErrors')->willReturn(new ErrorCollection());
 
+        /** @var AttributesValidatorInterface $mock */
         return $mock;
     }
 

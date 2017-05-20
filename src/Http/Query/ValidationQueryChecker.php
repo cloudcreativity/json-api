@@ -18,10 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Http\Query;
 
+use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
-use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 
 /**
  * Class ExtendedQueryChecker

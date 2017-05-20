@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ use Neomerx\JsonApi\Factories\Factory;
 
 /**
  * Class SchemasRepositoryTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class SchemasRepositoryTest extends TestCase
@@ -71,7 +72,7 @@ class SchemasRepositoryTest extends TestCase
 
     public function testDefaults()
     {
-        $this->assertEquals($this->defaults,  $this->repository->getSchemas());
+        $this->assertEquals($this->defaults, $this->repository->getSchemas());
         $this->assertEquals($this->defaults, $this->repository->getSchemas(SchemasRepository::DEFAULTS));
     }
 

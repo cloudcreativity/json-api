@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2015 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ namespace CloudCreativity\JsonApi\Decoders;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 use CloudCreativity\JsonApi\TestCase;
-use Exception;
 
 /**
  * Class DocumentDecoderTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class DocumentDecoderTest extends TestCase

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Class ValidationException
+ *
  * @package CloudCreativity\JsonApi
  */
 class ValidationException extends JsonApiException
@@ -32,6 +33,7 @@ class ValidationException extends JsonApiException
 
     /**
      * ValidationException constructor.
+     *
      * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
      * @param string|int|null $defaultHttpCode
      * @param Exception|null $previous

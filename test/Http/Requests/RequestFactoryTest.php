@@ -38,6 +38,7 @@ use stdClass;
 
 /**
  * Class RequestFactoryTest
+ *
  * @package CloudCreativity\JsonApi
  */
 class RequestFactoryTest extends TestCase

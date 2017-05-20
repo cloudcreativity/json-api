@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Utils\ErrorsAwareTrait;
 
 /**
  * Class TestContextValidator
+ *
  * @package CloudCreativity\JsonApi
  */
 final class TestContextValidator implements ResourceValidatorInterface
@@ -38,6 +39,7 @@ final class TestContextValidator implements ResourceValidatorInterface
 
     /**
      * TestContextValidator constructor.
+     *
      * @param callable $callback
      */
     public function __construct(callable $callback)
