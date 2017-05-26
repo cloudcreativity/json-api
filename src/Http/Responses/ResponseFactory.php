@@ -18,10 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseFactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 use Neomerx\JsonApi\Contracts\Http\ResponsesInterface;
 
@@ -39,20 +39,20 @@ class ResponseFactory implements ResponseFactoryInterface
     private $responses;
 
     /**
-     * @var HttpServiceInterface
+     * @var ErrorRepositoryInterface
      */
-    private $httpService;
+    private $errorRepository;
 
     /**
      * ResponseFactory constructor.
      *
      * @param ResponsesInterface $responses
-     * @param HttpServiceInterface $httpService
+     * @param ErrorRepositoryInterface $errorRepository
      */
-    public function __construct(ResponsesInterface $responses, HttpServiceInterface $httpService)
+    public function __construct(ResponsesInterface $responses, ErrorRepositoryInterface $errorRepository)
     {
         $this->responses = $responses;
-        $this->httpService = $httpService;
+        $this->errorRepository = $errorRepository;
     }
 
     /**
@@ -127,7 +127,7 @@ class ResponseFactory implements ResponseFactoryInterface
     public function error($errors, $defaultStatusCode = null, array $headers = [])
     {
         if (is_string($errors)) {
-            $errors = $this->httpService->getApi()->getErrors()->error($errors);
+            $errors = $this->errorRepository->error($errors);
         }
 
         $response = new ErrorResponse($errors, $defaultStatusCode, $headers);

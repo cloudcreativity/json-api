@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Http\HttpServiceInterface;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use Neomerx\JsonApi\Http\Headers\MediaType;
 use Neomerx\JsonApi\Http\Responses;
 
 /**
@@ -32,18 +32,25 @@ abstract class AbstractResponses extends Responses
 {
 
     /**
-     * @var HttpServiceInterface
+     * @var ApiInterface
      */
-    private $service;
+    private $api;
+
+    /**
+     * @var RequestInterface|null
+     */
+    private $request;
 
     /**
      * AbstractResponses constructor.
      *
-     * @param HttpServiceInterface $service
+     * @param ApiInterface $api
+     * @param RequestInterface|null $request
      */
-    public function __construct(HttpServiceInterface $service)
+    public function __construct(ApiInterface $api, RequestInterface $request = null)
     {
-        $this->service = $service;
+        $this->api = $api;
+        $this->request = $request;
     }
 
     /**
@@ -51,7 +58,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncoder()
     {
-        return $this->service->getApi()->getEncoder();
+        return $this->api->getEncoder();
     }
 
     /**
@@ -59,7 +66,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getUrlPrefix()
     {
-        return $this->service->getApi()->getUrlPrefix();
+        return $this->api->getUrlPrefix();
     }
 
     /**
@@ -67,11 +74,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncodingParameters()
     {
-        if (!$this->service->hasRequest()) {
-            return null;
-        }
-
-        return $this->service->getRequest()->getParameters();
+        return $this->request ? $this->request->getParameters() : null;
     }
 
     /**
@@ -79,7 +82,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSchemaContainer()
     {
-        return $this->service->getApi()->getSchemas();
+        return $this->api->getSchemas();
     }
 
     /**
@@ -87,7 +90,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSupportedExtensions()
     {
-        return $this->service->getApi()->getSupportedExts();
+        return $this->api->getSupportedExts();
     }
 
     /**
@@ -95,17 +98,9 @@ abstract class AbstractResponses extends Responses
      */
     protected function getMediaType()
     {
-        $type = $this
-            ->service
-            ->getApi()
-            ->getCodecMatcher()
-            ->getEncoderRegisteredMatchedType();
+        $type = $this->api->getCodecMatcher()->getEncoderRegisteredMatchedType();
 
-        if (!$type instanceof MediaTypeInterface) {
-            throw new RuntimeException('No matching media type for encoded JSON-API response.');
-        }
-
-        return $type;
+        return $type ?: MediaType::parse(0, MediaType::JSON_API_MEDIA_TYPE);
     }
 
 }
