@@ -57,6 +57,24 @@ interface ValidatorErrorFactoryInterface
     public function memberObjectExpected($memberKey, $pointer);
 
     /**
+     * A member is expected to be a string.
+     *
+     * @param $memberKey
+     * @param $pointer
+     * @return ErrorInterface
+     */
+    public function memberStringExpected($memberKey, $pointer);
+
+    /**
+     * A member has an empty value, but a value is expected.
+     *
+     * @param $memberKey
+     * @param $pointer
+     * @return ErrorInterface
+     */
+    public function memberEmptyNotAllowed($memberKey, $pointer);
+
+    /**
      * A member is expected to be a relationship - object, array or null.
      *
      * @param $memberKey

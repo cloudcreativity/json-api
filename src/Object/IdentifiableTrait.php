@@ -70,11 +70,11 @@ trait IdentifiableTrait
 
         $id = $this->get(DocumentInterface::KEYWORD_ID);
 
-        if (!is_string($id) && !is_int($id)) {
-            throw new RuntimeException('Id member is not a string or integer.');
+        if (!is_string($id)) {
+            throw new RuntimeException('Id member is not a string.');
         }
 
-        if (is_string($id) && empty($id)) {
+        if (empty($id)) {
             throw new RuntimeException('Id member is an empty string.');
         }
 

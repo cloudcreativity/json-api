@@ -140,6 +140,44 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
+    public function testDataTypeNull()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": null,
+        "id": "99"
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_STRING_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
+    }
+
+    public function testDataTypeEmptyString()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "",
+        "id": "99"
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_EMPTY_NOT_ALLOWED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
+    }
+
     public function testDataTypeUnknown()
     {
         $content = <<<JSON_API
@@ -195,6 +233,63 @@ JSON_API;
 
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdNull()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "users",
+        "id": null
+    }
+}
+JSON_API;
+
+        $document=  $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_STRING_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdInteger()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "users",
+        "id": 99
+    }
+}
+JSON_API;
+
+        $document=  $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_STRING_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdEmptyString()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "users",
+        "id": ""
+    }
+}
+JSON_API;
+
+        $document=  $this->decode($content);
+        $validator = $this->hasOne();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_EMPTY_NOT_ALLOWED);
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
     }
 

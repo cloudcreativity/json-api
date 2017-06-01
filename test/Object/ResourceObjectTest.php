@@ -31,7 +31,7 @@ class ResourceObjectTest extends TestCase
 {
 
     const TYPE = 'foo';
-    const ID = 123;
+    const ID = '123';
 
     protected $data;
 

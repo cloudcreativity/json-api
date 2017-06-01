@@ -24,6 +24,7 @@ use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Class ValidatorErrorFactory
@@ -35,6 +36,8 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 
     const MEMBER_REQUIRED = 'validation:member-required';
     const MEMBER_OBJECT_EXPECTED = 'validation:member-object-expected';
+    const MEMBER_STRING_EXPECTED = 'validation:member-string-expected';
+    const MEMBER_EMPTY_NOT_ALLOWED = 'validation:member-empty-not-allowed';
     const MEMBER_RELATIONSHIP_EXPECTED = 'validation:member-relationship-expected';
     const RESOURCE_UNSUPPORTED_TYPE = 'validation:resource-unsupported-type';
     const RESOURCE_UNSUPPORTED_ID = 'validation:resource-unsupported-id';
@@ -81,6 +84,26 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     public function memberObjectExpected($memberKey, $pointer)
     {
         return $this->repository->errorWithPointer(self::MEMBER_OBJECT_EXPECTED, $pointer, [
+            'member' => $memberKey,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function memberStringExpected($memberKey, $pointer)
+    {
+        return $this->repository->errorWithPointer(self::MEMBER_STRING_EXPECTED, $pointer, [
+            'member' => $memberKey,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function memberEmptyNotAllowed($memberKey, $pointer)
+    {
+        return $this->repository->errorWithPointer(self::MEMBER_EMPTY_NOT_ALLOWED, $pointer, [
             'member' => $memberKey,
         ]);
     }

@@ -65,9 +65,9 @@ interface ResourceIdentifierInterface extends StandardObjectInterface, MetaMembe
     public function mapType(array $types);
 
     /**
-     * @return string|int
+     * @return string
      * @throws RuntimeException
-     *      if the id member is not present, or is not a string/int, or is an empty string.
+     *      if the id member is not present, or is not a string, or is an empty string.
      */
     public function getId();
 

@@ -53,17 +53,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
      */
     public function isType($typeOrTypes)
     {
-        $types = is_array($typeOrTypes) ? $typeOrTypes : [$typeOrTypes];
-        $type = $this->get(self::TYPE);
-
-        foreach ($types as $check) {
-
-            if ($type === $check) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($this->get(self::TYPE), (array) $typeOrTypes, true);
     }
 
     /**
@@ -94,7 +84,7 @@ class ResourceIdentifier extends StandardObject implements ResourceIdentifierInt
     public function isSame(ResourceIdentifierInterface $identifier)
     {
         return $this->getType() === $identifier->getType() &&
-            $this->getId() == $identifier->getId();
+            $this->getId() === $identifier->getId();
     }
 
     /**

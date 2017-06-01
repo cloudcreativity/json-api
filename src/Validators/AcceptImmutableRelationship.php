@@ -45,7 +45,7 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
     public function __construct($type, $id = null)
     {
         if ($type && $id) {
-            $this->current = ResourceIdentifier::create($type, $id);
+            $this->current = ResourceIdentifier::create($type, (string) $id);
         }
     }
 

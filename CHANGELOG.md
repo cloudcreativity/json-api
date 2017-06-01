@@ -11,6 +11,8 @@ factory.
 ### Changed
 - Renamed `Resource` to `ResourceObject`, along with associated interfaces, collections and testers. This is because
 `resource` is a reserved name in PHP.
+- `id` member on a resource object or resource object identifier will now always be returned as a string. Integers
+were previously allowed, however the spec states that the `id` member must be a string.
 
 ### Removed
 - Separated out the standard object implementation into a `cloudcreativity/utils-object` package and removed the
@@ -18,7 +20,9 @@ classes, interfaces and utilities from this package.
 - Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
 
 ### Fixed
-- [#30] Attributes that are objects are now cast as standard obejcts when iterating over attributes.
+- #35 Validator was not rejecting a resource identifier with a `null` id. It will now reject an identifier that
+does not have a string `id`.
+- #30 Attributes that are objects are now cast as standard objects when iterating over attributes.
 
 ## [0.8.0] - 2017-05-20
 
