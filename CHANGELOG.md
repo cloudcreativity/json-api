@@ -20,9 +20,9 @@ classes, interfaces and utilities from this package.
 - Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
 
 ### Fixed
-- #35 Validator was not rejecting a resource identifier with a `null` id. It will now reject an identifier that
-does not have a string `id`.
-- #30 Attributes that are objects are now cast as standard objects when iterating over attributes.
+- [#35] Validator was not rejecting a resource identifier with a `null` id. It will now reject an identifier that
+does not have a string `id`. The same change has also been implemented in the resource object validator.
+- [#30] Attributes that are objects are now cast as standard objects when iterating over attributes.
 
 ## [0.8.0] - 2017-05-20
 
