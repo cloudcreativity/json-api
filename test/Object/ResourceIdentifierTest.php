@@ -18,7 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
+use CloudCreativity\Utils\Object\StandardObject;
 use stdClass;
 
 /**
@@ -29,21 +31,18 @@ use stdClass;
 class ResourceIdentifierTest extends TestCase
 {
 
-    const TYPE = 'foo';
-    const ID = 123;
-
     public function testTypeAndId()
     {
         $identifier = new ResourceIdentifier();
         $this->assertFalse($identifier->hasType());
         $this->assertFalse($identifier->hasId());
 
-        $identifier = ResourceIdentifier::create(self::TYPE, self::ID);
+        $identifier = ResourceIdentifier::create('posts', '1');
 
-        $this->assertSame(self::TYPE, $identifier->getType());
+        $this->assertSame('posts', $identifier->getType());
         $this->assertTrue($identifier->hasType());
 
-        $this->assertSame(self::ID, $identifier->getId());
+        $this->assertSame('1', $identifier->getId());
         $this->assertTrue($identifier->hasId());
 
         return $identifier;
@@ -54,36 +53,34 @@ class ResourceIdentifierTest extends TestCase
      */
     public function testIsType(ResourceIdentifier $identifier)
     {
-        $this->assertTrue($identifier->isType(static::TYPE));
+        $this->assertTrue($identifier->isType('posts'));
         $this->assertFalse($identifier->isType('invalid-type'));
-        $this->assertTrue($identifier->isType(['not-a-match', static::TYPE]));
+        $this->assertTrue($identifier->isType(['not-a-match', 'posts']));
     }
 
     public function testIsComplete()
     {
         $this->assertFalse((new ResourceIdentifier())->isComplete());
 
-        $complete = ResourceIdentifier::create(self::TYPE, self::ID);
+        $complete = ResourceIdentifier::create('posts', '1');
 
         $this->assertTrue($complete->isComplete());
     }
 
     public function testMapType()
     {
-        $identifier = ResourceIdentifier::create(self::TYPE, self::ID);
+        $identifier = ResourceIdentifier::create('posts', '1');
         $expected = 'My\Class';
 
         $map = [
             'not-a-match' => 'unexpected',
-            static::TYPE => $expected,
+            'posts' => $expected,
         ];
 
         $this->assertSame($expected, $identifier->mapType($map));
 
-        $this->setExpectedException('RuntimeException');
-        $identifier->mapType([
-            'not-a-match' => 'unexpected',
-        ]);
+        $this->expectException(RuntimeException::class);
+        $identifier->mapType(['not-a-match' => 'unexpected']);
     }
 
     public function testMeta()
@@ -99,5 +96,53 @@ class ResourceIdentifierTest extends TestCase
         $identifier->set(ResourceIdentifier::META, $meta);
 
         $this->assertEquals($expected, $identifier->getMeta());
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidTypeProvider()
+    {
+        return [
+            'null' => [null],
+            'integer' => [1],
+            'object' => [new StandardObject()],
+            'array' => [[]],
+            'empty string' => [''],
+        ];
+    }
+
+    /**
+     * @param $type
+     * @dataProvider invalidTypeProvider
+     */
+    public function testInvalidType($type)
+    {
+        $this->expectException(RuntimeException::class);
+        ResourceIdentifier::create($type, '1')->getType();
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidIdProvider()
+    {
+        return [
+            'null' => [null],
+            'integer' => [1],
+            'object' => [new StandardObject()],
+            'array' => [[]],
+            'empty string' => [''],
+        ];
+    }
+
+    /**
+     * @param $id
+     * @dataProvider invalidIdProvider
+     */
+    public function testInvalidId($id)
+    {
+        $this->expectException(RuntimeException::class);
+        ResourceIdentifier::create('posts', $id)->getId();
     }
 }

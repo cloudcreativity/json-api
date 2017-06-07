@@ -2,6 +2,30 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.9.0] - 2017-06-07
+
+### Added
+- Validation error messages for invalid attributes and query parameters can now be created via the validator error
+factory.
+
+### Changed
+- Renamed `Resource` to `ResourceObject`, along with associated interfaces, collections and testers. This is because
+`resource` is a reserved name in PHP.
+- `id` member on a resource object or resource object identifier will now always be returned as a string. Integers
+were previously allowed, however the spec states that the `id` member must be a string.
+
+### Removed
+- Separated out the standard object implementation into a `cloudcreativity/utils-object` package and removed the
+classes, interfaces and utilities from this package.
+- Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
+- The `HttpServiceInterface` was removed as it is no longer required as classes can be directly injected rather
+than obtained via the service.
+
+### Fixed
+- [#35] Validator was not rejecting a resource identifier with a `null` id. It will now reject an identifier that
+does not have a string `id`. The same change has also been implemented in the resource object validator.
+- [#30] Attributes that are objects are now cast as standard objects when iterating over attributes.
+
 ## [0.8.0] - 2017-05-20
 
 ### Added

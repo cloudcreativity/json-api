@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ErrorsAwareInterface;
 
 /**
@@ -30,10 +30,10 @@ interface ResourceValidatorInterface extends ErrorsAwareInterface
 {
 
     /**
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object|null $record
      *      the domain object that the resource represents.
      * @return bool
      */
-    public function isValid(ResourceInterface $resource, $record = null);
+    public function isValid(ResourceObjectInterface $resource, $record = null);
 }

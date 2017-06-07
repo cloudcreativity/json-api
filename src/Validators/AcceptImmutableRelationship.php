@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Validators;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AcceptRelatedResourceInterface;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 
@@ -45,7 +45,7 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
     public function __construct($type, $id = null)
     {
         if ($type && $id) {
-            $this->current = ResourceIdentifier::create($type, $id);
+            $this->current = ResourceIdentifier::create($type, (string) $id);
         }
     }
 
@@ -56,7 +56,7 @@ class AcceptImmutableRelationship implements AcceptRelatedResourceInterface
         ResourceIdentifierInterface $identifier,
         $record = null,
         $key = null,
-        ResourceInterface $resource = null
+        ResourceObjectInterface $resource = null
     ) {
         if (!$this->current) {
             return true;

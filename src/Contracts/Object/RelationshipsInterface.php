@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Contracts\Object;
 
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use IteratorAggregate;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 use Traversable;
 
 /**
@@ -27,7 +27,7 @@ use Traversable;
  *
  * @package CloudCreativity\JsonApi
  */
-interface RelationshipsInterface extends StandardObjectInterface, IteratorAggregate
+interface RelationshipsInterface extends StandardObjectInterface
 {
 
     /**

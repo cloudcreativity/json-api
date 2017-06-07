@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Validators;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\AttributesValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
@@ -105,6 +105,30 @@ JSON_API;
         $validator = $this->factory->resourceDocument();
 
         $this->willExist()->assertTrue($validator->isValid($document));
+    }
+
+    /**
+     * Test a valid create resource document with a client generated id.
+     */
+    public function testCreateWithClientGeneratedId()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "ec79df88-a11a-4853-a3c9-2da5057b0f85",
+        "attributes": {
+            "title": "My First Blog",
+            "content": "This is my first blog post..."
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator('posts');
+
+        $this->assertTrue($validator->isValid($document));
     }
 
     /**
@@ -198,6 +222,26 @@ JSON_API;
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_TYPE);
     }
 
+    public function testDataTypeNull()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": null,
+        "attributes": {
+            "title": "My First Blog"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator();
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::MEMBER_STRING_EXPECTED);
+    }
+
     public function testDataTypeEmpty()
     {
         $content = <<<JSON_API
@@ -215,7 +259,7 @@ JSON_API;
         $validator = $this->validator();
 
         $this->assertFalse($validator->isValid($document));
-        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::RESOURCE_UNSUPPORTED_TYPE);
+        $this->assertErrorAt($validator->getErrors(), '/data/type', Keys::MEMBER_EMPTY_NOT_ALLOWED);
     }
 
     public function testDataTypeNotSupported()
@@ -283,6 +327,72 @@ JSON_API;
         $this->assertFalse($validator->isValid($document));
         $this->assertErrorAt($validator->getErrors(), '/data', Keys::MEMBER_REQUIRED);
         $this->assertDetailContains($validator->getErrors(), '/data', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdNull()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": null,
+        "attributes": {
+            "title": "My First Post"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator('posts', '1');
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/id', Keys::MEMBER_STRING_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data/id', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdInteger()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": 1,
+        "attributes": {
+            "title": "My First Post"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator('posts', '1');
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/id', Keys::MEMBER_STRING_EXPECTED);
+        $this->assertDetailContains($validator->getErrors(), '/data/id', DocumentInterface::KEYWORD_ID);
+    }
+
+    public function testDataIdEmpty()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "",
+        "attributes": {
+            "title": "My First Post"
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $validator = $this->validator('posts', '1');
+
+        $this->assertFalse($validator->isValid($document));
+        $this->assertErrorAt($validator->getErrors(), '/data/id', Keys::MEMBER_EMPTY_NOT_ALLOWED);
+        $this->assertDetailContains($validator->getErrors(), '/data/id', DocumentInterface::KEYWORD_ID);
     }
 
     public function testDataIdNotSupported()
@@ -562,7 +672,7 @@ JSON_API;
         $called = false;
         $record = new stdClass();
 
-        $context = function (ResourceInterface $resource, $obj) use (&$called, $record) {
+        $context = function (ResourceObjectInterface $resource, $obj) use (&$called, $record) {
             $this->assertSame($record, $obj);
             $this->assertEquals('posts', $resource->getType());
             $this->assertEquals('123', $resource->getId());

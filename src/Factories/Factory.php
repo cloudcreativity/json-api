@@ -159,9 +159,7 @@ class Factory extends BaseFactory implements FactoryInterface
      */
     public function createValidatorFactory(ErrorRepositoryInterface $errors, StoreInterface $store)
     {
-        $errors = new ValidatorErrorFactory($errors);
-
-        return new ValidatorFactory($errors, $store);
+        return new ValidatorFactory($this->createValidatorErrorFactory($errors), $store);
     }
 
     /**
@@ -203,4 +201,12 @@ class Factory extends BaseFactory implements FactoryInterface
         return new Page($data, $first, $previous, $next, $last, $meta, $metaKey);
     }
 
+    /**
+     * @param ErrorRepositoryInterface $errors
+     * @return ValidatorErrorFactory
+     */
+    protected function createValidatorErrorFactory(ErrorRepositoryInterface $errors)
+    {
+        return new ValidatorErrorFactory($errors);
+    }
 }

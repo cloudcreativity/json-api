@@ -24,6 +24,25 @@ return [
     ],
 
     /**
+     * A non-string has been provided for a member that must be a string.
+     * E.g. the spec says that a resource's `type` and `id` keys MUST be strings.
+     */
+    V::MEMBER_STRING_EXPECTED => [
+        Error::TITLE => 'String Expected',
+        Error::DETAIL => "The member '{member}' must be a string.",
+        Error::STATUS => 400,
+    ],
+
+    /**
+     * A value was provided but it was empty, which is not allowed.
+     */
+    V::MEMBER_EMPTY_NOT_ALLOWED => [
+        Error::TITLE => 'Value Expected',
+        Error::DETAIL => "The member '{member}' cannot be empty.",
+        Error::STATUS => 400,
+    ],
+
+    /**
      * A member that is expected to be a relationship is not an object, array or null value.
      */
     V::MEMBER_RELATIONSHIP_EXPECTED => [
@@ -57,6 +76,15 @@ return [
         Error::TITLE => 'Invalid Attributes',
         Error::DETAIL => 'The attributes member is invalid.',
         Error::STATUS => 400,
+    ],
+
+    /**
+     * Used when generating JSON API errors from validation messages (usually from a framework specific validator)
+     * for the attributes member of a resource object.
+     */
+    V::RESOURCE_INVALID_ATTRIBUTES_MESSAGES => [
+        Error::TITLE => 'Invalid Attribute',
+        Error::STATUS => 422,
     ],
 
     /**
@@ -129,6 +157,14 @@ return [
     V::RELATIONSHIP_UNSUPPORTED_TYPE => [
         Error::TITLE => 'Invalid Relationship',
         Error::DETAIL => "Resource '{actual}' is not among the type(s) supported by this relationship. Expecting only '{expected}' resources.",
+        Error::STATUS => 400,
+    ],
+
+    /**
+     * Used when creating messages about the query parameters, usually from a framework specific validator.
+     */
+    V::QUERY_PARAMETERS_MESSAGES => [
+        Error::TITLE => 'Invalid Query Parameter',
         Error::STATUS => 400,
     ],
 ];

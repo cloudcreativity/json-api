@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Hydrator;
 
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 
 /**
  * Interface HydratesRelatedInterface
@@ -41,11 +41,11 @@ interface HydratesRelatedInterface
      * populated into a database. Or if the resource's attributes contain attribute values that are
      * actually read from related domain records rather than the primary record that the resource belongs to.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceObjectInterface $resource
      * @param object $record
      *      the domain record that the resource represents
      * @return object[]|null
      *      the related record(s) that were hydrated.
      */
-    public function hydrateRelated(ResourceInterface $resource, $record);
+    public function hydrateRelated(ResourceObjectInterface $resource, $record);
 }

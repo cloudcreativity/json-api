@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Helpers;
+namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
@@ -28,19 +28,6 @@ use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
  */
 trait IdentifiableTrait
 {
-
-    /**
-     * @param $key
-     * @param $default
-     * @return mixed
-     */
-    abstract public function get($key, $default = null);
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    abstract public function has($key);
 
     /**
      * @return string
@@ -83,11 +70,11 @@ trait IdentifiableTrait
 
         $id = $this->get(DocumentInterface::KEYWORD_ID);
 
-        if (!is_string($id) && !is_int($id)) {
-            throw new RuntimeException('Id member is not a string or integer.');
+        if (!is_string($id)) {
+            throw new RuntimeException('Id member is not a string.');
         }
 
-        if (is_string($id) && empty($id)) {
+        if (empty($id)) {
             throw new RuntimeException('Id member is an empty string.');
         }
 

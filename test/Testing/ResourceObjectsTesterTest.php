@@ -23,7 +23,7 @@ namespace CloudCreativity\JsonApi\Testing;
  *
  * @package CloudCreativity\JsonApi
  */
-class ResourcesTesterTest extends TestCase
+class ResourceObjectsTesterTest extends TestCase
 {
 
     public function testTypes()
@@ -63,13 +63,13 @@ JSON_API;
     }
 
     /**
-     * @param ResourcesTester $collection
+     * @param ResourceObjectsTester $collection
      * @depends testTypes
      */
-    public function testResource(ResourcesTester $collection)
+    public function testResource(ResourceObjectsTester $collection)
     {
         $resource = $collection->assertContainsResource('posts', 1)->assertResource('posts', '2');
-        $this->assertInstanceOf(ResourceTester::class, $resource);
+        $this->assertInstanceOf(ResourceObjectTester::class, $resource);
         $this->assertTrue($resource->is('posts', '2'));
 
         $this->willFail(function () use ($collection) {
@@ -82,10 +82,10 @@ JSON_API;
     }
 
     /**
-     * @param ResourcesTester $collection
+     * @param ResourceObjectsTester $collection
      * @depends testTypes
      */
-    public function testContainsOnly(ResourcesTester $collection)
+    public function testContainsOnly(ResourceObjectsTester $collection)
     {
         $collection->assertContainsOnly([
             'posts' => ['2', '1'],
@@ -146,10 +146,10 @@ JSON_API;
     }
 
     /**
-     * @param ResourcesTester $collection
+     * @param ResourceObjectsTester $collection
      * @depends testPolymorphicTypes
      */
-    public function testPolymorphicContainsOnly(ResourcesTester $collection)
+    public function testPolymorphicContainsOnly(ResourceObjectsTester $collection)
     {
         $collection->assertContainsOnly([
             'posts' => ['2', '1'],

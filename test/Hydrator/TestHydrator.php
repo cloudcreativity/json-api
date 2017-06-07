@@ -20,9 +20,10 @@ namespace CloudCreativity\JsonApi\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Hydrator\HydratesRelatedInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceInterface;
-use CloudCreativity\JsonApi\Object\StandardObject;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Utils\Str;
+use CloudCreativity\Utils\Object\StandardObject;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class TestHydrator
@@ -61,7 +62,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
      * @todo an equivalent method for this needs to be on the `RelatedHydratorTrait`
      * @see https://github.com/cloudcreativity/json-api/issues/28
      */
-    public function hydrateRelated(ResourceInterface $resource, $record)
+    public function hydrateRelated(ResourceObjectInterface $resource, $record)
     {
         $results = [];
         $attributes = $resource->getAttributes();
@@ -78,7 +79,7 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
 
         /** @var RelationshipInterface $relationship */
         foreach ($resource->getRelationships()->getAll() as $key => $relationship) {
-            $result = $this->callHydrateRelated($key, $relationship, $record);
+            $result = $this->callHydrateRelatedRelationship($key, $relationship, $record);
 
             if (is_array($result)) {
                 $results = array_merge($results, $result);
@@ -126,14 +127,16 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
     }
 
     /**
-     * @param StandardObject $object
+     * @param StandardObjectInterface $object
      * @param $record
      * @return object
      */
-    protected function hydrateRelatedAuthor(StandardObject $object, $record)
+    protected function hydrateRelatedAuthor(StandardObjectInterface $object, $record)
     {
-        return $object->transformKeys(function ($key) {
+        $object->transformKeys(function ($key) {
             return Str::underscore($key);
-        })->getProxy();
+        });
+
+        return (object) $object->toArray();
     }
 }

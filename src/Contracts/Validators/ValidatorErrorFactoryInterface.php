@@ -57,6 +57,24 @@ interface ValidatorErrorFactoryInterface
     public function memberObjectExpected($memberKey, $pointer);
 
     /**
+     * A member is expected to be a string.
+     *
+     * @param $memberKey
+     * @param $pointer
+     * @return ErrorInterface
+     */
+    public function memberStringExpected($memberKey, $pointer);
+
+    /**
+     * A member has an empty value, but a value is expected.
+     *
+     * @param $memberKey
+     * @param $pointer
+     * @return ErrorInterface
+     */
+    public function memberEmptyNotAllowed($memberKey, $pointer);
+
+    /**
      * A member is expected to be a relationship - object, array or null.
      *
      * @param $memberKey
@@ -192,4 +210,24 @@ interface ValidatorErrorFactoryInterface
         $relationshipKey = null,
         $errors = null
     );
+
+    /**
+     * @param mixed $messages
+     *      validation messages
+     * @param string|null $prefix
+     *      a prefix if the validation messages relate to a nested attribute.
+     * @param int $statusCode
+     * @return ErrorCollection
+     */
+    public function resourceInvalidAttributesMessages($messages, $prefix = null, $statusCode = 422);
+
+    /**
+     * @param mixed $messages
+     *      validation messages
+     * @param string|null $prefix
+     *      a prefix if the validation messages relate to a nested parameter.
+     * @param int $statusCode
+     * @return ErrorCollection
+     */
+    public function queryParametersMessages($messages, $prefix = null, $statusCode = 400);
 }

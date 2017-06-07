@@ -40,8 +40,8 @@ class ResourceIdentifierCollectionTest extends TestCase
 
     protected function setUp()
     {
-        $this->a = ResourceIdentifier::create('foo', 123);
-        $this->b = ResourceIdentifier::create('bar', 456);
+        $this->a = ResourceIdentifier::create('foo', '123');
+        $this->b = ResourceIdentifier::create('bar', '456');
     }
 
     public function testConstruct()

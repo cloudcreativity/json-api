@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Object\Helpers;
+namespace CloudCreativity\JsonApi\Object;
 
-use CloudCreativity\JsonApi\Contracts\Object\StandardObjectInterface;
+use CloudCreativity\Utils\Object\StandardObject;
+use CloudCreativity\Utils\Object\StandardObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\StandardObject;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
 
 /**
@@ -32,19 +32,6 @@ trait MetaMemberTrait
 {
 
     /**
-     * @param $key
-     * @param $default
-     * @return mixed
-     */
-    abstract public function get($key, $default = null);
-
-    /**
-     * @param $key
-     * @return bool
-     */
-    abstract public function has($key);
-
-    /**
      * Get the meta member of the document.
      *
      * @return StandardObjectInterface
@@ -53,13 +40,13 @@ trait MetaMemberTrait
      */
     public function getMeta()
     {
-        $meta = $this->get(DocumentInterface::KEYWORD_META);
+        $meta = $this->hasMeta() ? $this->get(DocumentInterface::KEYWORD_META) : new StandardObject();
 
-        if ($this->has(DocumentInterface::KEYWORD_META) && !is_object($meta)) {
+        if (!is_null($meta) && !$meta instanceof StandardObjectInterface) {
             throw new RuntimeException('Data member is not an object.');
         }
 
-        return new StandardObject($meta);
+        return $meta;
     }
 
     /**

@@ -23,8 +23,8 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorErrorFactoryInterface;
 use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
-use CloudCreativity\JsonApi\Repositories\ErrorRepository;
 use CloudCreativity\JsonApi\Utils\Pointer as P;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 
 /**
  * Class ValidatorErrorFactory
@@ -36,18 +36,22 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
 
     const MEMBER_REQUIRED = 'validation:member-required';
     const MEMBER_OBJECT_EXPECTED = 'validation:member-object-expected';
+    const MEMBER_STRING_EXPECTED = 'validation:member-string-expected';
+    const MEMBER_EMPTY_NOT_ALLOWED = 'validation:member-empty-not-allowed';
     const MEMBER_RELATIONSHIP_EXPECTED = 'validation:member-relationship-expected';
     const RESOURCE_UNSUPPORTED_TYPE = 'validation:resource-unsupported-type';
     const RESOURCE_UNSUPPORTED_ID = 'validation:resource-unsupported-id';
     const RESOURCE_INVALID_ATTRIBUTES = 'validation:resource-invalid-attributes';
+    const RESOURCE_INVALID_ATTRIBUTES_MESSAGES = 'validation:resource-invalid-attributes-messages';
     const RESOURCE_INVALID_RELATIONSHIPS = 'validation:resource-invalid-relationships';
-    const RELATIONSHIP_UNKNOWN_TYPE = 'validation:relationshio-unknown-type';
+    const RELATIONSHIP_UNKNOWN_TYPE = 'validation:relationship-unknown-type';
     const RELATIONSHIP_UNSUPPORTED_TYPE = 'validation:relationship-unsupported-type';
     const RELATIONSHIP_HAS_ONE_EXPECTED = 'validation:relationship-has-one-expected';
     const RELATIONSHIP_HAS_MANY_EXPECTED = 'validation:relationship-has-many-expected';
     const RELATIONSHIP_EMPTY_NOT_ALLOWED = 'validation:relationship-empty-not-allowed';
     const RELATIONSHIP_DOES_NOT_EXIST = 'validation:relationship-does-not-exist';
     const RELATIONSHIP_NOT_ACCEPTABLE = 'validation:relationship-not-acceptable';
+    const QUERY_PARAMETERS_MESSAGES = 'validation:query-parameters-messages';
 
     /**
      * @var ErrorRepositoryInterface
@@ -57,11 +61,11 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     /**
      * ValidatorErrorFactory constructor.
      *
-     * @param ErrorRepositoryInterface|null $repository
+     * @param ErrorRepositoryInterface $repository
      */
-    public function __construct(ErrorRepositoryInterface $repository = null)
+    public function __construct(ErrorRepositoryInterface $repository)
     {
-        $this->repository = $repository ?: new ErrorRepository();
+        $this->repository = $repository;
     }
 
     /**
@@ -80,6 +84,26 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
     public function memberObjectExpected($memberKey, $pointer)
     {
         return $this->repository->errorWithPointer(self::MEMBER_OBJECT_EXPECTED, $pointer, [
+            'member' => $memberKey,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function memberStringExpected($memberKey, $pointer)
+    {
+        return $this->repository->errorWithPointer(self::MEMBER_STRING_EXPECTED, $pointer, [
+            'member' => $memberKey,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function memberEmptyNotAllowed($memberKey, $pointer)
+    {
+        return $this->repository->errorWithPointer(self::MEMBER_EMPTY_NOT_ALLOWED, $pointer, [
             'member' => $memberKey,
         ]);
     }
@@ -246,4 +270,67 @@ class ValidatorErrorFactory implements ValidatorErrorFactoryInterface
         return $errors;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function resourceInvalidAttributesMessages($messages, $prefix = null, $statusCode = 422)
+    {
+        $errors = new MutableErrorCollection();
+
+        foreach ($messages as $key => $message) {
+            $errors->add($this->createAttributeError($key, $message, $prefix, $statusCode));
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function queryParametersMessages($messages, $prefix = null, $statusCode = 400)
+    {
+        $errors = new MutableErrorCollection();
+
+        foreach ($messages as $key => $message) {
+            $errors->add($this->createQueryParameterError($key, $message, $prefix, $statusCode));
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @param $key
+     * @param $message
+     * @param string|null $prefix
+     * @param int $statusCode
+     * @return MutableErrorInterface
+     */
+    protected function createAttributeError($key, $message, $prefix = null, $statusCode = 422)
+    {
+        $name = $prefix ? $prefix . $key : $key;
+        $error = $this->repository->error(self::RESOURCE_INVALID_ATTRIBUTES_MESSAGES);
+        $error->hasStatus() ? $error->setStatus($statusCode) : null;
+        $error->hasSourcePointer() ? $error->setSourcePointer(P::attribute($name)) : null;
+        $error->hasDetail() ? $error->setDetail($message) : null;
+
+        return $error;
+    }
+
+    /**
+     * @param $key
+     * @param $message
+     * @param string|null $prefix
+     * @param int $statusCode
+     * @return MutableErrorInterface
+     */
+    protected function createQueryParameterError($key, $message, $prefix = null, $statusCode = 400)
+    {
+        $name = $prefix ? $prefix . $key : $key;
+        $error = $this->repository->error(self::RESOURCE_INVALID_ATTRIBUTES_MESSAGES);
+        $error->hasStatus() ? $error->setStatus($statusCode) : null;
+        $error->hasSourceParameter() ? $error->setSourceParameter(P::attribute($name)) : null;
+        $error->hasDetail() ? $error->setDetail($message) : null;
+
+        return $error;
+    }
 }
