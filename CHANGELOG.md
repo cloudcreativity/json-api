@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [0.9.0] - 2017-06-07
 
 ### Added
 - Validation error messages for invalid attributes and query parameters can now be created via the validator error
@@ -18,6 +18,8 @@ were previously allowed, however the spec states that the `id` member must be a 
 - Separated out the standard object implementation into a `cloudcreativity/utils-object` package and removed the
 classes, interfaces and utilities from this package.
 - Deprecated `RelatedHydratorTrait::callHydrateRelated()` removed.
+- The `HttpServiceInterface` was removed as it is no longer required as classes can be directly injected rather
+than obtained via the service.
 
 ### Fixed
 - [#35] Validator was not rejecting a resource identifier with a `null` id. It will now reject an identifier that

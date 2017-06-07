@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cloudcreativity/json-api.svg?branch=master)](https://travis-ci.org/cloudcreativity/json-api)
+
 # cloudcreativity/json-api
 
 This repository extends [neomerx/json-api](https://github.com/neomerx/json-api), adding in several additional
