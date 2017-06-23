@@ -109,8 +109,9 @@ class RequestFactory
             return null;
         }
 
+        /** If there is no matched decoder, then the server request did not have message body. */
         if (!$decoder = $codecMatcher->getDecoder()) {
-            throw new RuntimeException('No matching decoder');
+            throw new JsonApiException([], 400);
         }
 
         $document = $decoder->decode((string) $request->getBody());
