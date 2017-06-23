@@ -229,7 +229,7 @@ JSON_API;
 
     public function testNoContent()
     {
-        $this->withRequest('POST')
+        $this->withRequest('POST', null, null, '')
             ->doFailure(400);
     }
 
@@ -347,7 +347,8 @@ JSON_API;
     {
         $defaults = ['Accept' => MediaTypeInterface::JSON_API_MEDIA_TYPE];
 
-        if ($content) {
+        if (!is_null($content)) {
+            $defaults['Content-Length'] = '1';
             $defaults['Content-Type'] = MediaTypeInterface::JSON_API_MEDIA_TYPE;
         }
 
@@ -388,7 +389,7 @@ JSON_API;
             $uri .= '?' . http_build_query($params);
         }
 
-        $this->normalizeHeaders($headers, $content);
+        $headers = $this->normalizeHeaders($headers, $content);
 
         return new ServerRequest($method, $uri, $headers, $content);
     }
