@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="test/bootstrap.php"
+<phpunit bootstrap="vendor/autoload.php"
          verbose="true"
          colors="true">
     <testsuites>
         <testsuite name="Unit">
-            <directory>./test/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory suffix=".php">src/</directory>
+            <directory suffix="Test.php">src/</directory>
         </whitelist>
     </filter>
 </phpunit>
