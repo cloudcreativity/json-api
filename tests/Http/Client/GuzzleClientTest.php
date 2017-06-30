@@ -6,12 +6,15 @@ use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 use function GuzzleHttp\Psr7\parse_query;
 
@@ -58,11 +61,13 @@ class GuzzleClientTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->method('getSchema')->with($this->record)->willReturn($schema);
 
-        /** @var ContainerInterface $container */
-        $this->client = new GuzzleClient(new Client([
-            'handler' => $this->mock = new MockHandler(),
+        $http = new Client([
+            'handler' => HandlerStack::create($this->mock = new MockHandler()),
             'base_uri' => 'http://localhost/api/v1/',
-        ]), $container, $encoder);
+        ]);
+
+        /** @var ContainerInterface $container */
+        $this->client = new GuzzleClient($http, $container, $encoder);
     }
 
     public function testCreateWithoutId()
@@ -109,6 +114,13 @@ class GuzzleClientTest extends TestCase
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
     }
 
+    public function testCreateError()
+    {
+        $this->willSerializeRecord()->willSeeErrors();
+        $this->expectException(JsonApiException::class);
+        $this->client->create($this->record);
+    }
+
     public function testRead()
     {
         $identifier = ResourceIdentifier::create('posts', '1');
@@ -136,6 +148,13 @@ class GuzzleClientTest extends TestCase
             'fields[author]' => 'first-name,surname',
             'fields[site]' => 'uri',
         ]);
+    }
+
+    public function testReadError()
+    {
+        $this->willSeeErrors();
+        $this->expectException(JsonApiException::class);
+        $this->client->read(ResourceIdentifier::create('posts', '1'));
     }
 
     public function testUpdate()
@@ -185,12 +204,33 @@ class GuzzleClientTest extends TestCase
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
     }
 
+    public function testUpdateError()
+    {
+        $this->willSerializeRecord()->willSeeErrors();
+        $this->expectException(JsonApiException::class);
+        $this->client->update($this->record);
+    }
+
     public function testDelete()
     {
         $this->appendResponse(204);
         $response = $this->client->delete($this->record);
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
         $this->assertRequested('DELETE', '/posts/1');
+    }
+
+    public function testErrorResponse()
+    {
+        $this->willSeeErrors([], 422);
+
+        try {
+            $this->client->delete($this->record);
+            $this->fail('No exception thrown.');
+        } catch (JsonApiException $ex) {
+            $this->assertSame(422, $ex->getHttpCode());
+            $this->assertEmpty($ex->getErrors());
+            $this->assertInstanceOf(BadResponseException::class, $ex->getPrevious());
+        }
     }
 
     /**
@@ -222,6 +262,20 @@ class GuzzleClientTest extends TestCase
     }
 
     /**
+     * @param array $errors
+     * @param int $status
+     * @return $this
+     */
+    private function willSeeErrors(array $errors = [], $status = 400)
+    {
+        $this->appendResponse($status, ['Content-Type' => 'application/vnd.api+json'], [
+            'errors' => $errors,
+        ]);
+
+        return $this;
+    }
+
+    /**
      * @param int $status
      * @param array $headers
      * @param array|null $body
@@ -243,10 +297,9 @@ class GuzzleClientTest extends TestCase
      */
     private function assertRequestSentRecord()
     {
+        $expected = json_encode(['data' => (array) $this->record]);
         $request = $this->mock->getLastRequest();
-        $this->assertJsonStringEqualsJsonString(json_encode([
-            'data' => (array) $this->record,
-        ]), (string) $request->getBody());
+        $this->assertJsonStringEqualsJsonString($expected, (string) $request->getBody());
     }
 
     /**
