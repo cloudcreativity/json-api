@@ -2,96 +2,124 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use GuzzleHttp\Client;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
-use Neomerx\JsonApi\Http\Headers\MediaType;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class GuzzleClient
 {
 
+    use SendsRequestsTrait;
+
     /**
      * @var Client
      */
-    private $client;
-
-    /**
-     * @var Encoder
-     */
-    private $encoder;
+    private $http;
 
     /**
      * GuzzleClient constructor.
      *
-     * @param Client $client
+     * @param Client $http
+     * @param ContainerInterface $schemas
      * @param Encoder $encoder
      */
-    public function __construct(Client $client, Encoder $encoder)
+    public function __construct(Client $http, ContainerInterface $schemas, Encoder $encoder)
     {
-        $this->client = $client;
+        $this->http = $http;
+        $this->schemas = $schemas;
         $this->encoder = $encoder;
     }
 
     /**
      * Send the domain record to the remote JSON API.
      *
-     * @param $record
+     * @param object $record
      * @param EncodingParametersInterface|null $parameters
      * @return Response
      */
     public function create($record, EncodingParametersInterface $parameters = null)
     {
-        return new Response($this->sendRecord('POST', $record, $parameters));
+        return new Response($this->sendRecord(
+            'POST',
+            $this->serializeRecord($record),
+            $parameters
+        ));
+    }
+
+    /**
+     * Read the domain record from the remote JSON API.
+     *
+     * @param ResourceIdentifierInterface $identifier
+     * @param EncodingParametersInterface|null $parameters
+     * @return Response
+     */
+    public function read(ResourceIdentifierInterface $identifier, EncodingParametersInterface $parameters = null)
+    {
+        $uri = $this->resourceUri($identifier);
+
+        $response = $this->http->get($uri, [
+            'headers' => $this->normalizeHeaders(),
+            'query' => $parameters ? $this->parseQuery($parameters) : null,
+        ]);
+
+        return new Response($response);
+    }
+
+    /**
+     * Update the domain record with the remote JSON API.
+     *
+     * @param object $record
+     * @param string[] $fields
+     *      the fields to send, if sending sparse field-sets.
+     * @param EncodingParametersInterface|null $parameters
+     * @return Response
+     */
+    public function update($record, array $fields = [], EncodingParametersInterface $parameters = null)
+    {
+        return new Response($this->sendRecord(
+            'PATCH',
+            $this->serializeRecord($record, $fields),
+            $parameters
+        ));
+    }
+
+    /**
+     * Delete the domain record from the remote JSON API.
+     *
+     * @param object $record
+     * @return Response
+     */
+    public function delete($record)
+    {
+        return new Response($this->http->delete($this->recordUri($record)));
     }
 
     /**
      * @param $method
-     * @param $record
+     * @param array $serializedRecord
+     *      the encoded record
      * @param EncodingParametersInterface|null $parameters
      * @return ResponseInterface
      */
-    private function sendRecord($method, $record, EncodingParametersInterface $parameters = null)
+    private function sendRecord($method, array $serializedRecord, EncodingParametersInterface $parameters = null)
     {
-        $encoded = $this->encoder->serializeData($record, $parameters);
-        $resourceType = $encoded['data']['type'];
-        $resourceId = isset($encoded['data']['id']) ? $encoded['data']['id'] : null;
-        $uri = $resourceId ? "$resourceType/$resourceId" : $resourceType;
+        $resourceType = $serializedRecord['data']['type'];
 
-        return $this->client->request($method, $uri, [
-            'json' => $encoded,
+        if ('POST' === $method) {
+            $uri = $this->resourceUri($resourceType);
+        } else {
+            $resourceId = isset($serializedRecord['data']['id']) ? $serializedRecord['data']['id'] : null;
+            $uri = $this->resourceUri($resourceType, $resourceId);
+        }
+
+        return $this->http->request($method, $uri, [
+            'json' => $serializedRecord,
             'query' => $parameters ? $this->parseQuery($parameters) : null,
-            'headers' => [
-                'Content-Type' => MediaType::JSON_API_MEDIA_TYPE,
-                'Accept' => MediaType::JSON_API_MEDIA_TYPE,
-            ],
+            'headers' => $this->normalizeHeaders(true),
         ]);
-    }
-
-    /**
-     * @param EncodingParametersInterface $parameters
-     * @return array
-     */
-    private function parseQuery(EncodingParametersInterface $parameters)
-    {
-        return array_filter([
-            QueryParametersParserInterface::PARAM_INCLUDE =>
-                implode(',', (array) $parameters->getIncludePaths()),
-            QueryParametersParserInterface::PARAM_FIELDS =>
-                $this->parseQueryFieldsets((array) $parameters->getFieldSets()),
-        ]);
-    }
-
-    /**
-     * @param array $fieldsets
-     * @return array
-     */
-    private function parseQueryFieldsets(array $fieldsets)
-    {
-        return array_map(function ($values) {
-            return implode(',', (array) $values);
-        }, $fieldsets);
     }
 
 }

@@ -3,11 +3,14 @@
 namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 use function GuzzleHttp\Psr7\parse_query;
@@ -44,26 +47,42 @@ class GuzzleClientTest extends TestCase
         $encoder = $this->encoder = $this->createMock(Encoder::class);
         $this->record = (object) [
             'type' => 'posts',
-            'id' => null,
+            'id' => '1',
             'attributes' => ['title' => 'Hello World'],
         ];
 
+        $schema = $this->createMock(SchemaProviderInterface::class);
+        $schema->method('getResourceType')->willReturn('posts');
+        $schema->method('getId')->with($this->record)->willReturn('1');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('getSchema')->with($this->record)->willReturn($schema);
+
+        /** @var ContainerInterface $container */
         $this->client = new GuzzleClient(new Client([
             'handler' => $this->mock = new MockHandler(),
             'base_uri' => 'http://localhost/api/v1/',
-        ]), $encoder);
+        ]), $container, $encoder);
     }
 
-    public function testCreate()
+    public function testCreateWithoutId()
     {
+        $this->record->id = null;
         $this->willSerializeRecord()->willSeeRecord(201);
         $response = $this->client->create($this->record);
-        $this->assertSame(201, $response->getPsrResponse()->getStatusCode());
 
-        $this->assertRequested('POST', '/posts')
-            ->assertRequestSentRecord()
-            ->assertHeader('Accept', 'application/vnd.api+json')
-            ->assertHeader('Content-Type', 'application/vnd.api+json');
+        $this->assertSame(201, $response->getPsrResponse()->getStatusCode());
+        $this->assertRequested('POST', '/posts');
+        $this->assertRequestSentRecord();
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+        $this->assertHeader('Content-Type', 'application/vnd.api+json');
+    }
+
+    public function testCreateWithClientGeneratedId()
+    {
+        $this->willSerializeRecord()->willSeeRecord(201);
+        $this->client->create($this->record);
+        $this->assertRequested('POST', '/posts');
     }
 
     public function testCreateWithParameters()
@@ -73,8 +92,9 @@ class GuzzleClientTest extends TestCase
             ['author' => ['first-name', 'surname'], 'site' => ['uri']]
         );
 
-        $this->willSerializeRecord($parameters)->willSeeRecord(201);
+        $this->willSerializeRecord()->willSeeRecord(201);
         $this->client->create($this->record, $parameters);
+
         $this->assertQueryParameters([
             'include' => 'author,site',
             'fields[author]' => 'first-name,surname',
@@ -82,6 +102,101 @@ class GuzzleClientTest extends TestCase
         ]);
     }
 
+    public function testCreateWithNoContentResponse()
+    {
+        $this->willSerializeRecord()->appendResponse(204);
+        $response = $this->client->create($this->record);
+        $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+    }
+
+    public function testRead()
+    {
+        $identifier = ResourceIdentifier::create('posts', '1');
+        $this->willSeeRecord();
+        $response = $this->client->read($identifier);
+
+        $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
+        $this->assertRequested('GET', '/posts/1');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+    }
+
+    public function testReadWithParameters()
+    {
+        $identifier = ResourceIdentifier::create('posts', '1');
+        $parameters = new EncodingParameters(
+            ['author', 'site'],
+            ['author' => ['first-name', 'surname'], 'site' => ['uri']]
+        );
+
+        $this->willSeeRecord();
+        $this->client->read($identifier, $parameters);
+
+        $this->assertQueryParameters([
+            'include' => 'author,site',
+            'fields[author]' => 'first-name,surname',
+            'fields[site]' => 'uri',
+        ]);
+    }
+
+    public function testUpdate()
+    {
+        $this->willSerializeRecord()->willSeeRecord();
+        $response = $this->client->update($this->record);
+
+        $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
+        $this->assertRequested('PATCH', '/posts/1');
+        $this->assertRequestSentRecord();
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+        $this->assertHeader('Content-Type', 'application/vnd.api+json');
+    }
+
+    public function testUpdateWithFieldsets()
+    {
+        $expected = new EncodingParameters(
+            null,
+            ['posts' => $fields = ['content', 'published-at']]
+        );
+
+        $this->willSerializeRecord($expected)->willSeeRecord();
+        $this->client->update($this->record, $fields);
+    }
+
+    public function testUpdateWithParameters()
+    {
+        $parameters = new EncodingParameters(
+            ['author', 'site'],
+            ['author' => ['first-name', 'surname'], 'site' => ['uri']]
+        );
+
+        $this->willSerializeRecord()->willSeeRecord(201);
+        $this->client->update($this->record, [], $parameters);
+
+        $this->assertQueryParameters([
+            'include' => 'author,site',
+            'fields[author]' => 'first-name,surname',
+            'fields[site]' => 'uri',
+        ]);
+    }
+
+    public function testUpdateWithNoContentResponse()
+    {
+        $this->willSerializeRecord()->appendResponse(204);
+        $response = $this->client->update($this->record);
+        $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+    }
+
+    public function testDelete()
+    {
+        $this->appendResponse(204);
+        $response = $this->client->delete($this->record);
+        $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+        $this->assertRequested('DELETE', '/posts/1');
+    }
+
+    /**
+     * @param EncodingParametersInterface|null $parameters
+     * @return $this
+     */
     private function willSerializeRecord(EncodingParametersInterface $parameters = null)
     {
         $this->encoder
@@ -124,7 +239,7 @@ class GuzzleClientTest extends TestCase
     }
 
     /**
-     * @return $this
+     * @return void
      */
     private function assertRequestSentRecord()
     {
@@ -132,14 +247,12 @@ class GuzzleClientTest extends TestCase
         $this->assertJsonStringEqualsJsonString(json_encode([
             'data' => (array) $this->record,
         ]), (string) $request->getBody());
-
-        return $this;
     }
 
     /**
      * @param $method
      * @param $path
-     * @return $this
+     * @return void
      */
     private function assertRequested($method, $path)
     {
@@ -147,33 +260,27 @@ class GuzzleClientTest extends TestCase
         $request = $this->mock->getLastRequest();
         $this->assertEquals($method, $request->getMethod());
         $this->assertEquals($uri, (string) $request->getUri(), 'request uri');
-
-        return $this;
     }
 
     /**
      * @param $key
      * @param $expected
-     * @return $this
+     * @return void
      */
     private function assertHeader($key, $expected)
     {
         $request = $this->mock->getLastRequest();
         $actual = $request->getHeaderLine($key);
         $this->assertSame($expected, $actual);
-
-        return $this;
     }
 
     /**
      * @param array $expected
-     * @return $this
+     * @return void
      */
     private function assertQueryParameters(array $expected)
     {
         $query = $this->mock->getLastRequest()->getUri()->getQuery();
         $this->assertEquals($expected, parse_query($query));
-
-        return $this;
     }
 }
