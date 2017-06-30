@@ -22,11 +22,12 @@ use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
+use function CloudCreativity\JsonApi\http_contains_body;
 
 /**
  * Trait NegotiatesContent
  *
- * @package CloudCreativity\JsonApi\Http\Middleware
+ * @package CloudCreativity\JsonApi
  */
 trait NegotiatesContent
 {
@@ -48,21 +49,6 @@ trait NegotiatesContent
         $parser = $httpFactory->createHeaderParametersParser();
         $checker = $httpFactory->createHeadersChecker($codecMatcher);
 
-        $checker->checkHeaders($parser->parse($request, $this->doesContainBody($request)));
-    }
-
-    /**
-     * Does the request contain a message body?
-     *
-     * "The presence of a message-body in a request is signaled by the inclusion of a Content-Length or
-     * Transfer-Encoding header field in the request's message-headers."
-     * https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3
-     *
-     * @param ServerRequestInterface $request
-     * @return bool
-     */
-    protected function doesContainBody(ServerRequestInterface $request)
-    {
-        return $request->hasHeader('Content-Length') || $request->hasHeader('Transfer-Encoding');
+        $checker->checkHeaders($parser->parse($request, http_contains_body($request)));
     }
 }

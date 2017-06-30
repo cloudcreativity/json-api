@@ -4,11 +4,21 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+- An HTTP client interface for sending JSON API requests to a remote server, and a Guzzle 6 implementation.
+- Can now get included resource objects from the JSON API document object.
+- Can now get error objects from the JSON API document object.
+- Added the following helper functions:
+  - `json_decode()`: wraps the native function and throws a JSON API exception if decoding fails.
+  - `http_contains_body()`: determines if a PSR message contains body content.
+- New serializer interface to type-hint that an encoder can also serialize data to an array.
+
 ### Fixed
 - A decoder is now only matched if the client has sent a HTTP request with message body.
 
 ### Removed
 - Deleted the `Utils\NullReporter` class as it was not in use.
+- The `Decoders\Helpers\DecodesJsonTrait` has been removed in preference of the package's `json_decode()` function.
 
 ## [0.9.0] - 2017-06-07
 

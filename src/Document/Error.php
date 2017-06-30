@@ -22,6 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use InvalidArgumentException;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+use Neomerx\JsonApi\Document\Link;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Class Error
@@ -98,15 +100,32 @@ class Error implements MutableErrorInterface
     /**
      * Create an error object from an array.
      *
-     * @param array $input
+     * @param array|object $input
      * @return Error
      */
-    public static function create(array $input)
+    public static function create($input)
     {
         $error = new self();
-        $error->exchangeArray($input);
+        $error->exchangeArray((array) $input);
 
         return $error;
+    }
+
+    /**
+     * Create an error collection from an array of error arrays.
+     *
+     * @param array $input
+     * @return ErrorCollection
+     */
+    public static function createMany(array $input)
+    {
+        $errors = new ErrorCollection();
+
+        foreach ($input as $item) {
+            $errors->add(self::create($item));
+        }
+
+        return $errors;
     }
 
     /**
@@ -189,6 +208,9 @@ class Error implements MutableErrorInterface
     public function addLinks(array $links = null)
     {
         foreach ((array) $links as $key => $link) {
+            if (is_string($link)) {
+                $link = new Link($link, null, true);
+            }
 
             if (!$link instanceof LinkInterface) {
                 throw new InvalidArgumentException('Expecting links to contain link objects.');
@@ -523,7 +545,7 @@ class Error implements MutableErrorInterface
 
         // Links
         if (array_key_exists(self::LINKS, $input)) {
-            $this->addLinks($input[self::LINKS]);
+            $this->addLinks((array) $input[self::LINKS]);
         }
 
         // About Link
@@ -568,7 +590,7 @@ class Error implements MutableErrorInterface
 
         // Meta
         if (array_key_exists(self::META, $input)) {
-            $this->addMeta($input[self::META]);
+            $this->addMeta((array) $input[self::META]);
         }
 
         return $this;

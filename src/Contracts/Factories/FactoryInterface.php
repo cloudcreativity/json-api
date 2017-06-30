@@ -18,9 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Factories;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
@@ -34,7 +38,10 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 /**
  * Interface FactoryInterface
@@ -46,6 +53,13 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 interface FactoryInterface extends BaseFactoryInterface
 {
+
+    /**
+     * @param SchemaContainerInterface $container
+     * @param EncoderOptions|null $encoderOptions
+     * @return SerializerInterface
+     */
+    public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null);
 
     /**
      * @param $namespace
@@ -68,7 +82,7 @@ interface FactoryInterface extends BaseFactoryInterface
     );
 
     /**
-     * Build a JSON API request object from an API definition and an HTTP request.
+     * Create a JSON API request object from a PSR server request.
      *
      * @param ServerRequestInterface $httpRequest
      *      the inbound HTTP request
@@ -83,6 +97,32 @@ interface FactoryInterface extends BaseFactoryInterface
         RequestInterpreterInterface $interpreter,
         ApiInterface $api
     );
+
+    /**
+     * Create a JSON API response object from a PSR response.
+     *
+     * @param PsrResponse $response
+     * @return ResponseInterface
+     */
+    public function createResponse(PsrResponse $response);
+
+    /**
+     * Create a JSON API document from a HTTP message.
+     *
+     * @param MessageInterface $message
+     * @return DocumentInterface|null
+     *      the document, or null if the message does not contain body content.
+     */
+    public function createDocumentObject(MessageInterface $message);
+
+    /**
+     * @param mixed $httpClient
+     *      the HTTP client that will send requests.
+     * @param SchemaContainerInterface $container
+     * @param SerializerInterface $encoder
+     * @return ClientInterface
+     */
+    public function createClient($httpClient, SchemaContainerInterface $container, SerializerInterface $encoder);
 
     /**
      * Create a codec matcher that is configured using the supplied codecs array.
@@ -147,7 +187,6 @@ interface FactoryInterface extends BaseFactoryInterface
         array $filteringParameters = null,
         QueryValidatorInterface $validator = null
     );
-
     /**
      * @param mixed $data
      * @param LinkInterface|null $first

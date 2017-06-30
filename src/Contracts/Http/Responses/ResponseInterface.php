@@ -16,27 +16,28 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi;
+namespace CloudCreativity\JsonApi\Contracts\Http\Responses;
 
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
-use PHPUnit_Framework_TestCase;
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 /**
- * Class TestCase
+ * Interface ResponseInterface
  *
  * @package CloudCreativity\JsonApi
  */
-class TestCase extends PHPUnit_Framework_TestCase
+interface ResponseInterface
 {
 
     /**
-     * @param $content
-     * @return Contracts\Object\DocumentInterface
+     * @return PsrResponse
      */
-    protected function decode($content)
-    {
-        $decoder = new DocumentDecoder();
+    public function getPsrResponse();
 
-        return $decoder->decode($content);
-    }
+    /**
+     * The parsed response document, if the response has body content.
+     *
+     * @return DocumentInterface|null
+     */
+    public function getDocument();
 }

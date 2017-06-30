@@ -2,7 +2,18 @@
 
 This file provides notes on how to upgrade between versions.
 
-## v0.8 to v0.9 (Unreleased)
+## v0.9 to v0.10
+
+### Documents
+
+The following methods have been added to the `Contracts\Object\DocumentInterface`:
+
+- `getIncluded()`
+- `getErrors()`
+
+This will only affect your implementation if you have implemented this interface yourself.
+
+## v0.8 to v0.9
 
 ### Renaming `Resource`
 
