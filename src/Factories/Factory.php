@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Factories;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
@@ -27,6 +28,7 @@ use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Api;
+use CloudCreativity\JsonApi\Http\Client\GuzzleClient;
 use CloudCreativity\JsonApi\Http\Query\ValidationQueryChecker;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
 use CloudCreativity\JsonApi\Pagination\Page;
@@ -54,11 +56,17 @@ class Factory extends BaseFactory implements FactoryInterface
 {
 
     /**
-     * @param SchemaContainerInterface $container
-     * @param EncoderOptions|null $encoderOptions
-     * @return Encoder
+     * @inheritdoc
      */
     public function createEncoder(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null)
+    {
+        return $this->createSerializer($container, $encoderOptions);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null)
     {
         $encoder = new Encoder($this, $container, $encoderOptions);
         $encoder->setLogger($this->logger);
@@ -199,6 +207,14 @@ class Factory extends BaseFactory implements FactoryInterface
         $metaKey = null
     ) {
         return new Page($data, $first, $previous, $next, $last, $meta, $metaKey);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createClient($httpClient, SchemaContainerInterface $container, SerializerInterface $encoder)
+    {
+        return new GuzzleClient($httpClient, $container, $encoder);
     }
 
     /**

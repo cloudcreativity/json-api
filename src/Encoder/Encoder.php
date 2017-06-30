@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Encoder;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 use Neomerx\JsonApi\Encoder\Serialize\ArraySerializerTrait;
@@ -27,7 +28,7 @@ use Neomerx\JsonApi\Encoder\Serialize\ArraySerializerTrait;
  *
  * @package CloudCreativity\JsonApi
  */
-class Encoder extends BaseEncoder
+class Encoder extends BaseEncoder implements SerializerInterface
 {
 
     use ArraySerializerTrait;

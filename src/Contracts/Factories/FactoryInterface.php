@@ -18,7 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Factories;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
@@ -34,6 +36,7 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface
 use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -167,4 +170,20 @@ interface FactoryInterface extends BaseFactoryInterface
         $meta = null,
         $metaKey = null
     );
+
+    /**
+     * @param mixed $httpClient
+     *      the HTTP client that will send requests.
+     * @param SchemaContainerInterface $container
+     * @param SerializerInterface $encoder
+     * @return ClientInterface
+     */
+    public function createClient($httpClient, SchemaContainerInterface $container, SerializerInterface $encoder);
+
+    /**
+     * @param SchemaContainerInterface $container
+     * @param EncoderOptions|null $encoderOptions
+     * @return SerializerInterface
+     */
+    public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null);
 }

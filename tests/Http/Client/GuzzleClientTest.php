@@ -2,9 +2,12 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Http\Responses\Response as ClientResponse;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
@@ -41,7 +44,7 @@ class GuzzleClientTest extends TestCase
     private $mock;
 
     /**
-     * @var GuzzleClient
+     * @var ClientInterface
      */
     private $client;
 
@@ -50,13 +53,14 @@ class GuzzleClientTest extends TestCase
      */
     protected function setUp()
     {
-        /** @var Encoder $encoder */
-        $encoder = $this->encoder = $this->createMock(Encoder::class);
         $this->record = (object) [
             'type' => 'posts',
             'id' => '1',
             'attributes' => ['title' => 'Hello World'],
         ];
+
+        /** @var SerializerInterface $serializer */
+        $serializer = $this->encoder = $this->createMock(SerializerInterface::class);
 
         $schema = $this->createMock(SchemaProviderInterface::class);
         $schema->method('getResourceType')->willReturn('posts');
@@ -71,7 +75,8 @@ class GuzzleClientTest extends TestCase
         ]);
 
         /** @var ContainerInterface $container */
-        $this->client = new GuzzleClient($http, $container, $encoder);
+        $factory = new Factory();
+        $this->client = $factory->createClient($http, $container, $serializer);
     }
 
     public function testIndex()

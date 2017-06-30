@@ -18,9 +18,9 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
@@ -45,9 +45,9 @@ trait SendsRequestsTrait
     protected $schemas;
 
     /**
-     * @var Encoder
+     * @var SerializerInterface
      */
-    protected $encoder;
+    protected $serializer;
 
     /**
      * @param $record
@@ -59,7 +59,7 @@ trait SendsRequestsTrait
         $resourceType = $this->schemas->getSchema($record)->getResourceType();
         $parameters = $fields ? new EncodingParameters(null, [$resourceType => $fields]) : null;
 
-        return $this->encoder->serializeData($record, $parameters);
+        return $this->serializer->serializeData($record, $parameters);
     }
 
     /**

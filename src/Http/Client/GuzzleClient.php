@@ -18,10 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Responses\Response;
 use Exception;
 use GuzzleHttp\Client;
@@ -50,13 +50,13 @@ class GuzzleClient implements ClientInterface
      *
      * @param Client $http
      * @param ContainerInterface $schemas
-     * @param Encoder $encoder
+     * @param SerializerInterface $serializer
      */
-    public function __construct(Client $http, ContainerInterface $schemas, Encoder $encoder)
+    public function __construct(Client $http, ContainerInterface $schemas, SerializerInterface $serializer)
     {
         $this->http = $http;
         $this->schemas = $schemas;
-        $this->encoder = $encoder;
+        $this->serializer = $serializer;
     }
 
     /**
