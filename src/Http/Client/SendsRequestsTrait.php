@@ -82,12 +82,28 @@ trait SendsRequestsTrait
      */
     protected function parseQuery(EncodingParametersInterface $parameters)
     {
-        return array_filter([
+        return array_filter(array_merge((array) $parameters->getUnrecognizedParameters(), [
             QueryParametersParserInterface::PARAM_INCLUDE =>
                 implode(',', (array) $parameters->getIncludePaths()),
             QueryParametersParserInterface::PARAM_FIELDS =>
                 $this->parseQueryFieldsets((array) $parameters->getFieldSets()),
-        ]);
+        ]));
+    }
+
+    /**
+     * @param EncodingParametersInterface $parameters
+     * @return array
+     */
+    protected function parseSearchQuery(EncodingParametersInterface $parameters)
+    {
+        return array_filter(array_merge($this->parseQuery($parameters), [
+            QueryParametersParserInterface::PARAM_SORT =>
+                implode(',', (array) $parameters->getSortParameters()),
+            QueryParametersParserInterface::PARAM_PAGE =>
+                $parameters->getPaginationParameters(),
+            QueryParametersParserInterface::PARAM_FILTER =>
+                $parameters->getFilteringParameters(),
+        ]));
     }
 
     /**

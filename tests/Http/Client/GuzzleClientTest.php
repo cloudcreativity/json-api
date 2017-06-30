@@ -70,6 +70,48 @@ class GuzzleClientTest extends TestCase
         $this->client = new GuzzleClient($http, $container, $encoder);
     }
 
+    public function testIndex()
+    {
+        $this->willSeeRecords();
+        $response = $this->client->index('posts');
+        $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
+        $this->assertRequested('GET', '/posts');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+    }
+
+    public function testIndexWithParameters()
+    {
+        $parameters = new EncodingParameters(
+            ['author', 'site'],
+            ['author' => ['first-name', 'surname'], 'site' => ['uri']],
+            ['created-at', 'author'],
+            ['number' => 1, 'size' => 15],
+            ['author' => 99],
+            ['foo' => 'bar']
+        );
+
+        $this->willSeeRecords();
+        $this->client->index('posts', $parameters);
+
+        $this->assertQueryParameters([
+            'include' => 'author,site',
+            'fields[author]' => 'first-name,surname',
+            'fields[site]' => 'uri',
+            'sort' => 'created-at,author',
+            'page[number]' => '1',
+            'page[size]' => '15',
+            'filter[author]' => '99',
+            'foo' => 'bar'
+        ]);
+    }
+
+    public function testIndexError()
+    {
+        $this->willSeeErrors();
+        $this->expectException(JsonApiException::class);
+        $this->client->index('posts');
+    }
+
     public function testCreateWithoutId()
     {
         $this->record->id = null;
@@ -94,7 +136,11 @@ class GuzzleClientTest extends TestCase
     {
         $parameters = new EncodingParameters(
             ['author', 'site'],
-            ['author' => ['first-name', 'surname'], 'site' => ['uri']]
+            ['author' => ['first-name', 'surname'], 'site' => ['uri']],
+            null,
+            null,
+            null,
+            ['foo' => 'bar']
         );
 
         $this->willSerializeRecord()->willSeeRecord(201);
@@ -104,6 +150,7 @@ class GuzzleClientTest extends TestCase
             'include' => 'author,site',
             'fields[author]' => 'first-name,surname',
             'fields[site]' => 'uri',
+            'foo' => 'bar'
         ]);
     }
 
@@ -244,6 +291,18 @@ class GuzzleClientTest extends TestCase
             ->method('serializeData')
             ->with($this->record, $parameters)
             ->willReturn(['data' => (array) $this->record]);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    private function willSeeRecords()
+    {
+        $this->appendResponse(200, ['Content-Type' => 'application/vnd.api+json'], [
+            'data' => [(array) $this->record],
+        ]);
 
         return $this;
     }

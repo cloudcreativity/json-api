@@ -36,6 +36,21 @@ class GuzzleClient
     }
 
     /**
+     * @param $resourceType
+     * @param EncodingParametersInterface|null $parameters
+     * @return Response
+     * @throws JsonApiException
+     *      if the remote server replies with an error.
+     */
+    public function index($resourceType, EncodingParametersInterface $parameters = null)
+    {
+        return new Response($this->request('GET', $this->resourceUri($resourceType), [
+            'headers' => $this->normalizeHeaders(),
+            'query' => $parameters ? $this->parseSearchQuery($parameters) : null,
+        ]));
+    }
+
+    /**
      * Send the domain record to the remote JSON API.
      *
      * @param object $record
