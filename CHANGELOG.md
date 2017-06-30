@@ -7,9 +7,14 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 - Can now get included resource objects from the JSON API document object.
 - Can now get error objects from the JSON API document object.
+- A `json_decode` helper function is now available to decode JSON strings and throw a JSON API exception if
+an error occurs.
 
 ### Fixed
 - A decoder is now only matched if the client has sent a HTTP request with message body.
+
+### Removed
+- The `Decoders\Helpers\DecodesJsonTrait` has been removed in preference of the package's `json_decode()` function.
 
 ## [0.9.0] - 2017-06-07
 

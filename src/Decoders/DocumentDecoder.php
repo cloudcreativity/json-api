@@ -19,10 +19,10 @@
 namespace CloudCreativity\JsonApi\Decoders;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use CloudCreativity\JsonApi\Decoders\Helpers\DecodesJson;
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
 use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
+use function CloudCreativity\JsonApi\json_decode;
 
 /**
  * Class DocumentDecoder
@@ -32,8 +32,6 @@ use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 class DocumentDecoder implements DecoderInterface
 {
 
-    use DecodesJson;
-
     /**
      * @param string $content
      * @return DocumentInterface
@@ -41,9 +39,7 @@ class DocumentDecoder implements DecoderInterface
      */
     public function decode($content)
     {
-        $obj = $this->decodeJson($content);
-
-        return new Document($obj);
+        return new Document(json_decode($content));
     }
 
 }

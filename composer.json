@@ -35,7 +35,10 @@
     "autoload": {
         "psr-4": {
             "CloudCreativity\\JsonApi\\": "src/"
-        }
+        },
+        "files": [
+            "helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
