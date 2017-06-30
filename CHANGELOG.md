@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file. This projec
 ### Fixed
 - A decoder is now only matched if the client has sent a HTTP request with message body.
 
+### Removed
+- Deleted the `Utils\NullReporter` class as it was not in use.
+
 ## [0.9.0] - 2017-06-07
 
 ### Added
