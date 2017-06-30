@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## Unreleased
 
 ### Added
+- An HTTP client interface for sending JSON API requests to a remote server, and a Guzzle 6 implementation.
 - Can now get included resource objects from the JSON API document object.
 - Can now get error objects from the JSON API document object.
 - Added the following helper functions:

@@ -22,7 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Http\Responses\Response;
+use CloudCreativity\JsonApi\Factories\Factory;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -48,12 +48,18 @@ class GuzzleClient implements ClientInterface
     /**
      * GuzzleClient constructor.
      *
+     * @param Factory $factory
      * @param Client $http
      * @param ContainerInterface $schemas
      * @param SerializerInterface $serializer
      */
-    public function __construct(Client $http, ContainerInterface $schemas, SerializerInterface $serializer)
-    {
+    public function __construct(
+        Factory $factory,
+        Client $http,
+        ContainerInterface $schemas,
+        SerializerInterface $serializer
+    ) {
+        $this->factory = $factory;
         $this->http = $http;
         $this->schemas = $schemas;
         $this->serializer = $serializer;
@@ -147,7 +153,7 @@ class GuzzleClient implements ClientInterface
             throw $this->parseErrorResponse($ex);
         }
 
-        return new Response($response, $this->decode($response));
+        return $this->factory->createResponse($response);
     }
 
     /**
@@ -163,7 +169,7 @@ class GuzzleClient implements ClientInterface
     {
         try {
             $response = $ex->getResponse();
-            $document = $response ? $this->decode($response) : null;
+            $document = $response ? $this->factory->createDocumentObject($response) : null;
             $errors = $document ? $document->getErrors() : [];
             $statusCode = $response ? $response->getStatusCode() : 0;
         } catch (Exception $e) {

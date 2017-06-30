@@ -19,17 +19,12 @@
 namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
-use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use Neomerx\JsonApi\Http\Headers\MediaType;
-use Psr\Http\Message\ResponseInterface;
-use function CloudCreativity\JsonApi\http_contains_body;
-use function CloudCreativity\JsonApi\json_decode;
 
 /**
  * Trait SendsRequestsTrait
@@ -38,6 +33,11 @@ use function CloudCreativity\JsonApi\json_decode;
  */
 trait SendsRequestsTrait
 {
+
+    /**
+     * @var FactoryInterface
+     */
+    protected $factory;
 
     /**
      * @var ContainerInterface
@@ -57,7 +57,7 @@ trait SendsRequestsTrait
     protected function serializeRecord($record, array $fields = [])
     {
         $resourceType = $this->schemas->getSchema($record)->getResourceType();
-        $parameters = $fields ? new EncodingParameters(null, [$resourceType => $fields]) : null;
+        $parameters = $fields ? $this->factory->createQueryParameters(null, [$resourceType => $fields]) : null;
 
         return $this->serializer->serializeData($record, $parameters);
     }
@@ -130,21 +130,6 @@ trait SendsRequestsTrait
             QueryParametersParserInterface::PARAM_FILTER =>
                 $parameters->getFilteringParameters(),
         ]));
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @return DocumentInterface|null
-     */
-    protected function decode(ResponseInterface $response)
-    {
-        if (!http_contains_body($response)) {
-            return null;
-        }
-
-        $content = (string) $response->getBody();
-
-        return new Document(json_decode($content));
     }
 
     /**
