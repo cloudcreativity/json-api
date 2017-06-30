@@ -2,16 +2,22 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Decoders\Helpers\DecodesJson;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use Neomerx\JsonApi\Http\Headers\MediaType;
+use Psr\Http\Message\ResponseInterface;
 
 trait SendsRequestsTrait
 {
+
+    use DecodesJson;
 
     /**
      * @var ContainerInterface
@@ -104,6 +110,17 @@ trait SendsRequestsTrait
             QueryParametersParserInterface::PARAM_FILTER =>
                 $parameters->getFilteringParameters(),
         ]));
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return DocumentInterface
+     */
+    protected function decode(ResponseInterface $response)
+    {
+        $content = (string) $response->getBody();
+
+        return new Document($this->decodeJson($content));
     }
 
     /**

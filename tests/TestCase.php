@@ -31,7 +31,7 @@ class TestCase extends PHPUnit_Framework_TestCase
 
     /**
      * @param $content
-     * @return Object\Document
+     * @return Contracts\Object\DocumentInterface
      */
     protected function decode($content)
     {

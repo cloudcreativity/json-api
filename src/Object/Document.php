@@ -19,6 +19,7 @@
 namespace CloudCreativity\JsonApi\Object;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\Utils\Object\StandardObject;
 use CloudCreativity\Utils\Object\StandardObjectInterface;
@@ -83,7 +84,6 @@ class Document extends StandardObject implements DocumentInterface
         return ResourceObjectCollection::create($data);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -91,4 +91,37 @@ class Document extends StandardObject implements DocumentInterface
     {
         return new Relationship($this->proxy);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIncluded()
+    {
+        if (!$this->has(self::INCLUDED)) {
+            return null;
+        }
+
+        if (!is_array($data = $this->{self::INCLUDED})) {
+            throw new RuntimeException('Included member is not an array.');
+        }
+
+        return ResourceObjectCollection::create($data);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getErrors()
+    {
+        if (!$this->has(self::ERRORS)) {
+            return null;
+        }
+
+        if (!is_array($data = $this->{self::ERRORS})) {
+            throw new RuntimeException('Errors member is not an array.');
+        }
+
+        return Error::createMany($data);
+    }
+
 }

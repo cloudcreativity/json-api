@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+- Can now get included resource objects from the JSON API document object.
+- Can now get error objects from the JSON API document object.
+
 ### Fixed
 - A decoder is now only matched if the client has sent a HTTP request with message body.
 

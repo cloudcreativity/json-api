@@ -25,7 +25,7 @@ use CloudCreativity\JsonApi\Object\Document;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 
 /**
- * Class ResourceDecoder
+ * Class DocumentDecoder
  *
  * @package CloudCreativity\JsonApi
  */

@@ -4,6 +4,7 @@ namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -159,9 +160,26 @@ class GuzzleClient
         try {
             return $this->http->request($method, $uri, $options);
         } catch (BadResponseException $ex) {
-            $statusCode = $ex->getResponse() ? $ex->getResponse()->getStatusCode() : null;
-            throw new JsonApiException([], $statusCode, $ex);
+            throw $this->parseErrorResponse($ex);
         }
+    }
+
+    /**
+     * @param BadResponseException $ex
+     * @return JsonApiException
+     */
+    private function parseErrorResponse(BadResponseException $ex)
+    {
+        try {
+            $response = $ex->getResponse();
+            $errors = $response ? $this->decode($response)->getErrors() : [];
+            $statusCode = $response ? $response->getStatusCode() : 0;
+        } catch (Exception $e) {
+            $errors = [];
+            $statusCode = 0;
+        }
+
+        return new JsonApiException($errors, $statusCode, $ex);
     }
 
 }

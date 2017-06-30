@@ -2,6 +2,7 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
@@ -13,6 +14,7 @@ use GuzzleHttp\Psr7\Response;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
+use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
@@ -275,8 +277,33 @@ class GuzzleClientTest extends TestCase
             $this->fail('No exception thrown.');
         } catch (JsonApiException $ex) {
             $this->assertSame(422, $ex->getHttpCode());
-            $this->assertEmpty($ex->getErrors());
+            $this->assertEmpty($ex->getErrors()->getArrayCopy());
             $this->assertInstanceOf(BadResponseException::class, $ex->getPrevious());
+        }
+    }
+
+    public function testErrorResponseWithErrorObjects()
+    {
+        $expected = new Error(
+            "536d04b6-3a76-43ed-8c2f-9e60e6e68aa1",
+            ['about' => new Link("http://localhost/errors/server", null, true)],
+            500,
+            "server",
+            "Server Error",
+            "An unexpected error occurred.",
+            ["pointer" => "/"],
+            ["foo" => "bar"]
+        );
+
+        /** @var Encoder $encoder */
+        $encoder = Encoder::instance();
+        $this->willSeeErrors($encoder->serializeErrors([$expected]), 500);
+
+        try {
+            $this->client->delete($this->record);
+            $this->fail('No exception thrown.');
+        } catch (JsonApiException $ex) {
+            $this->assertEquals([$expected], $ex->getErrors()->getArrayCopy());
         }
     }
 
@@ -325,11 +352,10 @@ class GuzzleClientTest extends TestCase
      * @param int $status
      * @return $this
      */
-    private function willSeeErrors(array $errors = [], $status = 400)
+    private function willSeeErrors(array $errors = null, $status = 400)
     {
-        $this->appendResponse($status, ['Content-Type' => 'application/vnd.api+json'], [
-            'errors' => $errors,
-        ]);
+        $errors = $errors ?: ['errors' => []];
+        $this->appendResponse($status, ['Content-Type' => 'application/vnd.api+json'], $errors);
 
         return $this;
     }
