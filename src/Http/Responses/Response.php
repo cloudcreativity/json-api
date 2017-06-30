@@ -16,21 +16,22 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Http\Client;
+namespace CloudCreativity\JsonApi\Http\Responses;
 
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 /**
  * Class Response
  *
  * @package CloudCreativity\JsonApi
  */
-class Response
+class Response implements ResponseInterface
 {
 
     /**
-     * @var ResponseInterface
+     * @var PsrResponse
      */
     private $response;
 
@@ -42,17 +43,17 @@ class Response
     /**
      * Response constructor.
      *
-     * @param ResponseInterface $response
-     * @param DocumentInterface $document
+     * @param PsrResponse $response
+     * @param DocumentInterface|null $document
      */
-    public function __construct(ResponseInterface $response, DocumentInterface $document = null)
+    public function __construct(PsrResponse $response, DocumentInterface $document = null)
     {
         $this->response = $response;
         $this->document = $document;
     }
 
     /**
-     * @return ResponseInterface
+     * @inheritdoc
      */
     public function getPsrResponse()
     {
@@ -60,9 +61,7 @@ class Response
     }
 
     /**
-     * The parsed response document, if it had one.
-     *
-     * @return DocumentInterface|null
+     * @inheritdoc
      */
     public function getDocument()
     {

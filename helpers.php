@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2017 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
@@ -19,21 +35,21 @@ if (!function_exists('CloudCreativity\JsonApi\json_decode')) {
      */
     function json_decode($content, $assoc = false, $depth = 512, $options = 0)
     {
-        $parsed = \json_decode($content, $assoc, $depth, $options);
+        $decoded = \json_decode($content, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw InvalidJsonException::create();
         }
 
-        if (!$assoc && !is_object($parsed)) {
+        if (!$assoc && !is_object($decoded)) {
             throw new InvalidJsonException(null, 'JSON is not an object.');
         }
 
-        if ($assoc && !is_array($parsed)) {
+        if ($assoc && !is_array($decoded)) {
             throw new InvalidJsonException(null, 'JSON is not an object or array.');
         }
 
-        return $parsed;
+        return $decoded;
     }
 }
 

@@ -18,8 +18,11 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Http\Responses\Response;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -32,7 +35,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
  *
  * @package CloudCreativity\JsonApi
  */
-class GuzzleClient
+class GuzzleClient implements ClientInterface
 {
 
     use SendsRequestsTrait;
@@ -57,11 +60,7 @@ class GuzzleClient
     }
 
     /**
-     * @param $resourceType
-     * @param EncodingParametersInterface|null $parameters
-     * @return Response
-     * @throws JsonApiException
-     *      if the remote server replies with an error.
+     * @inheritdoc
      */
     public function index($resourceType, EncodingParametersInterface $parameters = null)
     {
@@ -72,13 +71,7 @@ class GuzzleClient
     }
 
     /**
-     * Send the domain record to the remote JSON API.
-     *
-     * @param object $record
-     * @param EncodingParametersInterface|null $parameters
-     * @return Response
-     * @throws JsonApiException
-     *      if the remote server replies with an error.
+     * @inheritdoc
      */
     public function create($record, EncodingParametersInterface $parameters = null)
     {
@@ -86,13 +79,7 @@ class GuzzleClient
     }
 
     /**
-     * Read the domain record from the remote JSON API.
-     *
-     * @param ResourceIdentifierInterface $identifier
-     * @param EncodingParametersInterface|null $parameters
-     * @return Response
-     * @throws JsonApiException
-     *      if the remote server replies with an error.
+     * @inheritdoc
      */
     public function read(ResourceIdentifierInterface $identifier, EncodingParametersInterface $parameters = null)
     {
@@ -105,15 +92,7 @@ class GuzzleClient
     }
 
     /**
-     * Update the domain record with the remote JSON API.
-     *
-     * @param object $record
-     * @param string[] $fields
-     *      the fields to send, if sending sparse field-sets.
-     * @param EncodingParametersInterface|null $parameters
-     * @return Response
-     * @throws JsonApiException
-     *      if the remote server replies with an error.
+     * @inheritdoc
      */
     public function update($record, array $fields = [], EncodingParametersInterface $parameters = null)
     {
@@ -121,12 +100,7 @@ class GuzzleClient
     }
 
     /**
-     * Delete the domain record from the remote JSON API.
-     *
-     * @param object $record
-     * @return Response
-     * @throws JsonApiException
-     *      if the remote server replies with an error.
+     * @inheritdoc
      */
     public function delete($record)
     {
@@ -138,7 +112,7 @@ class GuzzleClient
      * @param array $serializedRecord
      *      the encoded record
      * @param EncodingParametersInterface|null $parameters
-     * @return Response
+     * @return ResponseInterface
      */
     protected function sendRecord($method, array $serializedRecord, EncodingParametersInterface $parameters = null)
     {
@@ -162,7 +136,7 @@ class GuzzleClient
      * @param $method
      * @param $uri
      * @param array $options
-     * @return Response
+     * @return ResponseInterface
      * @throws JsonApiException
      */
     protected function request($method, $uri, array $options = [])

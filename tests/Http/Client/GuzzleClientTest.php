@@ -5,7 +5,7 @@ namespace CloudCreativity\JsonApi\Http\Client;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Encoder\Encoder;
-use CloudCreativity\JsonApi\Http\Client\Response as ClientResponse;
+use CloudCreativity\JsonApi\Http\Responses\Response as ClientResponse;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Client;
