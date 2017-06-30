@@ -2,8 +2,10 @@
 
 namespace CloudCreativity\JsonApi\Http\Client;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Document\Error;
 use CloudCreativity\JsonApi\Encoder\Encoder;
+use CloudCreativity\JsonApi\Http\Client\Response as ClientResponse;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Client;
@@ -79,6 +81,12 @@ class GuzzleClientTest extends TestCase
         $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
         $this->assertRequested('GET', '/posts');
         $this->assertHeader('Accept', 'application/vnd.api+json');
+
+        $identifier = ResourceIdentifier::create('posts', '1');
+        $this->assertInstanceOf(
+            ResourceObjectInterface::class,
+            $response->getDocument()->getResources()->get($identifier)
+        );
     }
 
     public function testIndexWithParameters()
@@ -121,6 +129,7 @@ class GuzzleClientTest extends TestCase
         $response = $this->client->create($this->record);
 
         $this->assertSame(201, $response->getPsrResponse()->getStatusCode());
+        $this->assertResponseResource($response);
         $this->assertRequested('POST', '/posts');
         $this->assertRequestSentRecord();
         $this->assertHeader('Accept', 'application/vnd.api+json');
@@ -161,6 +170,7 @@ class GuzzleClientTest extends TestCase
         $this->willSerializeRecord()->appendResponse(204);
         $response = $this->client->create($this->record);
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+        $this->assertNull($response->getDocument());
     }
 
     public function testCreateError()
@@ -177,6 +187,7 @@ class GuzzleClientTest extends TestCase
         $response = $this->client->read($identifier);
 
         $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
+        $this->assertResponseResource($response);
         $this->assertRequested('GET', '/posts/1');
         $this->assertHeader('Accept', 'application/vnd.api+json');
     }
@@ -212,6 +223,7 @@ class GuzzleClientTest extends TestCase
         $response = $this->client->update($this->record);
 
         $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
+        $this->assertResponseResource($response);
         $this->assertRequested('PATCH', '/posts/1');
         $this->assertRequestSentRecord();
         $this->assertHeader('Accept', 'application/vnd.api+json');
@@ -251,6 +263,7 @@ class GuzzleClientTest extends TestCase
         $this->willSerializeRecord()->appendResponse(204);
         $response = $this->client->update($this->record);
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+        $this->assertNull($response->getDocument());
     }
 
     public function testUpdateError()
@@ -265,6 +278,7 @@ class GuzzleClientTest extends TestCase
         $this->appendResponse(204);
         $response = $this->client->delete($this->record);
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
+        $this->assertNull($response->getDocument());
         $this->assertRequested('DELETE', '/posts/1');
     }
 
@@ -340,8 +354,11 @@ class GuzzleClientTest extends TestCase
      */
     private function willSeeRecord($status = 200)
     {
+        $copy = clone $this->record;
+        $copy->id = $copy->id ?: '1';
+
         $this->appendResponse($status, ['Content-Type' => 'application/vnd.api+json'], [
-            'data' => (array) $this->record,
+            'data' => (array) $copy,
         ]);
 
         return $this;
@@ -370,6 +387,7 @@ class GuzzleClientTest extends TestCase
     {
         if (is_array($body)) {
             $body = json_encode($body);
+            $headers['Content-Length'] = strlen($body);
         }
 
         $this->mock->append(new Response($status, $headers, $body));
@@ -420,5 +438,16 @@ class GuzzleClientTest extends TestCase
     {
         $query = $this->mock->getLastRequest()->getUri()->getQuery();
         $this->assertEquals($expected, parse_query($query));
+    }
+
+    /**
+     * @param ClientResponse $response
+     */
+    private function assertResponseResource(ClientResponse $response)
+    {
+        $resource = $response->getDocument()->getResource();
+        $this->assertInstanceOf(ResourceObjectInterface::class, $resource);
+        $this->assertSame('posts', $resource->getType());
+        $this->assertSame('1', $resource->getId());
     }
 }

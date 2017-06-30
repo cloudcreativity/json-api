@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2017 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
@@ -10,8 +26,12 @@ use GuzzleHttp\Exception\BadResponseException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Class GuzzleClient
+ *
+ * @package CloudCreativity\JsonApi
+ */
 class GuzzleClient
 {
 
@@ -45,10 +65,10 @@ class GuzzleClient
      */
     public function index($resourceType, EncodingParametersInterface $parameters = null)
     {
-        return new Response($this->request('GET', $this->resourceUri($resourceType), [
+        return $this->request('GET', $this->resourceUri($resourceType), [
             'headers' => $this->normalizeHeaders(),
             'query' => $parameters ? $this->parseSearchQuery($parameters) : null,
-        ]));
+        ]);
     }
 
     /**
@@ -62,11 +82,7 @@ class GuzzleClient
      */
     public function create($record, EncodingParametersInterface $parameters = null)
     {
-        return new Response($this->sendRecord(
-            'POST',
-            $this->serializeRecord($record),
-            $parameters
-        ));
+        return $this->sendRecord('POST', $this->serializeRecord($record), $parameters);
     }
 
     /**
@@ -82,12 +98,10 @@ class GuzzleClient
     {
         $uri = $this->resourceUri($identifier);
 
-        $response = $this->request('GET', $uri, [
+        return $this->request('GET', $uri, [
             'headers' => $this->normalizeHeaders(),
             'query' => $parameters ? $this->parseQuery($parameters) : null,
         ]);
-
-        return new Response($response);
     }
 
     /**
@@ -103,11 +117,7 @@ class GuzzleClient
      */
     public function update($record, array $fields = [], EncodingParametersInterface $parameters = null)
     {
-        return new Response($this->sendRecord(
-            'PATCH',
-            $this->serializeRecord($record, $fields),
-            $parameters
-        ));
+        return $this->sendRecord('PATCH', $this->serializeRecord($record, $fields), $parameters);
     }
 
     /**
@@ -120,7 +130,7 @@ class GuzzleClient
      */
     public function delete($record)
     {
-        return new Response($this->request('DELETE', $this->recordUri($record)));
+        return $this->request('DELETE', $this->recordUri($record));
     }
 
     /**
@@ -128,9 +138,9 @@ class GuzzleClient
      * @param array $serializedRecord
      *      the encoded record
      * @param EncodingParametersInterface|null $parameters
-     * @return ResponseInterface
+     * @return Response
      */
-    private function sendRecord($method, array $serializedRecord, EncodingParametersInterface $parameters = null)
+    protected function sendRecord($method, array $serializedRecord, EncodingParametersInterface $parameters = null)
     {
         $resourceType = $serializedRecord['data']['type'];
 
@@ -152,19 +162,26 @@ class GuzzleClient
      * @param $method
      * @param $uri
      * @param array $options
-     * @return ResponseInterface
+     * @return Response
      * @throws JsonApiException
      */
-    private function request($method, $uri, array $options = [])
+    protected function request($method, $uri, array $options = [])
     {
         try {
-            return $this->http->request($method, $uri, $options);
+            $response = $this->http->request($method, $uri, $options);
         } catch (BadResponseException $ex) {
             throw $this->parseErrorResponse($ex);
         }
+
+        return new Response($response, $this->decode($response));
     }
 
     /**
+     * Safely parse an error response.
+     *
+     * This method wraps decoding the body content of the provided exception, so that
+     * another exception is not thrown while trying to parse an existing exception.
+     *
      * @param BadResponseException $ex
      * @return JsonApiException
      */
@@ -172,7 +189,8 @@ class GuzzleClient
     {
         try {
             $response = $ex->getResponse();
-            $errors = $response ? $this->decode($response)->getErrors() : [];
+            $document = $response ? $this->decode($response) : null;
+            $errors = $document ? $document->getErrors() : [];
             $statusCode = $response ? $response->getStatusCode() : 0;
         } catch (Exception $e) {
             $errors = [];
