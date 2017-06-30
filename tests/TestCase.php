@@ -18,16 +18,31 @@
 
 namespace CloudCreativity\JsonApi;
 
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
-use PHPUnit_Framework_TestCase;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Factories\Factory;
+use CloudCreativity\JsonApi\Object\Document;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
  * Class TestCase
  *
  * @package CloudCreativity\JsonApi
  */
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends BaseTestCase
 {
+
+    /**
+     * @var FactoryInterface
+     */
+    protected $factory;
+
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        $this->factory = new Factory();
+    }
 
     /**
      * @param $content
@@ -35,8 +50,6 @@ class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function decode($content)
     {
-        $decoder = new DocumentDecoder();
-
-        return $decoder->decode($content);
+        return new Document(json_decode($content));
     }
 }

@@ -19,13 +19,13 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use Generator;
 use Neomerx\JsonApi\Codec\CodecMatcher;
 use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\MediaType;
@@ -253,7 +253,7 @@ class CodecMatcherRepository implements CodecMatcherRepositoryInterface
 
             if (is_numeric($mediaType)) {
                 $mediaType = $decoderClass;
-                $decoderClass = DocumentDecoder::class;
+                $decoderClass = ObjectDecoder::class;
             }
 
             $closure = function () use ($decoderClass) {

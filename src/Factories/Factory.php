@@ -109,11 +109,11 @@ class Factory extends BaseFactory implements FactoryInterface
     public function createRequest(
         ServerRequestInterface $httpRequest,
         RequestInterpreterInterface $intepreter,
-        ApiInterface $api
+        StoreInterface $store
     ) {
         $requestFactory = new RequestFactory($this);
 
-        return $requestFactory->build($httpRequest, $intepreter, $api);
+        return $requestFactory->build($httpRequest, $intepreter, $store);
     }
 
 

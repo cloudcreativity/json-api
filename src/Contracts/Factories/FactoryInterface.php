@@ -88,14 +88,14 @@ interface FactoryInterface extends BaseFactoryInterface
      *      the inbound HTTP request
      * @param RequestInterpreterInterface $interpreter
      *      the interpreter to analyze the request
-     * @param ApiInterface $api
-     *      the API that is receiving the request
+     * @param StoreInterface $store
+     *      the store that the request relates to.
      * @return RequestInterface
      */
     public function createRequest(
         ServerRequestInterface $httpRequest,
         RequestInterpreterInterface $interpreter,
-        ApiInterface $api
+        StoreInterface $store
     );
 
     /**

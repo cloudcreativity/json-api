@@ -4,6 +4,11 @@ This file provides notes on how to upgrade between versions.
 
 ## v0.9 to v0.10
 
+### Factory
+
+The `createRequest()` method on the factory now takes a `StoreInterface` as its final argument, rather than an
+`ApiInterface`.
+
 ### Documents
 
 The following methods have been added to the `Contracts\Object\DocumentInterface`:
@@ -12,6 +17,18 @@ The following methods have been added to the `Contracts\Object\DocumentInterface
 - `getErrors()`
 
 This will only affect your implementation if you have implemented this interface yourself.
+
+### Document Decoder
+
+The `DocumentDecoder` has been removed. You should use the `createDocumentObject` method on the factory instead
+if creating a document from a PSR server request. If creating a document from a string, then use this package's
+`json_decode` helper function, passing the result into a new document instance. I.e.:
+
+```php
+$document = new \CloudCreativity\JsonApi\Object\Document(
+    \CloudCreativity\JsonApi\json_decode($string)
+);
+```
 
 ## v0.8 to v0.9
 

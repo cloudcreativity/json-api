@@ -52,7 +52,7 @@ class TestCase extends BaseTestCase
     /**
      * @var ValidatorFactory
      */
-    protected $factory;
+    protected $validatorFactory;
 
     /**
      * @var array
@@ -64,7 +64,8 @@ class TestCase extends BaseTestCase
      */
     protected function setUp()
     {
-        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        parent::setUp();
+        $store = $this->createMock(StoreInterface::class);
         $config = require __DIR__ . '/../../config/validation.php';
 
         $store->method('isType')->willReturnCallback(function ($type) {
@@ -74,7 +75,7 @@ class TestCase extends BaseTestCase
         $this->errorRepository = new ErrorRepository(new Replacer());
         $this->errorRepository->configure($config);
         $this->errorFactory = new ValidatorErrorFactory($this->errorRepository);
-        $this->factory = new ValidatorFactory($this->errorFactory, $store);
+        $this->validatorFactory = new ValidatorFactory($this->errorFactory, $store);
         $this->store = $store;
     }
 

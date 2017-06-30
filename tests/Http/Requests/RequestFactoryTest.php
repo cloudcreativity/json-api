@@ -21,8 +21,7 @@ namespace CloudCreativity\JsonApi\Http\Requests;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
-use CloudCreativity\JsonApi\Factories\Factory;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Http\Api;
 use CloudCreativity\JsonApi\Http\Middleware\NegotiatesContent;
 use CloudCreativity\JsonApi\Object\Document;
@@ -30,6 +29,7 @@ use CloudCreativity\JsonApi\TestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Headers\MediaType;
@@ -47,24 +47,19 @@ class RequestFactoryTest extends TestCase
     use NegotiatesContent;
 
     /**
-     * @var Api
-     */
-    private $api;
-
-    /**
      * @var Mock
      */
     private $interpreter;
 
     /**
-     * @var CodecMatcherInterface
-     */
-    private $codecMatcher;
-
-    /**
      * @var ServerRequest
      */
     private $serverRequest;
+
+    /**
+     * @var StoreInterface
+     */
+    private $store;
 
     /**
      * @var Mock
@@ -87,29 +82,16 @@ class RequestFactoryTest extends TestCase
     private $expectedRecord;
 
     /**
-     * @var Factory
-     */
-    private $factory;
-
-    /**
      * @return void
      */
     protected function setUp()
     {
-        $this->factory = new Factory();
-
-        $this->codecMatcher = $this->factory->createCodecMatcher();
+        parent::setUp();
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
-        $store = $this->factory->createStore($this->factory->createAdapterContainer(['posts' => $this->adapter]));
-        $this->api = $this->factory->createApi(
-            'v1',
-            $this->codecMatcher,
-            $this->factory->createContainer(),
-            $store,
-            $this->factory->createErrorRepository([])
+        $this->store = $this->factory->createStore(
+            $this->factory->createAdapterContainer(['posts' => $this->adapter])
         );
-        $this->withMediaType();
     }
 
     public function testIndex()
@@ -185,34 +167,6 @@ JSON_API;
             ->doBuild();
     }
 
-    public function testNotAcceptable()
-    {
-        $headers = ['Accept' => 'text/plain'];
-
-        $this->withRequest('GET', null, null, null, $headers)
-            ->doFailure(406);
-    }
-
-    public function testUnsupportedMediaType()
-    {
-        $content = <<<JSON_API
-{
-    "data": {
-        "type": "posts",
-        "attributes": {
-            "title": "My first post",
-            "content": "..."
-        }
-    }
-}
-JSON_API;
-
-        $headers = ['Content-Type' => 'application/json'];
-
-        $this->withRequest('POST', null, null, $content, $headers)
-            ->doFailure(415);
-    }
-
     public function testNotFound()
     {
         $this->withRequest('GET', '123')
@@ -238,9 +192,7 @@ JSON_API;
      */
     private function doBuild()
     {
-        /** We expect content negotiation to have been performed before creating a request. */
-        $this->doContentNegotiation($this->factory, $this->serverRequest, $this->api->getCodecMatcher());
-        $request = $this->factory->createRequest($this->serverRequest, $this->interpreter, $this->api);
+        $request = $this->factory->createRequest($this->serverRequest, $this->interpreter, $this->store);
 
         if (!$request instanceof RequestInterface) {
             $this->fail('No request built.');
@@ -302,25 +254,6 @@ JSON_API;
 
         $this->expectedUri = [$resourceId, $relationship];
         $this->expectedDocument = $content ? new Document(json_decode($content)) : null;
-
-        return $this;
-    }
-
-    /**
-     * @param string $mediaType
-     * @return $this
-     */
-    private function withMediaType($mediaType = MediaTypeInterface::JSON_API_MEDIA_TYPE)
-    {
-        $mediaType = MediaType::parse(0, $mediaType);
-
-        $this->codecMatcher->registerEncoder($mediaType, function () {
-            return Encoder::instance();
-        });
-
-        $this->codecMatcher->registerDecoder($mediaType, function () {
-            return new DocumentDecoder();
-        });
 
         return $this;
     }

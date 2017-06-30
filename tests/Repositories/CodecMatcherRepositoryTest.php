@@ -19,10 +19,10 @@
 namespace CloudCreativity\JsonApi\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Repositories\CodecMatcherRepositoryInterface;
-use CloudCreativity\JsonApi\Decoders\DocumentDecoder;
 use CloudCreativity\JsonApi\TestCase;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Decoders\ArrayDecoder;
+use Neomerx\JsonApi\Decoders\ObjectDecoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory;
 use Neomerx\JsonApi\Http\Headers\AcceptHeader;
@@ -77,7 +77,7 @@ class CodecMatcherRepositoryTest extends TestCase
         $this->encoderB = $factory->createEncoder($schemas, new EncoderOptions(JSON_BIGINT_AS_STRING, $urlPrefix));
         $this->encoderC = $factory->createEncoder($schemas, new EncoderOptions(JSON_PRETTY_PRINT, $urlPrefix, 123));
 
-        $this->decoderA = new DocumentDecoder();
+        $this->decoderA = new ObjectDecoder();
         $this->decoderB = new ArrayDecoder();
 
         $this->repository = new CodecMatcherRepository($factory);

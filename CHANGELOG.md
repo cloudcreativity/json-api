@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Removed
 - Deleted the `Utils\NullReporter` class as it was not in use.
 - The `Decoders\Helpers\DecodesJsonTrait` has been removed in preference of the package's `json_decode()` function.
+- The `Decoders\DocumentDecoder` has been removed as it is no longer in use.
 
 ## [0.9.0] - 2017-06-07
 
