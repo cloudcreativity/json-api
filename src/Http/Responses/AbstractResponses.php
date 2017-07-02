@@ -18,8 +18,18 @@
 
 namespace CloudCreativity\JsonApi\Http\Responses;
 
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ErrorResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
+use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
+use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Document\DocumentInterface;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
+use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use Neomerx\JsonApi\Http\Responses;
 
@@ -32,25 +42,237 @@ abstract class AbstractResponses extends Responses
 {
 
     /**
-     * @var ApiInterface
+     * @var FactoryInterface
      */
-    private $api;
+    private $factory;
 
     /**
-     * @var RequestInterface|null
+     * @var CodecMatcherInterface
      */
-    private $request;
+    private $codecs;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $schemas;
+
+    /**
+     * @var ErrorRepositoryInterface
+     */
+    private $errorRepository;
+
+    /**
+     * @var EncodingParametersInterface|null
+     */
+    private $parameters;
+
+    /**
+     * @var SupportedExtensionsInterface|null
+     */
+    private $extensions;
+
+    /**
+     * @var string|null
+     */
+    private $urlPrefix;
 
     /**
      * AbstractResponses constructor.
      *
-     * @param ApiInterface $api
-     * @param RequestInterface|null $request
+     * @param FactoryInterface $factory
+     * @param CodecMatcherInterface $codecs
+     * @param ContainerInterface $schemas
+     * @param ErrorRepositoryInterface $errors
+     * @param EncodingParametersInterface|null $parameters
+     * @param SupportedExtensionsInterface|null $extensions
+     * @param string|null $urlPrefix
      */
-    public function __construct(ApiInterface $api, RequestInterface $request = null)
+    public function __construct(
+        FactoryInterface $factory,
+        CodecMatcherInterface $codecs,
+        ContainerInterface $schemas,
+        ErrorRepositoryInterface $errors,
+        EncodingParametersInterface $parameters = null,
+        SupportedExtensionsInterface $extensions = null,
+        $urlPrefix = null
+    ) {
+        $this->factory = $factory;
+        $this->codecs = $codecs;
+        $this->schemas = $schemas;
+        $this->errorRepository = $errors;
+        $this->parameters = $parameters;
+        $this->extensions = $extensions;
+        $this->urlPrefix = $urlPrefix;
+    }
+
+    /**
+     * @param $statusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function statusCode($statusCode, array $headers = [])
     {
-        $this->api = $api;
-        $this->request = $request;
+        return $this->getCodeResponse($statusCode, $headers);
+    }
+
+    /**
+     * @param array $headers
+     * @return mixed
+     */
+    public function noContent(array $headers = [])
+    {
+        return $this->getCodeResponse(204, $headers);
+    }
+
+    /**
+     * @param $meta
+     * @param int $statusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function meta($meta, $statusCode = 200, array $headers = [])
+    {
+        return $this->getMetaResponse($meta, $statusCode, $headers);
+    }
+
+    /**
+     * @param $data
+     * @param array $links
+     * @param mixed $meta
+     * @param int $statusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function content(
+        $data,
+        array $links = [],
+        $meta = null,
+        $statusCode = self::HTTP_OK,
+        array $headers = []
+    ) {
+        return $this->getContentResponse($data, $statusCode, $links, $meta, $headers);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentResponse(
+        $data,
+        $statusCode = self::HTTP_OK,
+        $links = null,
+        $meta = null,
+        array $headers = []
+    ) {
+        if ($data instanceof PageInterface) {
+            list ($data, $meta, $links) = $this->extractPage($data, $meta, $links);
+        }
+
+        return parent::getContentResponse($data, $statusCode, $links, $meta, $headers);
+    }
+
+    /**
+     * @param $resource
+     * @param array $links
+     * @param mixed $meta
+     * @param array $headers
+     * @return mixed
+     */
+    public function created($resource, array $links = [], $meta = null, array $headers = [])
+    {
+        return $this->getCreatedResponse($resource, $links, $meta, $headers);
+    }
+
+    /**
+     * @param $data
+     * @param array $links
+     * @param mixed $meta
+     * @param int $statusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function relationship(
+        $data,
+        array $links = [],
+        $meta = null,
+        $statusCode = 200,
+        array $headers = []
+    ) {
+        return $this->getIdentifiersResponse($data, $statusCode, $links, $meta, $headers);
+    }
+
+    /**
+     * @param array|object $data
+     * @param int $statusCode
+     * @param $links
+     * @param $meta
+     * @param array $headers
+     * @return mixed
+     */
+    public function getIdentifiersResponse(
+        $data,
+        $statusCode = self::HTTP_OK,
+        $links = null,
+        $meta = null,
+        array $headers = []
+    ) {
+        if ($data instanceof PageInterface) {
+            list ($data, $meta, $links) = $this->extractPage($data, $meta, $links);
+        }
+
+        return parent::getIdentifiersResponse($data, $statusCode, $links, $meta, $headers);
+    }
+
+    /**
+     * @param mixed $errors
+     * @param int|null $defaultStatusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function error($errors, $defaultStatusCode = null, array $headers = [])
+    {
+        return $this->errors($errors, $defaultStatusCode, $headers);
+    }
+
+    /**
+     * @param mixed $errors
+     * @param int|null $defaultStatusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function errors($errors, $defaultStatusCode = null, array $headers = [])
+    {
+        if ($errors instanceof ErrorResponseInterface) {
+            return $this->getErrorResponse($errors);
+        }
+
+        if (is_string($errors)) {
+            $errors = $this->errorRepository->error($errors);
+        }
+
+        if (is_array($errors)) {
+            $errors = $this->errorRepository->errors($errors);
+        }
+
+        return $this->errors(
+            $this->factory->createErrorResponse($errors, $defaultStatusCode, $headers)
+        );
+    }
+
+    /**
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection|ErrorResponseInterface $errors
+     * @param int $statusCode
+     * @param array $headers
+     * @return mixed
+     */
+    public function getErrorResponse($errors, $statusCode = self::HTTP_BAD_REQUEST, array $headers = [])
+    {
+        if ($errors instanceof ErrorResponseInterface) {
+            $statusCode = $errors->getHttpCode();
+            $headers = $errors->getHeaders();
+            $errors= $errors->getErrors();
+        }
+
+        return parent::getErrorResponse($errors, $statusCode, $headers);
     }
 
     /**
@@ -58,7 +280,14 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncoder()
     {
-        return $this->api->getEncoder();
+        if ($encoder = $this->codecs->getEncoder()) {
+            return $encoder;
+        }
+
+        return $this->factory->createEncoder(
+            $this->getSchemaContainer(),
+            new EncoderOptions(0, $this->getUrlPrefix())
+        );
     }
 
     /**
@@ -66,7 +295,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getUrlPrefix()
     {
-        return $this->api->getUrlPrefix();
+        return $this->urlPrefix;
     }
 
     /**
@@ -74,7 +303,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncodingParameters()
     {
-        return $this->request ? $this->request->getParameters() : null;
+        return $this->parameters;
     }
 
     /**
@@ -82,7 +311,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSchemaContainer()
     {
-        return $this->api->getSchemas();
+        return $this->schemas;
     }
 
     /**
@@ -90,7 +319,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getSupportedExtensions()
     {
-        return $this->api->getSupportedExts();
+        return $this->extensions;
     }
 
     /**
@@ -98,9 +327,62 @@ abstract class AbstractResponses extends Responses
      */
     protected function getMediaType()
     {
-        $type = $this->api->getCodecMatcher()->getEncoderRegisteredMatchedType();
+        if ($mediaType = $this->codecs->getEncoderRegisteredMatchedType()) {
+            return $mediaType;
+        }
 
-        return $type ?: MediaType::parse(0, MediaType::JSON_API_MEDIA_TYPE);
+        return new MediaType(MediaType::JSON_API_TYPE, MediaType::JSON_API_SUB_TYPE);
+    }
+
+    /**
+     * @param PageInterface $page
+     * @param $meta
+     * @param $links
+     * @return array
+     */
+    private function extractPage(PageInterface $page, $meta, $links)
+    {
+        return [
+            $page->getData(),
+            $this->mergePageMeta($meta, $page),
+            $this->mergePageLinks($links, $page),
+        ];
+    }
+
+    /**
+     * @param object|array|null $existing
+     * @param PageInterface $page
+     * @return array
+     */
+    private function mergePageMeta($existing, PageInterface $page)
+    {
+        if (!$merge = $page->getMeta()) {
+            return $existing;
+        }
+
+        $existing = (array) $existing ?: [];
+
+        if ($key = $page->getMetaKey()) {
+            $existing[$key] = $merge;
+            return $existing;
+        }
+
+        return array_replace($existing, (array) $merge);
+    }
+
+    /**
+     * @param array $existing
+     * @param PageInterface $page
+     * @return array
+     */
+    private function mergePageLinks(array $existing, PageInterface $page)
+    {
+        return array_replace($existing, array_filter([
+            DocumentInterface::KEYWORD_FIRST => $page->getFirstLink(),
+            DocumentInterface::KEYWORD_PREV => $page->getPreviousLink(),
+            DocumentInterface::KEYWORD_NEXT => $page->getNextLink(),
+            DocumentInterface::KEYWORD_LAST => $page->getLastLink(),
+        ]));
     }
 
 }

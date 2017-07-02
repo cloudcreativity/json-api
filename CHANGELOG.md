@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file. This projec
   - `http_contains_body()`: determines if a PSR message contains body content.
 - New serializer interface to type-hint that an encoder can also serialize data to an array.
 
+### Changed
+- The response factory implementation was merged into the abstract responses class. This is because there was no
+logical difference between the two and it is simpler to merge them.
+
 ### Fixed
 - A decoder is now only matched if the client has sent a HTTP request with message body.
 
@@ -20,6 +24,10 @@ All notable changes to this project will be documented in this file. This projec
 - Deleted the `Utils\NullReporter` class as it was not in use.
 - The `Decoders\Helpers\DecodesJsonTrait` has been removed in preference of the package's `json_decode()` function.
 - The `Decoders\DocumentDecoder` has been removed as it is no longer in use.
+- The `Contracts\Http\ApiInterface` interface and `Http\Api` have been removed as they are no longer in use within 
+this package. 
+- The `Contracts\Http\Responses\ResponseFactoryInterface` interface and `Http\Responses\ResponseFactory` have been
+removed (see changes above).
 
 ## [0.9.0] - 2017-06-07
 

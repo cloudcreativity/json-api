@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Repositories;
 
 use CloudCreativity\JsonApi\Contracts\Document\MutableErrorInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ConfigurableInterface;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 
 /**
  * Interface ErrorRepositoryInterface
@@ -38,6 +39,16 @@ interface ErrorRepositoryInterface extends ConfigurableInterface
     public function exists($key);
 
     /**
+     * Create a set of errors from several keys.
+     *
+     * @param array ...$keys
+     * @return MutableErrorCollection
+     */
+    public function errors(...$keys);
+
+    /**
+     * Create an error from the key, merging in the provided values.
+     *
      * @param string $key
      * @param array $values
      *      values to substitute into error detail.
