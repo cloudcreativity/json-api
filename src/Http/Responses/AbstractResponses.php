@@ -47,11 +47,6 @@ abstract class AbstractResponses extends Responses
     private $factory;
 
     /**
-     * @var CodecMatcherInterface
-     */
-    private $codecs;
-
-    /**
      * @var ContainerInterface
      */
     private $schemas;
@@ -60,6 +55,11 @@ abstract class AbstractResponses extends Responses
      * @var ErrorRepositoryInterface
      */
     private $errorRepository;
+
+    /**
+     * @var CodecMatcherInterface
+     */
+    private $codecs;
 
     /**
      * @var EncodingParametersInterface|null
@@ -80,26 +80,26 @@ abstract class AbstractResponses extends Responses
      * AbstractResponses constructor.
      *
      * @param FactoryInterface $factory
-     * @param CodecMatcherInterface $codecs
      * @param ContainerInterface $schemas
      * @param ErrorRepositoryInterface $errors
+     * @param CodecMatcherInterface $codecs
      * @param EncodingParametersInterface|null $parameters
      * @param SupportedExtensionsInterface|null $extensions
      * @param string|null $urlPrefix
      */
     public function __construct(
         FactoryInterface $factory,
-        CodecMatcherInterface $codecs,
         ContainerInterface $schemas,
         ErrorRepositoryInterface $errors,
+        CodecMatcherInterface $codecs = null,
         EncodingParametersInterface $parameters = null,
         SupportedExtensionsInterface $extensions = null,
         $urlPrefix = null
     ) {
         $this->factory = $factory;
-        $this->codecs = $codecs;
         $this->schemas = $schemas;
         $this->errorRepository = $errors;
+        $this->codecs = $codecs;
         $this->parameters = $parameters;
         $this->extensions = $extensions;
         $this->urlPrefix = $urlPrefix;
@@ -280,7 +280,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getEncoder()
     {
-        if ($encoder = $this->codecs->getEncoder()) {
+        if ($this->codecs && $encoder = $this->codecs->getEncoder()) {
             return $encoder;
         }
 
@@ -327,7 +327,7 @@ abstract class AbstractResponses extends Responses
      */
     protected function getMediaType()
     {
-        if ($mediaType = $this->codecs->getEncoderRegisteredMatchedType()) {
+        if ($this->codecs && $mediaType = $this->codecs->getEncoderRegisteredMatchedType()) {
             return $mediaType;
         }
 
