@@ -56,14 +56,15 @@ interface ClientInterface
     /**
      * Read the domain record from the remote JSON API.
      *
-     * @param ResourceIdentifierInterface $identifier
+     * @param string $resourceType
+     * @param string $resourceId
      * @param EncodingParametersInterface|null $parameters
      *      the parameters to send to the remote server.
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function read(ResourceIdentifierInterface $identifier, EncodingParametersInterface $parameters = null);
+    public function read($resourceType, $resourceId, EncodingParametersInterface $parameters = null);
 
     /**
      * Update the domain record with the remote JSON API.

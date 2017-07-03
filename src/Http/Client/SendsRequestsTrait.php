@@ -20,7 +20,6 @@ namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
@@ -74,17 +73,12 @@ trait SendsRequestsTrait
     }
 
     /**
-     * @param ResourceIdentifierInterface|string $resourceType
+     * @param string $resourceType
      * @param string|null $resourceId
      * @return string
      */
     protected function resourceUri($resourceType, $resourceId = null)
     {
-        if ($resourceType instanceof ResourceIdentifierInterface) {
-            $resourceId = $resourceType->getId();
-            $resourceType = $resourceType->getType();
-        }
-
         return $resourceId ? "$resourceType/$resourceId" : $resourceType;
     }
 

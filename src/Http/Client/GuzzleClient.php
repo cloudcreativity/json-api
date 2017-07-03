@@ -21,7 +21,6 @@ namespace CloudCreativity\JsonApi\Http\Client;
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Factories\Factory;
 use Exception;
 use GuzzleHttp\Client;
@@ -87,9 +86,9 @@ class GuzzleClient implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function read(ResourceIdentifierInterface $identifier, EncodingParametersInterface $parameters = null)
+    public function read($resourceType, $resourceId, EncodingParametersInterface $parameters = null)
     {
-        $uri = $this->resourceUri($identifier);
+        $uri = $this->resourceUri($resourceType, $resourceId);
 
         return $this->request('GET', $uri, [
             'headers' => $this->normalizeHeaders(),

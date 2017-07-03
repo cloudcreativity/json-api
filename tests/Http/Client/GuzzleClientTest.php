@@ -208,9 +208,8 @@ class GuzzleClientTest extends TestCase
 
     public function testRead()
     {
-        $identifier = ResourceIdentifier::create('posts', '1');
         $this->willSeeRecord();
-        $response = $this->client->read($identifier);
+        $response = $this->client->read('posts', '1');
 
         $this->assertSame(200, $response->getPsrResponse()->getStatusCode());
         $this->assertResponseResource($response);
@@ -220,14 +219,13 @@ class GuzzleClientTest extends TestCase
 
     public function testReadWithParameters()
     {
-        $identifier = ResourceIdentifier::create('posts', '1');
         $parameters = new EncodingParameters(
             ['author', 'site'],
             ['author' => ['first-name', 'surname'], 'site' => ['uri']]
         );
 
         $this->willSeeRecord();
-        $this->client->read($identifier, $parameters);
+        $this->client->read('posts', '1', $parameters);
 
         $this->assertQueryParameters([
             'include' => 'author,site',
@@ -240,7 +238,7 @@ class GuzzleClientTest extends TestCase
     {
         $this->willSeeErrors();
         $this->expectException(JsonApiException::class);
-        $this->client->read(ResourceIdentifier::create('posts', '1'));
+        $this->client->read('posts', '1');
     }
 
     public function testUpdate()
