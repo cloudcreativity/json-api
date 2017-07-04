@@ -37,6 +37,7 @@ use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
 use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
+use Neomerx\JsonApi\Encoder\Parameters\SortParameter;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit_Framework_MockObject_MockObject as Mock;
 use function GuzzleHttp\Psr7\parse_query;
@@ -120,7 +121,7 @@ class GuzzleClientTest extends TestCase
         $parameters = new EncodingParameters(
             ['author', 'site'],
             ['author' => ['first-name', 'surname'], 'site' => ['uri']],
-            ['created-at', 'author'],
+            [new SortParameter('created-at', false), new SortParameter('author', true)],
             ['number' => 1, 'size' => 15],
             ['author' => 99],
             ['foo' => 'bar']
@@ -133,7 +134,7 @@ class GuzzleClientTest extends TestCase
             'include' => 'author,site',
             'fields[author]' => 'first-name,surname',
             'fields[site]' => 'uri',
-            'sort' => 'created-at,author',
+            'sort' => '-created-at,author',
             'page[number]' => '1',
             'page[size]' => '15',
             'filter[author]' => '99',
