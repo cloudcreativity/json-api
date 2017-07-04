@@ -35,11 +35,12 @@ interface ClientInterface
      * @param string $resourceType
      * @param EncodingParametersInterface|null $parameters
      *      the parameters to send to the remote server.
+     * @param array $options
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function index($resourceType, EncodingParametersInterface $parameters = null);
+    public function index($resourceType, EncodingParametersInterface $parameters = null, array $options = []);
 
     /**
      * Send the domain record to the remote JSON API.
@@ -47,11 +48,12 @@ interface ClientInterface
      * @param object $record
      * @param EncodingParametersInterface|null $parameters
      *      the parameters to send to the remote server.
+     * @param array $options
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function create($record, EncodingParametersInterface $parameters = null);
+    public function create($record, EncodingParametersInterface $parameters = null, array $options = []);
 
     /**
      * Read the domain record from the remote JSON API.
@@ -60,33 +62,46 @@ interface ClientInterface
      * @param string $resourceId
      * @param EncodingParametersInterface|null $parameters
      *      the parameters to send to the remote server.
+     * @param array $options
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function read($resourceType, $resourceId, EncodingParametersInterface $parameters = null);
+    public function read(
+        $resourceType,
+        $resourceId,
+        EncodingParametersInterface $parameters = null,
+        array $options = []
+    );
 
     /**
      * Update the domain record with the remote JSON API.
      *
      * @param object $record
-     * @param string[] $fields
+     * @param string[]|null $fields
      *      the resource fields to send, if sending sparse field-sets.
      * @param EncodingParametersInterface|null $parameters
      *      the parameters to send to the remote server.
+     * @param array $options
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function update($record, array $fields = [], EncodingParametersInterface $parameters = null);
+    public function update(
+        $record,
+        array $fields = null,
+        EncodingParametersInterface $parameters = null,
+        array $options = []
+    );
 
     /**
      * Delete the domain record from the remote JSON API.
      *
      * @param object $record
+     * @param array $options
      * @return ResponseInterface
      * @throws JsonApiException
      *      if the remote server replies with an error.
      */
-    public function delete($record);
+    public function delete($record, array $options = []);
 }

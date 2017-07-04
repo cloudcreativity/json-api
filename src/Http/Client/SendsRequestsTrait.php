@@ -50,13 +50,17 @@ trait SendsRequestsTrait
 
     /**
      * @param $record
-     * @param array $fields
+     * @param string[]|null $fields
      * @return array
      */
-    protected function serializeRecord($record, array $fields = [])
+    protected function serializeRecord($record, array $fields = null)
     {
-        $resourceType = $this->schemas->getSchema($record)->getResourceType();
-        $parameters = $fields ? $this->factory->createQueryParameters(null, [$resourceType => $fields]) : null;
+        $parameters = null;
+
+        if ($fields) {
+            $resourceType = $this->schemas->getSchema($record)->getResourceType();
+            $parameters = $this->factory->createQueryParameters(null, [$resourceType => $fields]);
+        }
 
         return $this->serializer->serializeData($record, $parameters);
     }
@@ -85,15 +89,17 @@ trait SendsRequestsTrait
     /**
      * @param bool $body
      *      whether HTTP request body is being sent.
-     * @param array $existing
      * @return array
      */
-    protected function normalizeHeaders($body = false, array $existing = [])
+    protected function jsonApiHeaders($body = false)
     {
-        $existing['Accept'] = MediaType::JSON_API_MEDIA_TYPE;
-        $existing['Content-Type'] = $body ? MediaType::JSON_API_MEDIA_TYPE : null;
+        $headers = ['Accept' => MediaType::JSON_API_MEDIA_TYPE];
 
-        return array_filter($existing);
+        if ($body) {
+            $headers['Content-Type'] = MediaType::JSON_API_MEDIA_TYPE;
+        }
+
+        return $headers;
     }
 
     /**

@@ -67,49 +67,64 @@ class GuzzleClient implements ClientInterface
     /**
      * @inheritdoc
      */
-    public function index($resourceType, EncodingParametersInterface $parameters = null)
+    public function index($resourceType, EncodingParametersInterface $parameters = null, array $options = [])
     {
-        return $this->request('GET', $this->resourceUri($resourceType), [
-            'headers' => $this->normalizeHeaders(),
+        $options = $this->mergeOptions([
+            'headers' => $this->jsonApiHeaders(false),
             'query' => $parameters ? $this->parseSearchQuery($parameters) : null,
-        ]);
+        ], $options);
+
+        return $this->request('GET', $this->resourceUri($resourceType), $options);
     }
 
     /**
      * @inheritdoc
      */
-    public function create($record, EncodingParametersInterface $parameters = null)
+    public function create($record, EncodingParametersInterface $parameters = null, array $options = [])
     {
-        return $this->sendRecord('POST', $this->serializeRecord($record), $parameters);
+        return $this->sendRecord('POST', $this->serializeRecord($record), $parameters, $options);
     }
 
     /**
      * @inheritdoc
      */
-    public function read($resourceType, $resourceId, EncodingParametersInterface $parameters = null)
-    {
+    public function read(
+        $resourceType,
+        $resourceId,
+        EncodingParametersInterface $parameters = null,
+        array $options = []
+    ) {
         $uri = $this->resourceUri($resourceType, $resourceId);
-
-        return $this->request('GET', $uri, [
-            'headers' => $this->normalizeHeaders(),
+        $options = $this->mergeOptions([
+            'headers' => $this->jsonApiHeaders(false),
             'query' => $parameters ? $this->parseQuery($parameters) : null,
-        ]);
+        ], $options);
+
+        return $this->request('GET', $uri, $options);
     }
 
     /**
      * @inheritdoc
      */
-    public function update($record, array $fields = [], EncodingParametersInterface $parameters = null)
-    {
-        return $this->sendRecord('PATCH', $this->serializeRecord($record, $fields), $parameters);
+    public function update(
+        $record,
+        array $fields = null,
+        EncodingParametersInterface $parameters = null,
+        array $options = []
+    ) {
+        return $this->sendRecord('PATCH', $this->serializeRecord($record, $fields), $parameters, $options);
     }
 
     /**
      * @inheritdoc
      */
-    public function delete($record)
+    public function delete($record, array $options = [])
     {
-        return $this->request('DELETE', $this->recordUri($record));
+        $options = $this->mergeOptions([
+            'headers' => $this->jsonApiHeaders(false)
+        ], $options);
+
+        return $this->request('DELETE', $this->recordUri($record), $options);
     }
 
     /**
@@ -117,10 +132,15 @@ class GuzzleClient implements ClientInterface
      * @param array $serializedRecord
      *      the encoded record
      * @param EncodingParametersInterface|null $parameters
+     * @param array $options
      * @return ResponseInterface
      */
-    protected function sendRecord($method, array $serializedRecord, EncodingParametersInterface $parameters = null)
-    {
+    protected function sendRecord(
+        $method,
+        array $serializedRecord,
+        EncodingParametersInterface $parameters = null,
+        array $options = []
+    ) {
         $resourceType = $serializedRecord['data']['type'];
 
         if ('POST' === $method) {
@@ -130,11 +150,24 @@ class GuzzleClient implements ClientInterface
             $uri = $this->resourceUri($resourceType, $resourceId);
         }
 
-        return $this->request($method, $uri, [
-            'json' => $serializedRecord,
+        $options = $this->mergeOptions([
+            'headers' => $this->jsonApiHeaders(true),
             'query' => $parameters ? $this->parseQuery($parameters) : null,
-            'headers' => $this->normalizeHeaders(true),
-        ]);
+        ], $options);
+
+        $options['json'] = $serializedRecord;
+
+        return $this->request($method, $uri, $options);
+    }
+
+    /**
+     * @param array $new
+     * @param array $existing
+     * @return array
+     */
+    protected function mergeOptions(array $new, array $existing)
+    {
+        return array_replace_recursive($new, $existing);
     }
 
     /**

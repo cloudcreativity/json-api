@@ -141,6 +141,19 @@ class GuzzleClientTest extends TestCase
         ]);
     }
 
+    public function testIndexWithOptions()
+    {
+        $this->willSeeRecords();
+        $this->client->index('posts', null, [
+            'headers' => [
+                'X-Foo' => 'Bar'
+            ],
+        ]);
+
+        $this->assertHeader('X-Foo', 'Bar');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+    }
+
     public function testIndexError()
     {
         $this->willSeeErrors();
@@ -199,6 +212,17 @@ class GuzzleClientTest extends TestCase
         $this->assertNull($response->getDocument());
     }
 
+    public function testCreateWithOptions()
+    {
+        $this->willSerializeRecord()->willSeeRecord(201);
+        $this->client->create($this->record, null, [
+            'headers' => ['X-Foo' => 'Bar'],
+        ]);
+
+        $this->assertHeader('X-Foo', 'Bar');
+        $this->assertHeader('Content-Type', 'application/vnd.api+json');
+    }
+
     public function testCreateError()
     {
         $this->willSerializeRecord()->willSeeErrors();
@@ -232,6 +256,19 @@ class GuzzleClientTest extends TestCase
             'fields[author]' => 'first-name,surname',
             'fields[site]' => 'uri',
         ]);
+    }
+
+    public function testReadWithOptions()
+    {
+        $this->willSeeRecord();
+        $this->client->read('posts', '1', null, [
+            'headers' => [
+                'X-Foo' => 'Bar',
+            ],
+        ]);
+
+        $this->assertHeader('X-Foo', 'Bar');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
     }
 
     public function testReadError()
@@ -290,6 +327,19 @@ class GuzzleClientTest extends TestCase
         $this->assertNull($response->getDocument());
     }
 
+    public function testUpdateWithOptions()
+    {
+        $this->willSerializeRecord()->willSeeRecord();
+        $this->client->update($this->record, null, null, [
+            'headers' => [
+                'X-Foo' => 'Bar',
+            ],
+        ]);
+
+        $this->assertHeader('X-Foo', 'Bar');
+        $this->assertHeader('Content-Type', 'application/vnd.api+json');
+    }
+
     public function testUpdateError()
     {
         $this->willSerializeRecord()->willSeeErrors();
@@ -304,6 +354,20 @@ class GuzzleClientTest extends TestCase
         $this->assertSame(204, $response->getPsrResponse()->getStatusCode());
         $this->assertNull($response->getDocument());
         $this->assertRequested('DELETE', '/posts/1');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
+    }
+
+    public function testDeleteWithOptions()
+    {
+        $this->appendResponse(204);
+        $this->client->delete($this->record, [
+            'headers' => [
+                'X-Foo' => 'Bar',
+            ],
+        ]);
+
+        $this->assertHeader('X-Foo', 'Bar');
+        $this->assertHeader('Accept', 'application/vnd.api+json');
     }
 
     public function testErrorResponse()
