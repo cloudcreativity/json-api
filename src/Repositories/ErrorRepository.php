@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Repositories;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Document\Error;
+use CloudCreativity\JsonApi\Exceptions\MutableErrorCollection;
 
 /**
  * Class ErrorRepository
@@ -71,6 +72,25 @@ class ErrorRepository implements ErrorRepositoryInterface
     {
         return isset($this->errors[$key]);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function errors(...$keys)
+    {
+        $errors = new MutableErrorCollection();
+
+        foreach ($keys as $error) {
+            if (is_string($error)) {
+                $error = $this->error($error);
+            }
+
+            $errors->add($error);
+        }
+
+        return $errors;
+    }
+
 
     /**
      * @inheritdoc

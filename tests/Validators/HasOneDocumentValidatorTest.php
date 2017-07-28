@@ -69,7 +69,7 @@ JSON_API;
      */
     public function testValidWithDefaultValidator(Document $document)
     {
-        $validator = $this->factory->relationshipDocument();
+        $validator = $this->validatorFactory->relationshipDocument();
 
         $this->willExist()->assertTrue($validator->isValid($document));
     }
@@ -477,8 +477,8 @@ JSON_API;
         $expectedType = 'users'
     ) {
         $this->willExist($exists);
-        $validator = $this->factory->hasOne($expectedType, $allowEmpty, $acceptable);
+        $validator = $this->validatorFactory->hasOne($expectedType, $allowEmpty, $acceptable);
 
-        return $this->factory->relationshipDocument($validator);
+        return $this->validatorFactory->relationshipDocument($validator);
     }
 }

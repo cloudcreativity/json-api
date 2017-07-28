@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Contracts\Object;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\Utils\Object\StandardObjectInterface;
 use Neomerx\JsonApi\Contracts\Document\DocumentInterface as NeomerxDocumentInterface;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
 /**
  * Interface DocumentInterface
@@ -32,6 +33,8 @@ interface DocumentInterface extends StandardObjectInterface, MetaMemberInterface
 
     const DATA = NeomerxDocumentInterface::KEYWORD_DATA;
     const META = NeomerxDocumentInterface::KEYWORD_META;
+    const INCLUDED = NeomerxDocumentInterface::KEYWORD_INCLUDED;
+    const ERRORS = NeomerxDocumentInterface::KEYWORD_ERRORS;
 
     /**
      * Get the data member of the document as a standard object or array
@@ -66,5 +69,21 @@ interface DocumentInterface extends StandardObjectInterface, MetaMemberInterface
      * @return RelationshipInterface
      */
     public function getRelationship();
+
+    /**
+     * Get the included member as a resource object collection.
+     *
+     * @return ResourceObjectCollectionInterface|null
+     *      the resources or null if the included member is not present.
+     */
+    public function getIncluded();
+
+    /**
+     * Get the errors member as an error collection.
+     *
+     * @return ErrorCollection|null
+     *      the errors or null if the error member is not present.
+     */
+    public function getErrors();
 
 }

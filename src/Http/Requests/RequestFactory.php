@@ -18,16 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-use Neomerx\JsonApi\Contracts\Http\HttpFactoryInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -40,18 +36,18 @@ class RequestFactory
 {
 
     /**
-     * @var HttpFactoryInterface
+     * @var FactoryInterface
      */
-    private $httpFactory;
+    private $factory;
 
     /**
      * RequestFactory constructor.
      *
-     * @param HttpFactoryInterface $httpFactory
+     * @param FactoryInterface $factory
      */
-    public function __construct(HttpFactoryInterface $httpFactory)
+    public function __construct(FactoryInterface $factory)
     {
-        $this->httpFactory = $httpFactory;
+        $this->factory = $factory;
     }
 
     /**
@@ -65,22 +61,22 @@ class RequestFactory
      *      the inbound HTTP request
      * @param RequestInterpreterInterface $interpreter
      *      the intepreter to analyze the request.
-     * @param ApiInterface $api
-     *      the API that is receiving the request.
+     * @param StoreInterface $store
+     *      the store that the request relates to.
      * @return Request
      */
     public function build(
         ServerRequestInterface $request,
         RequestInterpreterInterface $interpreter,
-        ApiInterface $api
+        StoreInterface $store
     ) {
         return new Request(
             $interpreter->getResourceType(),
             $this->parseParameters($request),
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
-            $this->parseDocument($request, $interpreter, $api->getCodecMatcher()),
-            $this->locateRecord($interpreter, $api->getStore())
+            $this->parseDocument($request, $interpreter),
+            $this->locateRecord($interpreter, $store)
         );
     }
 
@@ -91,35 +87,23 @@ class RequestFactory
      */
     protected function parseParameters(ServerRequestInterface $request)
     {
-        return $this->httpFactory->createQueryParametersParser()->parse($request);
+        return $this->factory->createQueryParametersParser()->parse($request);
     }
 
     /**
      * @param ServerRequestInterface $request
      * @param RequestInterpreterInterface $interpreter
-     * @param CodecMatcherInterface $codecMatcher
      * @return DocumentInterface
      */
     protected function parseDocument(
         ServerRequestInterface $request,
-        RequestInterpreterInterface $interpreter,
-        CodecMatcherInterface $codecMatcher
+        RequestInterpreterInterface $interpreter
     ) {
-        if (!$interpreter->isExpectingDocument()) {
-            return null;
+        $document = $this->factory->createDocumentObject($request);
+
+        if (!$document && $interpreter->isExpectingDocument()) {
+            throw new JsonApiException([], 400);
         }
-
-        if (!$decoder = $codecMatcher->getDecoder()) {
-            throw new RuntimeException('No matching decoder');
-        }
-
-        $document = $decoder->decode((string) $request->getBody());
-
-        if (!is_object($document)) {
-            throw new RuntimeException('A decoder that decodes to an object must be used.');
-        }
-
-        $document = ($document instanceof DocumentInterface) ? $document : new Document($document);
 
         return $document;
     }

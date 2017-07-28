@@ -16,34 +16,28 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Decoders;
+namespace CloudCreativity\JsonApi\Contracts\Http\Responses;
 
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
-use CloudCreativity\JsonApi\Decoders\Helpers\DecodesJson;
-use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
-use CloudCreativity\JsonApi\Object\Document;
-use Neomerx\JsonApi\Contracts\Decoder\DecoderInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 /**
- * Class ResourceDecoder
+ * Interface ResponseInterface
  *
  * @package CloudCreativity\JsonApi
  */
-class DocumentDecoder implements DecoderInterface
+interface ResponseInterface
 {
 
-    use DecodesJson;
+    /**
+     * @return PsrResponse
+     */
+    public function getPsrResponse();
 
     /**
-     * @param string $content
-     * @return DocumentInterface
-     * @throws InvalidJsonException
+     * The parsed response document, if the response has body content.
+     *
+     * @return DocumentInterface|null
      */
-    public function decode($content)
-    {
-        $obj = $this->decodeJson($content);
-
-        return new Document($obj);
-    }
-
+    public function getDocument();
 }

@@ -2,7 +2,53 @@
 
 This file provides notes on how to upgrade between versions.
 
-## v0.8 to v0.9 (Unreleased)
+## v0.9 to v0.10
+
+### Interfaces
+
+If you are implementing `Contracts\Factories\FactoryInterface`, make the following changes:
+
+- `createRequest()` now takes a `StoreInterface` as its final argument.
+- add `createResponse()`.
+- add `createErrorResponse()`.
+- add `createDocumentObject()`.
+- `createApi()` is no longer on the interface and can be removed if you are not using it.
+
+If you are implementing `Contracts\Repositories\ErrorRepositoryInterface`, add the `errors()` method to 
+your implementation.
+
+The following methods have been added to the `Contracts\Object\DocumentInterface`:
+
+- `getIncluded()`
+- `getErrors()`
+
+The `Contracts\Http\ApiInterface` has been removed as it is no longer required in this package. You can still continue
+to use APIs, but you will need to remove references to this interface.
+
+The `Contracts\Http\Responses\ResponseFactoryInterface` has been removed. However, the methods are now available
+directly on the `Http\Responses\AbstractResponses` class.
+
+### Document Decoder
+
+The `DocumentDecoder` has been removed. You should use the `createDocumentObject` method on the factory instead
+if creating a document from a PSR server request. If creating a document from a string, then use this package's
+`json_decode` helper function, passing the result into a new document instance. I.e.:
+
+```php
+$document = new \CloudCreativity\JsonApi\Object\Document(
+    \CloudCreativity\JsonApi\json_decode($string)
+);
+```
+
+### Responses
+
+The `Http\Responses\ResponseFactory` has been merged into `Http\Responses\AbstractResponses`. This is because the
+factory simply wrapped the responses implementation, effectively providing helper methods. It reduced complexity
+to merge the two.
+
+You will need to check the constructor arguments of the abstract class and amend your implementation accordingly.
+
+## v0.8 to v0.9
 
 ### Renaming `Resource`
 

@@ -21,7 +21,6 @@ namespace CloudCreativity\JsonApi\Store;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Factories\Factory;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\TestCase;
 use CloudCreativity\Utils\Object\StandardObject;
@@ -34,19 +33,6 @@ use PHPUnit_Framework_MockObject_MockObject;
  */
 class StoreTest extends TestCase
 {
-
-    /**
-     * @var Factory
-     */
-    private $factory;
-
-    /**
-     * @return void
-     */
-    protected function setUp()
-    {
-        $this->factory = new Factory();
-    }
 
     public function testQuery()
     {

@@ -102,7 +102,7 @@ JSON_API;
      */
     public function testValidWithDefaultValidator(Document $document)
     {
-        $validator = $this->factory->resourceDocument();
+        $validator = $this->validatorFactory->resourceDocument();
 
         $this->willExist()->assertTrue($validator->isValid($document));
     }
@@ -771,8 +771,8 @@ JSON_API;
     ) {
         $context = $context ? new TestContextValidator($context) : null;
 
-        $resource = $this->factory->resource($resourceType, $id, $attributes, $relationships, $context);
-        $validator = $this->factory->resourceDocument($resource);
+        $resource = $this->validatorFactory->resource($resourceType, $id, $attributes, $relationships, $context);
+        $validator = $this->validatorFactory->resourceDocument($resource);
 
         return $validator;
     }
@@ -798,6 +798,6 @@ JSON_API;
     private function relationships($exists = true)
     {
         $this->willExist($exists);
-        return $this->factory->relationships();
+        return $this->validatorFactory->relationships();
     }
 }

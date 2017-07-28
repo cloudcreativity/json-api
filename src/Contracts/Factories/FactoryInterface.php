@@ -18,9 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Factories;
 
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
@@ -29,11 +32,15 @@ use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
+use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -48,41 +55,63 @@ interface FactoryInterface extends BaseFactoryInterface
 {
 
     /**
-     * @param $namespace
-     * @param CodecMatcherInterface $codecMatcher
-     * @param SchemaContainerInterface $schemaContainer
-     * @param StoreInterface $store
-     * @param ErrorRepositoryInterface $errorRepository
-     * @param SupportedExtensionsInterface|null $supportedExtensions
-     * @param string|null $urlPrefix
-     * @return ApiInterface
+     * @param SchemaContainerInterface $container
+     * @param EncoderOptions|null $encoderOptions
+     * @return SerializerInterface
      */
-    public function createApi(
-        $namespace,
-        CodecMatcherInterface $codecMatcher,
-        SchemaContainerInterface $schemaContainer,
-        StoreInterface $store,
-        ErrorRepositoryInterface $errorRepository,
-        SupportedExtensionsInterface $supportedExtensions = null,
-        $urlPrefix = null
-    );
+    public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null);
 
     /**
-     * Build a JSON API request object from an API definition and an HTTP request.
+     * Create a JSON API request object from a PSR server request.
      *
      * @param ServerRequestInterface $httpRequest
      *      the inbound HTTP request
      * @param RequestInterpreterInterface $interpreter
      *      the interpreter to analyze the request
-     * @param ApiInterface $api
-     *      the API that is receiving the request
+     * @param StoreInterface $store
+     *      the store that the request relates to.
      * @return RequestInterface
      */
     public function createRequest(
         ServerRequestInterface $httpRequest,
         RequestInterpreterInterface $interpreter,
-        ApiInterface $api
+        StoreInterface $store
     );
+
+    /**
+     * Create a JSON API response object from a PSR response.
+     *
+     * @param PsrResponse $response
+     * @return ResponseInterface
+     */
+    public function createResponse(PsrResponse $response);
+
+    /**
+     * Create an error response object.
+     *
+     * @param ErrorInterface|ErrorInterface[]|ErrorCollection $errors
+     * @param int|null $defaultHttpCode
+     * @param array $headers
+     */
+    public function createErrorResponse($errors, $defaultHttpCode, array $headers = []);
+
+    /**
+     * Create a JSON API document from a HTTP message.
+     *
+     * @param MessageInterface $message
+     * @return DocumentInterface|null
+     *      the document, or null if the message does not contain body content.
+     */
+    public function createDocumentObject(MessageInterface $message);
+
+    /**
+     * @param mixed $httpClient
+     *      the HTTP client that will send requests.
+     * @param SchemaContainerInterface $container
+     * @param SerializerInterface $encoder
+     * @return ClientInterface
+     */
+    public function createClient($httpClient, SchemaContainerInterface $container, SerializerInterface $encoder);
 
     /**
      * Create a codec matcher that is configured using the supplied codecs array.
@@ -147,7 +176,6 @@ interface FactoryInterface extends BaseFactoryInterface
         array $filteringParameters = null,
         QueryValidatorInterface $validator = null
     );
-
     /**
      * @param mixed $data
      * @param LinkInterface|null $first

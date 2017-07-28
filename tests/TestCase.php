@@ -16,26 +16,40 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Utils;
+namespace CloudCreativity\JsonApi;
 
-use CloudCreativity\JsonApi\Contracts\Http\ErrorResponseInterface;
-use CloudCreativity\JsonApi\Contracts\Utils\ErrorReporterInterface;
-use Exception;
+use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\JsonApi\Factories\Factory;
+use CloudCreativity\JsonApi\Object\Document;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
- * Class NullReporter
+ * Class TestCase
  *
  * @package CloudCreativity\JsonApi
  */
-class NullReporter implements ErrorReporterInterface
+class TestCase extends BaseTestCase
 {
 
     /**
-     * @inheritdoc
+     * @var FactoryInterface
      */
-    public function report(ErrorResponseInterface $response, Exception $e = null)
+    protected $factory;
+
+    /**
+     * @return void
+     */
+    protected function setUp()
     {
-        // noop
+        $this->factory = new Factory();
     }
 
+    /**
+     * @param $content
+     * @return Contracts\Object\DocumentInterface
+     */
+    protected function decode($content)
+    {
+        return new Document(json_decode($content));
+    }
 }

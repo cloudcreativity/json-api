@@ -18,17 +18,20 @@
 
 namespace CloudCreativity\JsonApi\Factories;
 
+use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Http\ApiInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
-use CloudCreativity\JsonApi\Http\Api;
+use CloudCreativity\JsonApi\Http\Client\GuzzleClient;
 use CloudCreativity\JsonApi\Http\Query\ValidationQueryChecker;
 use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
+use CloudCreativity\JsonApi\Http\Responses\ErrorResponse;
+use CloudCreativity\JsonApi\Http\Responses\Response;
+use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\Pagination\Page;
 use CloudCreativity\JsonApi\Repositories\CodecMatcherRepository;
 use CloudCreativity\JsonApi\Repositories\ErrorRepository;
@@ -37,13 +40,17 @@ use CloudCreativity\JsonApi\Store\Store;
 use CloudCreativity\JsonApi\Utils\Replacer;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory;
 use CloudCreativity\JsonApi\Validators\ValidatorFactory;
-use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
+use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
-use Neomerx\JsonApi\Contracts\Http\Headers\SupportedExtensionsInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Exceptions\ErrorCollection;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
+use function CloudCreativity\JsonApi\http_contains_body;
+use function CloudCreativity\JsonApi\json_decode;
 
 /**
  * Class Factory
@@ -54,11 +61,17 @@ class Factory extends BaseFactory implements FactoryInterface
 {
 
     /**
-     * @param SchemaContainerInterface $container
-     * @param EncoderOptions|null $encoderOptions
-     * @return Encoder
+     * @inheritdoc
      */
     public function createEncoder(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null)
+    {
+        return $this->createSerializer($container, $encoderOptions);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null)
     {
         $encoder = new Encoder($this, $container, $encoderOptions);
         $encoder->setLogger($this->logger);
@@ -69,37 +82,51 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createApi(
-        $namespace,
-        CodecMatcherInterface $codecMatcher,
-        SchemaContainerInterface $schemaContainer,
-        StoreInterface $store,
-        ErrorRepositoryInterface $errorRepository,
-        SupportedExtensionsInterface $supportedExtensions = null,
-        $urlPrefix = null
+    public function createRequest(
+        ServerRequestInterface $httpRequest,
+        RequestInterpreterInterface $intepreter,
+        StoreInterface $store
     ) {
-        return new Api(
-            $namespace,
-            $codecMatcher,
-            $schemaContainer,
-            $store,
-            $errorRepository,
-            $supportedExtensions,
-            $urlPrefix
-        );
+        $requestFactory = new RequestFactory($this);
+
+        return $requestFactory->build($httpRequest, $intepreter, $store);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function createResponse(PsrResponse $response)
+    {
+        return new Response($response, $this->createDocumentObject($response));
     }
 
     /**
      * @inheritDoc
      */
-    public function createRequest(
-        ServerRequestInterface $httpRequest,
-        RequestInterpreterInterface $intepreter,
-        ApiInterface $api
-    ) {
-        $requestFactory = new RequestFactory($this);
+    public function createErrorResponse($errors, $defaultHttpCode, array $headers = [])
+    {
+        return new ErrorResponse($errors, $defaultHttpCode, $headers);
+    }
 
-        return $requestFactory->build($httpRequest, $intepreter, $api);
+    /**
+     * @inheritDoc
+     */
+    public function createDocumentObject(MessageInterface $message)
+    {
+        if (!http_contains_body($message)) {
+            return null;
+        }
+
+        return new Document(json_decode($message->getBody()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createClient($httpClient, SchemaContainerInterface $container, SerializerInterface $encoder)
+    {
+        return new GuzzleClient($this, $httpClient, $container, $encoder);
     }
 
     /**
@@ -185,7 +212,6 @@ class Factory extends BaseFactory implements FactoryInterface
 
         return new ValidationQueryChecker($checker, $validator);
     }
-
     /**
      * @inheritDoc
      */
