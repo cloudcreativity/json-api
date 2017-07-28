@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [0.10.0] - 2017-07-28
 
 ### Added
 - An HTTP client interface for sending JSON API requests to a remote server, and a Guzzle 6 implementation.
