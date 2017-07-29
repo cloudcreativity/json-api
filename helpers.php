@@ -61,15 +61,23 @@ if (!function_exists('CloudCreativity\JsonApi\http_contains_body')) {
      * Transfer-Encoding header field in the request's message-headers."
      * https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3
      *
+     * However, some browsers send a Content-Length header with an empty string for e.g. GET requests
+     * without any message-body. Therefore rather than checking for the existence of a Content-Length
+     * header, we will allow an empty value to indicate that the request does not contain body.
+     *
      * @param MessageInterface $message
      * @return bool
      */
     function http_contains_body(MessageInterface $message)
     {
-        if ($message->hasHeader('Content-Length')) {
+        if ($message->hasHeader('Transfer-Encoding')) {
             return true;
         };
 
-        return $message->hasHeader('Transfer-Encoding');
+        if (!$contentLength = $message->getHeader('Content-Length')) {
+            return false;
+        }
+
+        return 0 < $contentLength[0];
     }
 }
