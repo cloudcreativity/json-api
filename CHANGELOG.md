@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.10.1] - 2017-07-29
+
+### Fixed
+- Browsers sending an empty `Content-Length` header were being interpreted as sending message-body because
+we were following the specification exactly and checking for the *existence* of the header. If the `Content-Length`
+header is sent, it is now checked that it is a non-zero value.
+
 ## [0.10.0] - 2017-07-28
 
 ### Added
