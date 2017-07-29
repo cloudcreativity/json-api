@@ -3,6 +3,7 @@
 namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
+use GuzzleHttp\Psr7\ServerRequest;
 
 class HelpersTest extends TestCase
 {
@@ -37,6 +38,34 @@ class HelpersTest extends TestCase
                 $this->assertJsonError($ex);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function requestContainsBodyProvider()
+    {
+        return [
+            'neither header' => [[], false],
+            'content-length' => [['Content-Length' => '120'], true],
+            'zero content-length' => [['Content-Length' => '0'], false],
+            'empty content-length' => [['Content-Length' => ''], false],
+            'transfer-encoding 1' => [['Transfer-Encoding' => 'chunked'], true],
+            'transfer-encoding 2' => [['Transfer-Encoding' => 'gzip, chunked'], true],
+            'content-type no content-length' => [['Content-Type' => 'text/plain'], false],
+        ];
+    }
+
+    /**
+     * @param array $headers
+     * @param $expected
+     * @dataProvider requestContainsBodyProvider
+     */
+    public function testHttpContainsBody(array $headers, $expected)
+    {
+        $request = new ServerRequest('GET', '/api/posts', $headers);
+
+        $this->assertSame($expected, http_contains_body($request));
     }
 
     /**
