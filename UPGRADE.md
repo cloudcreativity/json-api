@@ -2,6 +2,16 @@
 
 This file provides notes on how to upgrade between versions.
 
+## v0.10 to v0.11
+
+### Testing
+
+The testing namespace has been moved to a separate package. To install:
+
+```bash
+$ composer require --dev cloudcreativity/json-api-testing
+```
+
 ## v0.9 to v0.10
 
 ### Interfaces
