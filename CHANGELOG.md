@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.11.0] - 2017-09-02
+
+### Removed
+- All classes in the `Testing` namespace have been moved to the `cloudcreativity/json-api-testing` package.
+
 ## [0.10.1] - 2017-07-29
 
 ### Fixed
