@@ -14,7 +14,6 @@ queries for models/entities.
 returning JSON API errors.
 5. **Errors**: Mutable errors allow JSON API errors to be added to via your application stack and construction from
 arrays.
-6. **Testing**: Test helpers to assert content within a JSON API document.
 
 For a framework specific implementation, see 
 [cloudcreativity/laravel-json-api](https://github.com/cloudcreativity/laravel-json-api)
