@@ -72,11 +72,11 @@ class RequestFactory
     ) {
         return new Request(
             $interpreter->getResourceType(),
-            $this->parseParameters($request),
+            $parameters = $this->parseParameters($request),
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
             $this->parseDocument($request, $interpreter),
-            $this->locateRecord($interpreter, $store)
+            $this->locateRecord($interpreter, $store, $parameters)
         );
     }
 
@@ -111,16 +111,20 @@ class RequestFactory
     /**
      * @param RequestInterpreterInterface $interpreter
      * @param StoreInterface $store
+     * @param EncodingParametersInterface $parameters
      * @return object
      */
-    protected function locateRecord(RequestInterpreterInterface $interpreter, StoreInterface $store)
-    {
+    protected function locateRecord(
+        RequestInterpreterInterface $interpreter,
+        StoreInterface $store,
+        EncodingParametersInterface $parameters
+    ) {
         if (!$id = $interpreter->getResourceId()) {
             return null;
         }
 
         $identifier = ResourceIdentifier::create($interpreter->getResourceType(), $id);
-        $record = $store->find($identifier);
+        $record = $store->queryRecord($identifier, $parameters);
 
         if (!$record) {
             throw new JsonApiException([], 404);

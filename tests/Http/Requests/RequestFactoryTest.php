@@ -266,7 +266,7 @@ JSON_API;
     {
         $this->expectedRecord = new stdClass();
         $this->adapter->method('exists')->with($resourceId)->willReturn(true);
-        $this->adapter->method('find')->with($resourceId)->willReturn($this->expectedRecord);
+        $this->adapter->method('queryRecord')->with($resourceId)->willReturn($this->expectedRecord);
 
         return $this;
     }

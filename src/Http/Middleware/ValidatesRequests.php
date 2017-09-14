@@ -23,6 +23,7 @@ use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
+use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
@@ -44,20 +45,24 @@ trait ValidatesRequests
         ValidatorProviderInterface $validators
     ) {
         /** Check request parameters are acceptable */
-        $this->checkQueryParameters($request, $validators);
+        $this->checkQueryParameters($interpreter, $request, $validators);
 
         /** Check the document content is acceptable */
         $this->checkDocumentIsAcceptable($interpreter, $request, $validators);
     }
 
     /**
+     * @param RequestInterpreterInterface $interpreter
      * @param RequestInterface $request
      * @param ValidatorProviderInterface $validators
      * @throws JsonApiException
      */
-    protected function checkQueryParameters(RequestInterface $request, ValidatorProviderInterface $validators)
-    {
-        $checker = $validators->queryChecker();
+    protected function checkQueryParameters(
+        RequestInterpreterInterface $interpreter,
+        RequestInterface $request,
+        ValidatorProviderInterface $validators
+    ) {
+        $checker = $this->queryChecker($validators, $interpreter);
         $checker->checkQuery($request->getParameters());
     }
 
@@ -111,6 +116,24 @@ trait ValidatesRequests
         }
 
         return null;
+    }
+
+    /**
+     * @param ValidatorProviderInterface $validators
+     * @param RequestInterpreterInterface $interpreter
+     * @return QueryCheckerInterface
+     */
+    protected function queryChecker(ValidatorProviderInterface $validators, RequestInterpreterInterface $interpreter)
+    {
+        if ($interpreter->isIndex()) {
+            return $validators->searchQueryChecker();
+        } elseif ($interpreter->isReadRelatedResource()) {
+            return $validators->searchRelatedQueryChecker();
+        } elseif ($interpreter->isRelationshipData()) {
+            return $validators->searchRelationshipQueryChecker();
+        }
+
+        return $validators->resourceQueryChecker();
     }
 
 }

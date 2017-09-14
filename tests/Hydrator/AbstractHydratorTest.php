@@ -18,7 +18,6 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\TestCase;
 use DateTime;
 use DateTimeZone;
@@ -45,12 +44,50 @@ class AbstractHydratorTest extends TestCase
         $this->hydrator = new TestHydrator();
     }
 
-    public function testHydration()
+    public function testCreate()
     {
         $content = <<<JSON_API
 {
     "data": {
         "type": "posts",
+        "id": "27f80377-c66b-4d35-8fd6-647e89e0c239",
+        "attributes": {
+            "title": "My First Post",
+            "content": "Here is some content..."
+        },
+        "relationships": {
+            "user": {
+                "data": {
+                    "type": "users",
+                    "id": "123"
+                }
+            }
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+
+        $expected = (object) [
+            'id' => '27f80377-c66b-4d35-8fd6-647e89e0c239',
+            'saved' => true,
+            'title' => 'My First Post',
+            'content' => 'Here is some content...',
+            'user_id' => '123',
+        ];
+
+        $record = $this->hydrator->create($document->getResource());
+        $this->assertEquals($expected, $record);
+    }
+
+    public function testUpdate()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "1",
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content..."
@@ -86,16 +123,47 @@ class AbstractHydratorTest extends TestCase
 JSON_API;
 
         $document = $this->decode($content);
-        $record = new stdClass();
+        $record = (object) ['id' => '1'];
 
         $expected = (object) [
+            'id' => '1',
             'title' => 'My First Post',
             'content' => 'Here is some content...',
             'user_id' => '123',
             'tag_ids' => ['456', '789'],
+            'saved' => true,
         ];
 
-        $this->hydrator->hydrate($document->getResource(), $record);
+        $this->hydrator->update($document->getResource(), $record);
+        $this->assertEquals($expected, $record);
+    }
+
+    public function testAttributeFieldMethodInvoked()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "1",
+        "attributes": {
+            "title": "my first post",
+            "content": "Here is some content..."
+        }
+    }
+}
+JSON_API;
+
+        $document = $this->decode($content);
+        $record = (object) ['id' => '1'];
+
+        $expected = (object) [
+            'id' => '1',
+            'title' => 'My First Post',
+            'content' => 'Here is some content...',
+            'saved' => true,
+        ];
+
+        $this->hydrator->update($document->getResource(), $record);
         $this->assertEquals($expected, $record);
     }
 
@@ -111,6 +179,7 @@ JSON_API;
 {
     "data": {
         "type": "posts",
+        "id": "1",
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content...",
@@ -121,15 +190,17 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $record = new stdClass();
+        $record = (object) ['id' => '1'];
 
         $expected = (object) [
+            'id' => '1',
             'title' => 'My First Post',
             'content' => 'Here is some content...',
             'is_published' => true,
+            'saved' => true,
         ];
 
-        $this->hydrator->hydrate($document->getResource(), $record);
+        $this->hydrator->update($document->getResource(), $record);
         $this->assertEquals($expected, $record);
     }
 
@@ -141,6 +212,7 @@ JSON_API;
 {
     "data": {
         "type": "posts",
+        "id": "1",
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content...",
@@ -151,9 +223,9 @@ JSON_API;
 JSON_API;
 
         $document = $this->decode($content);
-        $record = new stdClass();
+        $record = (object) ['id' => '1'];
 
-        $this->hydrator->hydrate($document->getResource(), $record);
+        $this->hydrator->update($document->getResource(), $record);
         $this->assertObjectNotHasAttribute('published', $record);
     }
 
@@ -179,6 +251,7 @@ JSON_API;
 {
     "data": {
         "type": "posts",
+        "id": "1",
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content...",
@@ -193,15 +266,16 @@ JSON_API;
         $published = new DateTime('2017-07-01 12:30:00', new DateTimeZone('Europe/London'));
         $exact = new DateTime('2017-07-10 13:00:00.150', new DateTimeZone('Australia/Melbourne'));
         $document = $this->decode($content);
+        $record = (object) ['id' => '1'];
 
-        $this->hydrator->hydrate($document->getResource(), $record = new stdClass());
+        $this->hydrator->update($document->getResource(), $record);
         $this->assertEquals($published, $record->published_at);
         $this->assertEquals($exact, $record->exact);
         $this->assertObjectHasAttribute('empty', $record);
         $this->assertNull($record->empty);
     }
 
-    public function testHydrateRelationship()
+    public function testUpdateRelationship()
     {
         $content = <<<JSON_API
 {
@@ -216,76 +290,46 @@ JSON_API;
         $record->user_id = "123";
 
         $document = $this->decode($content);
-        $this->hydrator->hydrateRelationship('user', $document->getRelationship(), $record);
+        $this->hydrator->updateRelationship('user', $document->getRelationship(), $record);
         $this->assertEquals("999", $record->user_id);
     }
 
-    public function testHydrateRelationshipNotRecognised()
+    public function testAddToRelationship()
     {
         $content = <<<JSON_API
 {
-    "data": {
-        "type": "users",
-        "id": "999"
-    }
+    "data": [
+        {"type": "tags", "id": "2"},
+        {"type": "tags", "id": "3"}
+    ]
 }
 JSON_API;
 
+        $record = (object) ['tag_ids' => ['1']];
+        $expected = (object) ['tag_ids' => ['1', '2', '3']];
+
         $document = $this->decode($content);
-        $this->setExpectedException(RuntimeException::class);
-        $this->hydrator->hydrateRelationship('foo', $document->getRelationship(), new stdClass());
+        $this->hydrator->addToRelationship('latest-tags', $document->getRelationship(), $record);
+        $this->assertEquals($expected, $record);
     }
 
-    /**
-     * Test related (second step) hydration.
-     *
-     * - E.g. a nested record within the `author` attribute.
-     * - E.g. a has-many relationship.
-     */
-    public function testHydrateRelated()
+    public function testRemoveFromRelationship()
     {
-        $this->hydrator->attributes = ['title', 'content'];
-
         $content = <<<JSON_API
 {
-    "data": {
-        "type": "posts",
-        "attributes": {
-            "title": "My First Post",
-            "content": "Here is some content...",
-            "author": {
-                "first-name": "John",
-                "surname": "Doe"
-            }
-        },
-        "relationships": {
-            "user": {
-                "data": {
-                    "type": "users",
-                    "id": "123"
-                }
-            },
-            "linked-posts": {
-                "data": [
-                    { "type": "posts", "id": "98" },
-                    { "type": "posts", "id": "99" }
-                ]
-            }
-        }
-    }
+    "data": [
+        {"type": "tags", "id": "2"},
+        {"type": "tags", "id": "3"}
+    ]
 }
 JSON_API;
 
-        $document = $this->decode($content);
-        $author = (object) ['first_name' => "John", "surname" => "Doe"];
-        $post1 = (object) ['type' => 'posts', 'id' => '98', 'title' => 'Post 98'];
-        $post2 = (object) ['type' => 'posts', 'id' => '99', 'title' => 'Post 99'];
-        $record = new stdClass();
+        $record = (object) ['tag_ids' => ['1', '3', '5']];
+        $expected = (object) ['tag_ids' => ['1', '5']];
 
-        $this->assertEquals([
-            $author,
-            $post1,
-            $post2
-        ], $this->hydrator->hydrateRelated($document->getResource(), $record));
+        $document = $this->decode($content);
+        $this->hydrator->removeFromRelationship('latest-tags', $document->getRelationship(), $record);
+        $this->assertEquals($expected, $record);
     }
+
 }

@@ -22,7 +22,6 @@ use CloudCreativity\JsonApi\Contracts\Hydrator\HydratorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
@@ -33,7 +32,20 @@ use CloudCreativity\Utils\Object\StandardObjectInterface;
 abstract class AbstractHydrator implements HydratorInterface
 {
 
-    use RelationshipHydratorTrait;
+    use HydratesFieldsTrait;
+
+    /**
+     * Create a new record.
+     *
+     * Implementing classes need only implement the logic to transfer the minimum
+     * amount of data from the resource that is required to construct a new record
+     * instance. The hydrate will then hydrate the object after it has been
+     * created.
+     *
+     * @param ResourceObjectInterface $resource
+     * @return object
+     */
+    abstract protected function createRecord(ResourceObjectInterface $resource);
 
     /**
      * @param StandardObjectInterface $attributes
@@ -43,38 +55,35 @@ abstract class AbstractHydrator implements HydratorInterface
     abstract protected function hydrateAttributes(StandardObjectInterface $attributes, $record);
 
     /**
-     * Transfer data from a resource to a record.
+     * Persist changes to the record.
      *
-     * @param ResourceObjectInterface $resource
-     * @param object $record
-     * @return object
+     * @param $record
      */
-    public function hydrate(ResourceObjectInterface $resource, $record)
+    abstract protected function persist($record);
+
+    /**
+     * @inheritdoc
+     */
+    public function create(ResourceObjectInterface $resource)
     {
-        $this->hydrating($resource, $record);
+        $record = $this->createRecord($resource);
         $this->hydrateAttributes($resource->getAttributes(), $record);
         $this->hydrateRelationships($resource->getRelationships(), $record);
-        $this->hydrated($resource, $record);
+        $this->persist($record);
 
         return $record;
     }
 
     /**
-     * Transfer data from a resource relationship to a record.
-     *
-     * @param $relationshipKey
-     *      the key of the relationship to hydrate.
-     * @param RelationshipInterface $relationship
-     *      the relationship object to use for the hydration.
-     * @param object $record
-     *      the object to hydrate.
-     * @return void
+     * @inheritdoc
      */
-    public function hydrateRelationship($relationshipKey, RelationshipInterface $relationship, $record)
+    public function update(ResourceObjectInterface $resource, $record)
     {
-        if (!$this->callHydrateRelationship($relationshipKey, $relationship, $record)) {
-            throw new RuntimeException("Cannot hydrate relationship: $relationshipKey");
-        }
+        $this->hydrateAttributes($resource->getAttributes(), $record);
+        $this->hydrateRelationships($resource->getRelationships(), $record);
+        $this->persist($record);
+
+        return $record;
     }
 
     /**
@@ -85,33 +94,7 @@ abstract class AbstractHydrator implements HydratorInterface
     {
         /** @var RelationshipInterface $relationship */
         foreach ($relationships->getAll() as $key => $relationship) {
-            $this->callHydrateRelationship($key, $relationship, $record);
+            $this->callMethodForField($key, $relationship, $record);
         }
-    }
-
-    /**
-     * Called before any hydration occurs.
-     *
-     * Child classes can overload this method if they need to do any logic pre-hydration.
-     *
-     * @param ResourceObjectInterface $resource
-     * @param $record
-     * @return void
-     */
-    protected function hydrating(ResourceObjectInterface $resource, $record)
-    {
-    }
-
-    /**
-     * Called after hydration has occurred.
-     *
-     * Child classes can overload this method if they need to do any logic post-hydration.
-     *
-     * @param ResourceObjectInterface $resource
-     * @param $record
-     * @return void
-     */
-    protected function hydrated(ResourceObjectInterface $resource, $record)
-    {
     }
 }

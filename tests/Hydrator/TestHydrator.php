@@ -18,22 +18,18 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
-use CloudCreativity\JsonApi\Contracts\Hydrator\HydratesRelatedInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
-use CloudCreativity\JsonApi\Utils\Str;
-use CloudCreativity\Utils\Object\StandardObject;
-use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
  * Class TestHydrator
  *
  * @package CloudCreativity\JsonApi
  */
-class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
+class TestHydrator extends AbstractHydrator
 {
 
-    use HydratesAttributesTrait, RelatedHydratorTrait;
+    use HydratesAttributesTrait;
 
     /**
      * The attributes that can be hydrated
@@ -49,6 +45,41 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
      */
     public $dates;
 
+
+    /**
+     * @inheritdoc
+     */
+    public function updateRelationship($relationshipKey, RelationshipInterface $relationship, $record)
+    {
+        $this->callMethodForField($relationshipKey, $relationship, $record);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addToRelationship($relationshipKey, RelationshipInterface $relationship, $record)
+    {
+        $this->callMethodForAddToField($relationshipKey, $relationship, $record);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeFromRelationship($relationshipKey, RelationshipInterface $relationship, $record)
+    {
+        $this->callMethodForRemoveFromField($relationshipKey, $relationship, $record);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function createRecord(ResourceObjectInterface $resource)
+    {
+        $id = $resource->getId();
+
+        return (object) compact('id');
+    }
+
     /**
      * @inheritDoc
      */
@@ -58,42 +89,19 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
     }
 
     /**
-     * @inheritDoc
-     * @todo an equivalent method for this needs to be on the `RelatedHydratorTrait`
-     * @see https://github.com/cloudcreativity/json-api/issues/28
+     * @param $record
+     * @param $value
      */
-    public function hydrateRelated(ResourceObjectInterface $resource, $record)
+    protected function hydrateTitleField($record, $value)
     {
-        $results = [];
-        $attributes = $resource->getAttributes();
-
-        /**
-         * Have to iterate over keys because the standard object iteration has a bug.
-         *
-         * @see https://github.com/cloudcreativity/json-api/issues/30
-         * @todo change this when that issue is fixed.
-         */
-        foreach ($attributes->keys() as $key) {
-            $results[] = $this->callHydrateRelatedAttribute($key, $attributes->get($key), $record);
-        }
-
-        /** @var RelationshipInterface $relationship */
-        foreach ($resource->getRelationships()->getAll() as $key => $relationship) {
-            $result = $this->callHydrateRelatedRelationship($key, $relationship, $record);
-
-            if (is_array($result)) {
-                $results = array_merge($results, $result);
-            }
-        }
-
-        return array_values(array_filter($results));
+        $record->title = ucwords($value);
     }
 
     /**
      * @param RelationshipInterface $relationship
      * @param $record
      */
-    protected function hydrateUserRelationship(RelationshipInterface $relationship, $record)
+    protected function hydrateUserField(RelationshipInterface $relationship, $record)
     {
         $record->user_id = $relationship->getIdentifier()->getId();
     }
@@ -102,41 +110,45 @@ class TestHydrator extends AbstractHydrator implements HydratesRelatedInterface
      * @param RelationshipInterface $relationship
      * @param $record
      */
-    protected function hydrateLatestTagsRelationship(RelationshipInterface $relationship, $record)
+    protected function hydrateLatestTagsField(RelationshipInterface $relationship, $record)
     {
         $record->tag_ids = $relationship->getIdentifiers()->getIds();
     }
 
     /**
      * @param RelationshipInterface $relationship
-     * @return array
+     * @param $record
      */
-    protected function hydrateRelatedLinkedPosts(RelationshipInterface $relationship)
+    protected function addToLatestTagsField(RelationshipInterface $relationship, $record)
     {
-        $arr = [];
+        $existing = isset($record->tag_ids) ? $record->tag_ids : [];
+        $ids = $relationship->getIdentifiers()->getIds();
 
-        foreach ($relationship->getData()->getAll() as $identifier) {
-            $arr[] = (object) [
-                'type' => $identifier->getType(),
-                'id' => $identifier->getId(),
-                'title' => sprintf('Post %d', $identifier->getId()),
-            ];
-        }
-
-        return $arr;
+        $record->tag_ids = array_merge($existing, $ids);
     }
 
     /**
-     * @param StandardObjectInterface $object
+     * @param RelationshipInterface $relationship
      * @param $record
-     * @return object
      */
-    protected function hydrateRelatedAuthor(StandardObjectInterface $object, $record)
+    protected function removeFromLatestTagsField(RelationshipInterface $relationship, $record)
     {
-        $object->transformKeys(function ($key) {
-            return Str::underscore($key);
-        });
+        $existing = isset($record->tag_ids) ? $record->tag_ids : [];
+        $ids = $relationship->getIdentifiers()->getIds();
 
-        return (object) $object->toArray();
+        $record->tag_ids = array_values(array_diff($existing, $ids));
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function persist($record)
+    {
+        if (!isset($record->id)) {
+            $record->id = 'new';
+        }
+
+        $record->saved = true;
+    }
+
 }

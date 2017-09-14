@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Store;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
 use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
@@ -74,6 +75,48 @@ class Store implements StoreInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function queryRecord(ResourceIdentifierInterface $identifier, EncodingParametersInterface $params)
+    {
+        return $this
+            ->adapterFor($identifier->getType())
+            ->queryRecord($identifier->getId(), $params);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function queryRelated(
+        $resourceType,
+        $record,
+        $relationshipName,
+        EncodingParametersInterface $params
+    ) {
+        $inverse = $this->inverse($resourceType, $relationshipName);
+
+        return $this
+            ->adapterFor($inverse)
+            ->queryRelated($record, $relationshipName, $params);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function queryRelationship(
+        $resourceType,
+        $record,
+        $relationshipName,
+        EncodingParametersInterface $params
+    ) {
+        $inverse = $this->inverse($resourceType, $relationshipName);
+
+        return $this
+            ->adapterFor($inverse)
+            ->queryRelationship($record, $relationshipName, $params);
+    }
+
+    /**
      * @inheritdoc
      */
     public function exists(ResourceIdentifierInterface $identifier)
@@ -118,13 +161,44 @@ class Store implements StoreInterface
     /**
      * @inheritdoc
      */
-    public function findRecord(ResourceIdentifierInterface $identifier)
+    public function findOrFail(ResourceIdentifierInterface $identifier)
     {
         if (!$record = $this->find($identifier)) {
             throw new RecordNotFoundException($identifier);
         }
 
         return $record;
+    }
+
+    /**
+     * @inheritDoc
+     * @deprecated
+     */
+    public function findRecord(ResourceIdentifierInterface $identifier)
+    {
+        return $this->findOrFail($identifier);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findMany(ResourceIdentifierCollectionInterface $identifiers)
+    {
+        $results = [];
+
+        foreach ($identifiers->map() as $resourceType => $ids) {
+            $results = array_merge($results, $this->adapterFor($resourceType)->findMany($ids));
+        }
+
+        return $results;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inverse($resourceType, $relationshipName)
+    {
+        return $this->adapterFor($resourceType)->inverse($relationshipName);
     }
 
     /**

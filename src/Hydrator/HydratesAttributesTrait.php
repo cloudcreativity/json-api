@@ -29,6 +29,8 @@ use DateTime;
 trait HydratesAttributesTrait
 {
 
+    use HydratesFieldsTrait;
+
     /**
      * @param object $record
      *      the record to hydrate
@@ -57,7 +59,10 @@ trait HydratesAttributesTrait
             }
 
             $deserialized = $this->deserializeAttribute($attributes->get($resourceKey), $resourceKey);
-            $this->hydrateAttribute($record, $attrKey, $deserialized);
+
+            if (!$this->callMethodForField($resourceKey, $record, $deserialized)) {
+                $this->hydrateAttribute($record, $attrKey, $deserialized);
+            }
         }
     }
 
