@@ -198,7 +198,11 @@ class Store implements StoreInterface
      */
     public function inverse($resourceType, $relationshipName)
     {
-        return $this->adapterFor($resourceType)->inverse($relationshipName);
+        if ($inverse = $this->adapterFor($resourceType)->inverse($relationshipName)) {
+            return $inverse;
+        }
+
+        throw new RuntimeException("Unknown inverse resource type for: $resourceType -> $relationshipName");
     }
 
     /**

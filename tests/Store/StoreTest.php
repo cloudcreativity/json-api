@@ -134,6 +134,21 @@ class StoreTest extends TestCase
         ]);
 
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('users');
+        $store->queryRelated('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
+    }
+
+    /**
+     * If the inverse type is an empty value, an exception is thrown.
+     */
+    public function testCannotQueryRelated3()
+    {
+        $store = $this->store([
+            'posts' => $this->willNotQuery(['author' => null])
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('author');
         $store->queryRelated('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
     }
 
