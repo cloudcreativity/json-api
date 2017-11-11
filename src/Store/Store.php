@@ -131,7 +131,7 @@ class Store implements StoreInterface
      * @param $resourceType
      * @return AdapterInterface
      */
-    protected function adapterFor($resourceType)
+    public function adapterFor($resourceType)
     {
         if (!$adapter = $this->container->getAdapterByResourceType($resourceType)) {
             throw new RuntimeException("No adapter for resource type: $resourceType");
