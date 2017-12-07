@@ -3,7 +3,8 @@
 namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
-use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 class HelpersTest extends TestCase
 {
@@ -61,11 +62,44 @@ class HelpersTest extends TestCase
      * @param $expected
      * @dataProvider requestContainsBodyProvider
      */
-    public function testHttpContainsBody(array $headers, $expected)
+    public function testRequestContainsBody(array $headers, $expected)
     {
-        $request = new ServerRequest('GET', '/api/posts', $headers);
+        $request = new Request('GET', '/api/posts', $headers);
 
         $this->assertSame($expected, http_contains_body($request));
+    }
+
+    /**
+     * @return array
+     */
+    public function responseContainsBodyProvider()
+    {
+        return [
+            'head never contains body' => [false, 'HEAD', 200],
+            '1xx never contain body' => [false, 'POST', 100],
+            '204 never contains body' => [false, 'GET', 204],
+            '304 never contains body' => [false, 'GET', 304],
+            '200 with zero content length' => [false, 'GET', 200, ['Content-Length' => '0']],
+            '200 with content' => [true, 'GET', 200, ['Content-Length' => '3'], 'foo'],
+            '201 with content' => [true, 'POST', 201, ['Content-Length' => '3'], 'foo'],
+            '200 with transfer encoding' => [true, 'GET', 200, ['Transfer-Encoding' => 'chunked']],
+        ];
+    }
+
+    /**
+     * @param $expected
+     * @param $method
+     * @param $status
+     * @param array $headers
+     * @param $body
+     * @dataProvider responseContainsBodyProvider
+     */
+    public function testResponseContainsBody($expected, $method, $status, $headers = [], $body = null)
+    {
+        $request = new Request($method, '/api/posts');
+        $response = new Response($status, $headers, $body);
+
+        $this->assertSame($expected, http_contains_body($request, $response));
     }
 
     /**

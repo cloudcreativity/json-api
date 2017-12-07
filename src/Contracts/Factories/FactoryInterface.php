@@ -39,7 +39,7 @@ use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface as PsrRequest;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -81,10 +81,11 @@ interface FactoryInterface extends BaseFactoryInterface
     /**
      * Create a JSON API response object from a PSR response.
      *
+     * @param PsrRequest $request
      * @param PsrResponse $response
      * @return ResponseInterface
      */
-    public function createResponse(PsrResponse $response);
+    public function createResponse(PsrRequest $request, PsrResponse $response);
 
     /**
      * Create an error response object.
@@ -98,11 +99,12 @@ interface FactoryInterface extends BaseFactoryInterface
     /**
      * Create a JSON API document from a HTTP message.
      *
-     * @param MessageInterface $message
+     * @param PsrRequest $request
+     * @param PsrResponse $response
      * @return DocumentInterface|null
      *      the document, or null if the message does not contain body content.
      */
-    public function createDocumentObject(MessageInterface $message);
+    public function createDocumentObject(PsrRequest $request, PsrResponse $response = null);
 
     /**
      * @param mixed $httpClient
