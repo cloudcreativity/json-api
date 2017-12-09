@@ -23,25 +23,16 @@ interface RelationshipAdapterInterface
 {
 
     /**
-     * Use the supplied container to gain access to resource adapters.
-     *
-     * @param ContainerInterface $adapters
-     * @return $this
-     */
-    public function withAdapters(ContainerInterface $adapters);
-
-    /**
      * Query related resources for the specified domain record.
      *
      * For example, if a client was querying the `comments` relationship of a `posts` resource.
      * This method would be invoked providing the post that is being queried as the `$record` argument.
      *
      * @param object $record
-     * @param $relationshipName
      * @param EncodingParametersInterface $parameters
      * @return mixed
      */
-    public function queryRelated($record, $relationshipName, EncodingParametersInterface $parameters);
+    public function queryRelated($record, EncodingParametersInterface $parameters);
 
     /**
      * Query relationship data for the specified domain record.
@@ -50,10 +41,9 @@ interface RelationshipAdapterInterface
      * This method would be invoked providing the post that is being queried as the `$record` argument.
      *
      * @param $record
-     * @param $relationshipName
      * @param EncodingParametersInterface $parameters
      * @return mixed
      */
-    public function queryRelationship($record, $relationshipName, EncodingParametersInterface $parameters);
+    public function queryRelationship($record, EncodingParametersInterface $parameters);
 
 }

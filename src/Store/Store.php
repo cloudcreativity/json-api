@@ -96,8 +96,7 @@ class Store implements StoreInterface
         return $this
             ->adapterFor($resourceType)
             ->related($relationshipName)
-            ->withAdapters($this->container)
-            ->queryRelated($record, $relationshipName, $params);
+            ->queryRelated($record, $params);
     }
 
     /**
@@ -112,8 +111,7 @@ class Store implements StoreInterface
         return $this
             ->adapterFor($resourceType)
             ->related($relationshipName)
-            ->withAdapters($this->container)
-            ->queryRelationship($record, $relationshipName, $params);
+            ->queryRelationship($record, $params);
     }
 
     /**
@@ -202,6 +200,8 @@ class Store implements StoreInterface
         if (!$adapter = $this->container->getAdapterByResourceType($resourceType)) {
             throw new RuntimeException("No adapter for resource type: $resourceType");
         }
+
+        $adapter->withAdapters($this->container);
 
         return $adapter;
     }

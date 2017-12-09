@@ -33,6 +33,14 @@ interface ResourceAdapterInterface
 {
 
     /**
+     * Use the supplied container to gain access to other adapters.
+     *
+     * @param ContainerInterface $adapters
+     * @return $this
+     */
+    public function withAdapters(ContainerInterface $adapters);
+
+    /**
      * Query many domain records.
      *
      * @param EncodingParametersInterface $parameters

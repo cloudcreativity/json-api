@@ -460,6 +460,12 @@ class StoreTest extends TestCase
     private function willQuery($params, $results, $expectation = null)
     {
         $mock = $this->adapter();
+
+        $mock->expects($this->once())
+            ->method('withAdapters')
+            ->with($this->container)
+            ->willReturnSelf();
+
         $mock->expects($expectation ?: $this->any())
             ->method('query')
             ->with($params)
@@ -477,6 +483,12 @@ class StoreTest extends TestCase
     private function willQueryRecord($resourceId, $params, $record)
     {
         $mock = $this->adapter();
+
+        $mock->expects($this->once())
+            ->method('withAdapters')
+            ->with($this->container)
+            ->willReturnSelf();
+
         $mock->expects($this->atLeastOnce())
             ->method('queryRecord')
             ->with($resourceId, $params)
@@ -497,7 +509,7 @@ class StoreTest extends TestCase
         $mock = $this->relationshipAdapter();
         $mock->expects($this->atLeastOnce())
             ->method('queryRelated')
-            ->with($record, $relationshipName, $parameters)
+            ->with($record, $parameters)
             ->willReturn($expected);
 
         return $this->adapter([$relationshipName => $mock]);
@@ -515,7 +527,7 @@ class StoreTest extends TestCase
         $mock = $this->relationshipAdapter();
         $mock->expects($this->atLeastOnce())
             ->method('queryRelationship')
-            ->with($record, $relationshipName, $parameters)
+            ->with($record, $parameters)
             ->willReturn($expected);
 
         return $this->adapter([$relationshipName => $mock]);
@@ -554,13 +566,6 @@ class StoreTest extends TestCase
      */
     private function relationshipAdapter()
     {
-        $mock = $this->createMock(RelationshipAdapterInterface::class);
-
-        $mock->expects($this->once())
-            ->method('withAdapters')
-            ->with($this->container)
-            ->willReturnSelf();
-
-        return $mock;
+        return $this->createMock(RelationshipAdapterInterface::class);
     }
 }
