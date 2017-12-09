@@ -63,6 +63,15 @@ interface HydratorInterface
     public function update(ResourceObjectInterface $resource, $record);
 
     /**
+     * Delete a domain record.
+     *
+     * @param $record
+     * @return bool
+     *      whether the record was successfully destroyed.
+     */
+    public function delete($record);
+
+    /**
      * Update a domain record's relationship with data from the supplied relationship object.
      *
      * For a has-one relationship, this changes the relationship to match the supplied relationship

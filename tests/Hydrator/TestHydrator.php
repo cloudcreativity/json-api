@@ -45,6 +45,15 @@ class TestHydrator extends AbstractHydrator
      */
     public $dates;
 
+    /**
+     * @inheritDoc
+     */
+    public function delete($record)
+    {
+        $record->destroyed = true;
+
+        return true;
+    }
 
     /**
      * @inheritdoc
