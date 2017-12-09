@@ -174,25 +174,4 @@ interface StoreInterface
      */
     public function findMany(ResourceIdentifierCollectionInterface $identifiers);
 
-    /**
-     * Get the inverse resource type for a resource type's relationship.
-     *
-     * For example, if a `posts` resource has an `author` relationship, this
-     * method would return the resource type of the inverse resource -
-     * e.g. `users` if the author was a `users` resource.
-     *
-     * If the inverse type is polymorphic, it must return an 'abstract' type
-     * that represents the polymorphism.
-     *
-     * For example, an application with a `tags` resource that has an `items`
-     * relationship that can contain either `posts` and/or `videos` resources.
-     * In this case, the inverse type for the items relationship would be an
-     * abstract type call `taggables` - representing any resource that can be
-     * linked to a tag.
-     *
-     * @param $resourceType
-     * @param $relationshipName
-     * @return string
-     */
-    public function inverse($resourceType, $relationshipName);
 }

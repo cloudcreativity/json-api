@@ -19,6 +19,8 @@
 namespace CloudCreativity\JsonApi\Store;
 
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Store\RelationshipAdapterInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
@@ -34,6 +36,20 @@ use PHPUnit_Framework_MockObject_MockObject;
  */
 class StoreTest extends TestCase
 {
+
+    /**
+     * @var ContainerInterface|PHPUnit_Framework_MockObject_MockObject
+     */
+    private $container;
+
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->container = $this->createMock(ContainerInterface::class);
+    }
 
     /**
      * A query request must be handed off to the adapter for the resource type
@@ -91,10 +107,8 @@ class StoreTest extends TestCase
     }
 
     /**
-     * A query related request must be handed off to the adapter for the inverse resource
-     * type of the relationship. I.e. in this example, a query for the 'author' relationship
-     * of a 'posts' resource is handed off to the 'users' adapter, having obtained the inverse
-     * type from the 'posts' adapter.
+     * A query related request must be handed off to the relationship adapter provided by the
+     * resource adapter.
      */
     public function testQueryRelated()
     {
@@ -103,60 +117,16 @@ class StoreTest extends TestCase
         $expected = $this->factory->createPage([]);
 
         $store = $this->store([
-            'posts' => $this->willNotQuery(['author' => 'users']),
-            'users' => $this->willQueryRelated($record, 'author', $parameters, $expected),
-        ]);
-
-        $this->assertSame($expected, $store->queryRelated('posts', $record, 'author', $parameters));
-    }
-
-    /**
-     * If the resource type for the record on which the relationship is being queried is
-     * not recognised, an exception must be thrown.
-     */
-    public function testCannotQueryRelated1()
-    {
-        $store = $this->store([
             'users' => $this->willNotQuery(),
+            'posts' => $this->willQueryRelated($record, 'user', $parameters, $expected),
         ]);
 
-        $this->expectException(RuntimeException::class);
-        $store->queryRelated('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
+        $this->assertSame($expected, $store->queryRelated('posts', $record, 'user', $parameters));
     }
 
     /**
-     * If the inverse resource type for the relationship is not recognised, an exception must be thrown.
-     */
-    public function testCannotQueryRelated2()
-    {
-        $store = $this->store([
-            'posts' => $this->willNotQuery(['author' => 'users']),
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('users');
-        $store->queryRelated('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
-    }
-
-    /**
-     * If the inverse type is an empty value, an exception is thrown.
-     */
-    public function testCannotQueryRelated3()
-    {
-        $store = $this->store([
-            'posts' => $this->willNotQuery(['author' => null])
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('author');
-        $store->queryRelated('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
-    }
-
-    /**
-     * A query relationship request must be handed off to the adapter for the inverse resource
-     * type of the relationship. I.e. in this example, a query for the 'author' relationship
-     * of a 'posts' resource is handed off to the 'users' adapter, having obtained the inverse
-     * type from the 'posts' adapter.
+     * A query relationship request must be handed off to the relationship adapter provided by
+     * the resource adapter.
      */
     public function testQueryRelationship()
     {
@@ -165,38 +135,11 @@ class StoreTest extends TestCase
         $expected = $this->factory->createPage([]);
 
         $store = $this->store([
-            'posts' => $this->willNotQuery(['author' => 'users']),
-            'users' => $this->willQueryRelationship($record, 'author', $parameters, $expected),
-        ]);
-
-        $this->assertSame($expected, $store->queryRelationship('posts', $record, 'author', $parameters));
-    }
-
-    /**
-     * If the resource type for the record on which the relationship is being queried is
-     * not recognised, an exception must be thrown.
-     */
-    public function testCannotQueryRelationship1()
-    {
-        $store = $this->store([
             'users' => $this->willNotQuery(),
+            'posts' => $this->willQueryRelationship($record, 'user', $parameters, $expected),
         ]);
 
-        $this->expectException(RuntimeException::class);
-        $store->queryRelationship('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
-    }
-
-    /**
-     * If the inverse resource type for the relationship is not recognised, an exception must be thrown.
-     */
-    public function testCannotQueryRelationship2()
-    {
-        $store = $this->store([
-            'posts' => $this->willNotQuery(['author' => 'users']),
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $store->queryRelationship('posts', new StandardObject(), 'author', $this->factory->createQueryParameters());
+        $this->assertSame($expected, $store->queryRelationship('posts', $record, 'user', $parameters));
     }
 
     public function testExists()
@@ -416,9 +359,13 @@ class StoreTest extends TestCase
      */
     private function store(array $adapters)
     {
-        $container = $this->factory->createAdapterContainer($adapters);
+        $this->container
+            ->method('getAdapterByResourceType')
+            ->willReturnCallback(function ($resourceType) use ($adapters) {
+                return isset($adapters[$resourceType]) ? $adapters[$resourceType] : null;
+            });
 
-        return $this->factory->createStore($container);
+        return new Store($this->container);
     }
 
     /**
@@ -547,13 +494,13 @@ class StoreTest extends TestCase
      */
     private function willQueryRelated($record, $relationshipName, $parameters, $expected)
     {
-        $mock = $this->adapter();
+        $mock = $this->relationshipAdapter();
         $mock->expects($this->atLeastOnce())
             ->method('queryRelated')
             ->with($record, $relationshipName, $parameters)
             ->willReturn($expected);
 
-        return $mock;
+        return $this->adapter([$relationshipName => $mock]);
     }
 
     /**
@@ -565,40 +512,54 @@ class StoreTest extends TestCase
      */
     private function willQueryRelationship($record, $relationshipName, $parameters, $expected)
     {
-        $mock = $this->adapter();
+        $mock = $this->relationshipAdapter();
         $mock->expects($this->atLeastOnce())
             ->method('queryRelationship')
             ->with($record, $relationshipName, $parameters)
             ->willReturn($expected);
 
-        return $mock;
+        return $this->adapter([$relationshipName => $mock]);
     }
 
     /**
-     * @param array $inverse
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willNotQuery(array $inverse = [])
+    private function willNotQuery()
     {
-        $mock = $this->adapter($inverse);
+        $mock = $this->adapter();
         $mock->expects($this->never())->method('query');
         $mock->expects($this->never())->method('queryRecord');
-        $mock->expects($this->never())->method('queryRelated');
-        $mock->expects($this->never())->method('queryRelationship');
+        $mock->expects($this->never())->method('related');
 
         return $mock;
     }
 
     /**
-     * @param array $inverse
+     * @param array $relationships
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function adapter(array $inverse = [])
+    private function adapter(array $relationships = [])
     {
         $mock = $this->createMock(AdapterInterface::class);
-        $mock->method('inverse')->willReturnCallback(function ($name) use ($inverse) {
-            return $inverse[$name];
+
+        $mock->method('related')->willReturnCallback(function ($name) use ($relationships) {
+            return $relationships[$name];
         });
+
+        return $mock;
+    }
+
+    /**
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function relationshipAdapter()
+    {
+        $mock = $this->createMock(RelationshipAdapterInterface::class);
+
+        $mock->expects($this->once())
+            ->method('withAdapters')
+            ->with($this->container)
+            ->willReturnSelf();
 
         return $mock;
     }

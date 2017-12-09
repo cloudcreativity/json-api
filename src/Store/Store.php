@@ -93,10 +93,10 @@ class Store implements StoreInterface
         $relationshipName,
         EncodingParametersInterface $params
     ) {
-        $inverse = $this->inverse($resourceType, $relationshipName);
-
         return $this
-            ->adapterFor($inverse)
+            ->adapterFor($resourceType)
+            ->related($relationshipName)
+            ->withAdapters($this->container)
             ->queryRelated($record, $relationshipName, $params);
     }
 
@@ -109,10 +109,10 @@ class Store implements StoreInterface
         $relationshipName,
         EncodingParametersInterface $params
     ) {
-        $inverse = $this->inverse($resourceType, $relationshipName);
-
         return $this
-            ->adapterFor($inverse)
+            ->adapterFor($resourceType)
+            ->related($relationshipName)
+            ->withAdapters($this->container)
             ->queryRelationship($record, $relationshipName, $params);
     }
 
@@ -194,18 +194,6 @@ class Store implements StoreInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function inverse($resourceType, $relationshipName)
-    {
-        if ($inverse = $this->adapterFor($resourceType)->inverse($relationshipName)) {
-            return $inverse;
-        }
-
-        throw new RuntimeException("Unknown inverse resource type for: $resourceType -> $relationshipName");
-    }
-
-    /**
      * @param $resourceType
      * @return AdapterInterface
      */
@@ -217,4 +205,5 @@ class Store implements StoreInterface
 
         return $adapter;
     }
+
 }

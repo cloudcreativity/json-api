@@ -18,101 +18,12 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
-
 /**
  * Interface AdapterInterface
  *
- * Adapters are responsible for converting JSON API queries or resource identifiers into domain
- * record(s). Adapters are attached to a store via the adapter container. This allows a JSON API
- * store to query different types of domain records regardless of how these are actually stored
- * and retrieved within an application.
- *
  * @package CloudCreativity\JsonApi
+ * @deprecated extend `ResourceAdapterInterface` directly.
  */
-interface AdapterInterface
+interface AdapterInterface extends ResourceAdapterInterface
 {
-
-    /**
-     * Query many domain records.
-     *
-     * @param EncodingParametersInterface $parameters
-     * @return mixed
-     */
-    public function query(EncodingParametersInterface $parameters);
-
-    /**
-     * Query a single domain record.
-     *
-     * @param string $resourceId
-     * @param EncodingParametersInterface $parameters
-     * @return object|null
-     */
-    public function queryRecord($resourceId, EncodingParametersInterface $parameters);
-
-    /**
-     * Query related resources for the specified domain record.
-     *
-     * For example, if a client was querying the `comments` relationship of a `posts` resource.
-     * This method would be invoked on the `comments` adapter, providing the post that is being
-     * queried as the `$record` argument.
-     *
-     * @param object $record
-     * @param $relationshipName
-     * @param EncodingParametersInterface $parameters
-     * @return mixed
-     */
-    public function queryRelated($record, $relationshipName, EncodingParametersInterface $parameters);
-
-    /**
-     * Query relationship data for the specified domain record.
-     *
-     * For example, if a client was querying the `comments` relationship of a `posts` resource.
-     * This method would be invoked on the `comments` adapter, providing the post that is being
-     * queried as the `$record` argument.
-     *
-     * @param $record
-     * @param $relationshipName
-     * @param EncodingParametersInterface $parameters
-     * @return mixed
-     */
-    public function queryRelationship($record, $relationshipName, EncodingParametersInterface $parameters);
-
-    /**
-     * Does a domain record of the specified JSON API resource id exist?
-     *
-     * @param string $resourceId
-     * @return bool
-     */
-    public function exists($resourceId);
-
-    /**
-     * Get the domain record that relates to the specified JSON API resource id, if it exists.
-     *
-     * @param string $resourceId
-     * @return object|null
-     */
-    public function find($resourceId);
-
-    /**
-     * Find many domain records for the specified JSON API resource ids.
-     *
-     * The returned collection MUST NOT contain any duplicate domain records, and MUST only contain
-     * domain records that match the supplied resource ids. A collection MUST be returned even if some
-     * or all of the resource IDs cannot be converted into domain records - i.e. the returned collection
-     * may contain less domain records than the supplied number of ids.
-     *
-     * @param array $resourceIds
-     * @return array
-     */
-    public function findMany(array $resourceIds);
-
-    /**
-     * Get the inverse resource type for the supplied relationship name.
-     *
-     * @param $relationshipName
-     * @return string
-     */
-    public function inverse($relationshipName);
-
 }
