@@ -121,10 +121,8 @@ class TestHydrator extends AbstractHydrator
      */
     protected function addToLatestTagsField(RelationshipInterface $relationship, $record)
     {
-        $existing = isset($record->tag_ids) ? $record->tag_ids : [];
-        $ids = $relationship->getIdentifiers()->getIds();
-
-        $record->tag_ids = array_merge($existing, $ids);
+        $tags = $this->store()->findMany($relationship->getIdentifiers());
+        $record->tags = $tags;
     }
 
     /**
@@ -133,10 +131,11 @@ class TestHydrator extends AbstractHydrator
      */
     protected function removeFromLatestTagsField(RelationshipInterface $relationship, $record)
     {
-        $existing = isset($record->tag_ids) ? $record->tag_ids : [];
-        $ids = $relationship->getIdentifiers()->getIds();
+        $remove = $this->store()->findMany($relationship->getIdentifiers());
 
-        $record->tag_ids = array_values(array_diff($existing, $ids));
+        $record->tags = array_values(array_filter($record->tags, function ($tag) use ($remove) {
+            return !in_array($tag, $remove, true);
+        }));
     }
 
     /**

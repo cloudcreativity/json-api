@@ -22,6 +22,8 @@ use CloudCreativity\JsonApi\Contracts\Hydrator\HydratorInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipsInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\Utils\Object\StandardObjectInterface;
 
 /**
@@ -33,6 +35,11 @@ abstract class AbstractHydrator implements HydratorInterface
 {
 
     use HydratesFieldsTrait;
+
+    /**
+     * @var StoreInterface|null
+     */
+    private $store;
 
     /**
      * Create a new record.
@@ -60,6 +67,17 @@ abstract class AbstractHydrator implements HydratorInterface
      * @param $record
      */
     abstract protected function persist($record);
+
+    /**
+     * @param StoreInterface $store
+     * @return $this
+     */
+    public function withStore(StoreInterface $store)
+    {
+        $this->store = $store;
+
+        return $this;
+    }
 
     /**
      * @inheritdoc
@@ -96,5 +114,17 @@ abstract class AbstractHydrator implements HydratorInterface
         foreach ($relationships->getAll() as $key => $relationship) {
             $this->callMethodForField($key, $relationship, $record);
         }
+    }
+
+    /**
+     * @return StoreInterface|null
+     */
+    protected function store()
+    {
+        if (!$this->store) {
+            throw new RuntimeException('No store set on the hydrator.');
+        }
+
+        return $this->store;
     }
 }

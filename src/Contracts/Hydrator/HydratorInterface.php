@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Contracts\Hydrator;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
@@ -32,6 +33,14 @@ use CloudCreativity\JsonApi\Exceptions\RuntimeException;
  */
 interface HydratorInterface
 {
+
+    /**
+     * Use the supplied store to lookup JSON API identifiers.
+     *
+     * @param StoreInterface $store
+     * @return $this
+     */
+    public function withStore(StoreInterface $store);
 
     /**
      * Create a domain record using data from the supplied resource object.

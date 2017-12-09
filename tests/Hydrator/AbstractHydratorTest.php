@@ -18,6 +18,10 @@
 
 namespace CloudCreativity\JsonApi\Hydrator;
 
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier;
+use CloudCreativity\JsonApi\Object\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\TestCase;
 use DateTime;
 use DateTimeZone;
@@ -37,11 +41,19 @@ class AbstractHydratorTest extends TestCase
     private $hydrator;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $store;
+
+    /**
      * @return void
      */
     protected function setUp()
     {
+        /** @var StoreInterface $store */
+        $store = $this->store = $this->createMock(StoreInterface::class);
         $this->hydrator = new TestHydrator();
+        $this->hydrator->withStore($store);
     }
 
     public function testCreate()
@@ -296,6 +308,21 @@ JSON_API;
 
     public function testAddToRelationship()
     {
+        $tags = [
+            (object) ['id' => 2, 'name' => 'Foo'],
+            (object) ['id' => 3, 'name' => 'Bar'],
+        ];
+
+        $identifiers = new ResourceIdentifierCollection();
+        $identifiers->add(ResourceIdentifier::create('tags', '2'));
+        $identifiers->add(ResourceIdentifier::create('tags', '3'));
+
+        $this->store
+            ->expects($this->once())
+            ->method('findMany')
+            ->with($identifiers)
+            ->willReturn($tags);
+
         $content = <<<JSON_API
 {
     "data": [
@@ -306,15 +333,31 @@ JSON_API;
 JSON_API;
 
         $record = (object) ['tag_ids' => ['1']];
-        $expected = (object) ['tag_ids' => ['1', '2', '3']];
 
         $document = $this->decode($content);
         $this->hydrator->addToRelationship('latest-tags', $document->getRelationship(), $record);
-        $this->assertEquals($expected, $record);
+        $this->assertSame($tags, $record->tags);
     }
 
     public function testRemoveFromRelationship()
     {
+        $tags = [
+            (object) ['id' => 1, 'name' => 'Foo'],
+            (object) ['id' => 2, 'name' => 'Bar'],
+            (object) ['id' => 3, 'name' => 'Baz'],
+            (object) ['id' => 4, 'name' => 'Bat'],
+        ];
+
+        $identifiers = new ResourceIdentifierCollection();
+        $identifiers->add(ResourceIdentifier::create('tags', '2'));
+        $identifiers->add(ResourceIdentifier::create('tags', '3'));
+
+        $this->store
+            ->expects($this->once())
+            ->method('findMany')
+            ->with($identifiers)
+            ->willReturn([$tags[1], $tags[2]]);
+
         $content = <<<JSON_API
 {
     "data": [
@@ -324,12 +367,35 @@ JSON_API;
 }
 JSON_API;
 
-        $record = (object) ['tag_ids' => ['1', '3', '5']];
-        $expected = (object) ['tag_ids' => ['1', '5']];
+        $record = (object) compact('tags');
 
         $document = $this->decode($content);
         $this->hydrator->removeFromRelationship('latest-tags', $document->getRelationship(), $record);
-        $this->assertEquals($expected, $record);
+        $this->assertEquals([$tags[0], $tags[3]], $record->tags);
+    }
+
+    /**
+     * If no store has been injected, an exception must be thrown if the hydrator needs to
+     * lookup resource identifiers.
+     */
+    public function testNoStoreThrowsException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $content = <<<JSON_API
+{
+    "data": [
+        {"type": "tags", "id": "2"},
+        {"type": "tags", "id": "3"}
+    ]
+}
+JSON_API;
+
+        $record = (object) [];
+        $document = $this->decode($content);
+
+        $this->expectException(RuntimeException::class);
+        (new TestHydrator())->addToRelationship('latest-tags', $document->getRelationship(), $record);
     }
 
 }

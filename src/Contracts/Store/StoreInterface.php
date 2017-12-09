@@ -169,8 +169,8 @@ interface StoreInterface
      * be of a length shorter than the collection of identifiers.
      *
      * @param ResourceIdentifierCollectionInterface $identifiers
-     * @return array|iterable
-     *      a collection of domain records that match the supplied identifiers.
+     * @return array
+     *      an array of domain records that match the supplied identifiers.
      */
     public function findMany(ResourceIdentifierCollectionInterface $identifiers);
 
