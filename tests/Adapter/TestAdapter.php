@@ -117,8 +117,11 @@ class TestAdapter extends AbstractResourceAdaptor
     /**
      * @inheritDoc
      */
-    protected function hydrateRelationships($record, RelationshipsInterface $relationships)
-    {
+    protected function hydrateRelationships(
+        $record,
+        RelationshipsInterface $relationships,
+        EncodingParametersInterface $parameters
+    ) {
         // TODO: Implement hydrateRelationships() method.
     }
 
