@@ -11,6 +11,10 @@ All notable changes to this project will be documented in this file. This projec
 ### Removed
 - Hydrators have been removed as a result of the adapter changes described above.
 
+### Fixed
+
+- [37](https://github.com/cloudcreativity/json-api/issues/37) Correctly detect message body in a HTTP response.
+
 ## [0.11.0] - 2017-09-02
 
 ### Removed
