@@ -19,8 +19,10 @@
 namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Exceptions\InvalidJsonException;
+use CloudCreativity\JsonApi\Utils\Http;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 if (!function_exists('CloudCreativity\JsonApi\json_decode')) {
     /**
@@ -57,27 +59,18 @@ if (!function_exists('CloudCreativity\JsonApi\http_contains_body')) {
     /**
      * Does the HTTP message contain body content?
      *
-     * "The presence of a message-body in a request is signaled by the inclusion of a Content-Length or
-     * Transfer-Encoding header field in the request's message-headers."
-     * https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.3
+     * If only a request is provided, the method will determine if the request contains body.
      *
-     * However, some browsers send a Content-Length header with an empty string for e.g. GET requests
-     * without any message-body. Therefore rather than checking for the existence of a Content-Length
-     * header, we will allow an empty value to indicate that the request does not contain body.
+     * If a request and response is provided, the method will determine if the response contains
+     * body. Determining this for a response is dependent on the request method, which is why
+     * the request is also required.
      *
-     * @param MessageInterface $message
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
      * @return bool
      */
-    function http_contains_body(MessageInterface $message)
+    function http_contains_body(RequestInterface $request, ResponseInterface $response = null)
     {
-        if ($message->hasHeader('Transfer-Encoding')) {
-            return true;
-        };
-
-        if (!$contentLength = $message->getHeader('Content-Length')) {
-            return false;
-        }
-
-        return 0 < $contentLength[0];
+        return $response ? Http::doesResponseHaveBody($request, $response) : Http::doesRequestHaveBody($request);
     }
 }

@@ -43,7 +43,7 @@ use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface as PsrRequest;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use function CloudCreativity\JsonApi\http_contains_body;
@@ -92,9 +92,9 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createResponse(PsrResponse $response)
+    public function createResponse(PsrRequest $request, PsrResponse $response)
     {
-        return new Response($response, $this->createDocumentObject($response));
+        return new Response($response, $this->createDocumentObject($request, $response));
     }
 
     /**
@@ -108,13 +108,13 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * @inheritDoc
      */
-    public function createDocumentObject(MessageInterface $message)
+    public function createDocumentObject(PsrRequest $request, PsrResponse $response = null)
     {
-        if (!http_contains_body($message)) {
+        if (!http_contains_body($request, $response)) {
             return null;
         }
 
-        return new Document(json_decode($message->getBody()));
+        return new Document(json_decode($response ? $response->getBody() : $request->getBody()));
     }
 
     /**

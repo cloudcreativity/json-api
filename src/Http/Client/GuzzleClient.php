@@ -20,11 +20,14 @@ namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Factories\Factory;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface as PsrRequest;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -179,13 +182,15 @@ class GuzzleClient implements ClientInterface
      */
     protected function request($method, $uri, array $options = [])
     {
+        $request = new Request($method, $uri);
+
         try {
-            $response = $this->http->request($method, $uri, $options);
+            $response = $this->http->send($request, $options);
         } catch (BadResponseException $ex) {
-            throw $this->parseErrorResponse($ex);
+            throw $this->parseErrorResponse($request, $ex);
         }
 
-        return $this->factory->createResponse($response);
+        return $this->factory->createResponse($request, $response);
     }
 
     /**
@@ -194,14 +199,15 @@ class GuzzleClient implements ClientInterface
      * This method wraps decoding the body content of the provided exception, so that
      * another exception is not thrown while trying to parse an existing exception.
      *
+     * @param PsrRequest $request
      * @param BadResponseException $ex
      * @return JsonApiException
      */
-    private function parseErrorResponse(BadResponseException $ex)
+    private function parseErrorResponse(PsrRequest $request, BadResponseException $ex)
     {
         try {
             $response = $ex->getResponse();
-            $document = $response ? $this->factory->createDocumentObject($response) : null;
+            $document = $response ? $this->factory->createDocumentObject($request, $response) : null;
             $errors = $document ? $document->getErrors() : [];
             $statusCode = $response ? $response->getStatusCode() : 0;
         } catch (Exception $e) {
