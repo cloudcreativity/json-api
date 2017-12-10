@@ -167,7 +167,7 @@ interface StoreInterface
      * @return object
      *      the updated domain record.
      */
-    public function updateRelationship(
+    public function replaceRelationship(
         $record,
         $relationshipKey,
         RelationshipInterface $relationship,

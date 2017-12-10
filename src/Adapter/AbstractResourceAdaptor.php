@@ -59,15 +59,20 @@ abstract class AbstractResourceAdaptor implements ResourceAdapterInterface, Stor
     /**
      * @param $record
      * @param RelationshipsInterface $relationships
+     * @param EncodingParametersInterface $parameters
      * @return void
      */
-    abstract protected function hydrateRelationships($record, RelationshipsInterface $relationships);
+    abstract protected function hydrateRelationships(
+        $record,
+        RelationshipsInterface $relationships,
+        EncodingParametersInterface $parameters
+    );
 
     /**
      * Persist changes to the record.
      *
      * @param $record
-     * @return object
+     * @return object|void
      */
     abstract protected function persist($record);
 
@@ -78,10 +83,22 @@ abstract class AbstractResourceAdaptor implements ResourceAdapterInterface, Stor
     {
         $record = $this->createRecord($resource);
         $this->hydrateAttributes($record, $resource->getAttributes());
-        $this->hydrateRelationships($record, $resource->getRelationships());
-        $record = $this->persist($record);
+        $this->hydrateRelationships($record, $resource->getRelationships(), $parameters);
+        $record = $this->persist($record) ?: $record;
 
-        return $this->hydrateRelated($record, $resource);
+        if (method_exists($this, 'hydrateRelated')) {
+            $record = $this->hydrateRelated($record, $resource, $parameters) ?: $record;
+        }
+
+        return $record;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function read($resourceId, EncodingParametersInterface $parameters)
+    {
+        return $this->find($resourceId);
     }
 
     /**
@@ -90,26 +107,14 @@ abstract class AbstractResourceAdaptor implements ResourceAdapterInterface, Stor
     public function update($record, ResourceObjectInterface $resource, EncodingParametersInterface $parameters)
     {
         $this->hydrateAttributes($record, $resource->getAttributes());
-        $this->hydrateRelationships($record, $resource->getRelationships());
-        $record = $this->persist($record);
+        $this->hydrateRelationships($record, $resource->getRelationships(), $parameters);
+        $record = $this->persist($record) ?: $record;
 
-        return $this->hydrateRelated($record, $resource);
-    }
+        if (method_exists($this, 'hydrateRelated')) {
+            $record = $this->hydrateRelated($record, $resource, $parameters) ?: $record;
+        }
 
-    /**
-     * Hydrate any related domain records after the supplied record has been persisted.
-     *
-     * Child classes can overload this method if they need to do any hydration work after the
-     * supplied record has been persisted. This is particularly useful for database structures
-     * where relationship data is stored in separate tables, and so the record must have a
-     * database id before its relationships can be created.
-     *
-     * @param $record
-     * @param ResourceObjectInterface $resource
-     * @return object
-     */
-    protected function hydrateRelated($record, ResourceObjectInterface $resource)
-    {
         return $record;
     }
+
 }

@@ -194,14 +194,14 @@ class NamespaceResolver implements IteratorAggregate, ResolverInterface
      */
     private function flip(array $resources)
     {
-        $types = [];
+        $all = [];
 
         foreach ($resources as $resourceType => $types) {
             foreach ((array) $types as $type) {
-                $types[$type] = $resourceType;
+                $all[$type] = $resourceType;
             }
         }
 
-        return $types;
+        return $all;
     }
 }

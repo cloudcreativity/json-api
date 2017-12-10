@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Store;
 
+use CloudCreativity\JsonApi\Contracts\Adapter\HasManyAdapterInterface;
 use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
@@ -161,13 +162,16 @@ class Store implements StoreInterface
     /**
      * @inheritDoc
      */
-    public function updateRelationship(
+    public function replaceRelationship(
         $record,
-        $relationshipKey,
+        $relationshipName,
         RelationshipInterface $relationship,
         EncodingParametersInterface $params
     ) {
-        // TODO: Implement updateRelationship() method.
+        return $this
+            ->adapterFor($record)
+            ->related($relationshipName)
+            ->replace($record, $relationship, $params);
     }
 
     /**
@@ -175,11 +179,13 @@ class Store implements StoreInterface
      */
     public function addToRelationship(
         $record,
-        $relationshipKey,
+        $relationshipName,
         RelationshipInterface $relationship,
         EncodingParametersInterface $params
     ) {
-        // TODO: Implement addToRelationship() method.
+        return $this
+            ->adapterForHasMany($record, $relationshipName)
+            ->add($record, $relationship, $params);
     }
 
     /**
@@ -187,11 +193,13 @@ class Store implements StoreInterface
      */
     public function removeFromRelationship(
         $record,
-        $relationshipKey,
+        $relationshipName,
         RelationshipInterface $relationship,
         EncodingParametersInterface $params
     ) {
-        // TODO: Implement removeFromRelationship() method.
+        return $this
+            ->adapterForHasMany($record, $relationshipName)
+            ->remove($record, $relationship, $params);
     }
 
     /**
@@ -286,6 +294,22 @@ class Store implements StoreInterface
 
         if ($adapter instanceof StoreAwareInterface) {
             $adapter->withStore($this);
+        }
+
+        return $adapter;
+    }
+
+    /**
+     * @param $resourceType
+     * @param $relationshipName
+     * @return HasManyAdapterInterface
+     */
+    private function adapterForHasMany($resourceType, $relationshipName)
+    {
+        $adapter = $this->adapterFor($resourceType)->related($relationshipName);
+
+        if (!$adapter instanceof HasManyAdapterInterface) {
+            throw new RuntimeException("Expecting a has-many relationship adapter.");
         }
 
         return $adapter;
