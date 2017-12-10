@@ -18,13 +18,15 @@
 
 namespace CloudCreativity\JsonApi\Store;
 
+use CloudCreativity\JsonApi\Contracts\Adapter\RelationshipAdapterInterface;
+use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
-use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
-use CloudCreativity\JsonApi\Contracts\Store\RelationshipAdapterInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use CloudCreativity\JsonApi\Object\ResourceIdentifierCollection;
+use CloudCreativity\JsonApi\Object\ResourceObject;
 use CloudCreativity\JsonApi\TestCase;
 use CloudCreativity\Utils\Object\StandardObject;
 use PHPUnit_Framework_MockObject_MockObject;
@@ -65,7 +67,7 @@ class StoreTest extends TestCase
             'users' => $this->willQuery($params, $expected),
         ]);
 
-        $this->assertSame($expected, $store->query('users', $params));
+        $this->assertSame($expected, $store->queryRecords('users', $params));
     }
 
     /**
@@ -75,35 +77,103 @@ class StoreTest extends TestCase
     {
         $store = $this->store(['posts' => $this->willNotQuery()]);
         $this->expectException(RuntimeException::class);
-        $store->query('users', $this->factory->createQueryParameters());
+        $store->queryRecords('users', $this->factory->createQueryParameters());
+    }
+
+    public function testCreateRecord()
+    {
+        $params = $this->factory->createQueryParameters();
+        $resource = new ResourceObject();
+        $expected = new StandardObject();
+
+        $store = $this->store([
+            'posts' => $this->willNotQuery(),
+            'comments' => $this->willCreateRecord($resource, $params, $expected)
+        ]);
+
+        $this->assertSame($expected, $store->createRecord('comments', $resource, $params));
+    }
+
+    public function testCannotCreate()
+    {
+        $store = $this->store(['posts' => $this->willNotQuery()]);
+        $this->expectException(RuntimeException::class);
+        $store->createRecord('comments', new ResourceObject(), $this->factory->createQueryParameters());
     }
 
     /**
      * A query record request must be handed off to the adapter for the resource type
      * specified in the identifier.
      */
-    public function testQueryRecord()
+    public function testReadRecord()
     {
-        $identifier = ResourceIdentifier::create('users', '1');
         $params = $this->factory->createQueryParameters();
         $expected = new StandardObject();
 
         $store = $this->store([
             'posts' => $this->willNotQuery(),
-            'users' => $this->willQueryRecord('1', $params, $expected)
+            'comments' => $this->willReadRecord('1', $params, $expected)
         ]);
 
-        $this->assertSame($expected, $store->queryRecord($identifier, $params));
+        $this->assertSame($expected, $store->readRecord('comments', '1', $params));
     }
 
     /**
      * If there is no adapter for the resource type, an exception must be thrown.
      */
-    public function testCannotQueryRecord()
+    public function testCannotReadRecord()
     {
         $store = $this->store(['posts' => $this->willNotQuery()]);
         $this->expectException(RuntimeException::class);
-        $store->queryRecord(ResourceIdentifier::create('users', '1'), $this->factory->createQueryParameters());
+        $store->readRecord('users', '1', $this->factory->createQueryParameters());
+    }
+
+    public function testUpdateRecord()
+    {
+        $params = $this->factory->createQueryParameters();
+        $resource = new ResourceObject();
+        $record = new StandardObject();
+        $expected = clone $record;
+
+        $adapter = $this->willUpdateRecord($record, $resource, $params, $expected);
+
+        $store = $this->storeByTypes([
+            ResourceObject::class => $this->willNotQuery(),
+            StandardObject::class => $adapter,
+        ]);
+
+        $this->assertSame($expected, $store->updateRecord($record, $resource, $params));
+    }
+
+    public function testDeleteRecord()
+    {
+        $params = $this->factory->createQueryParameters();
+        $record = new StandardObject();
+
+        $adapter = $this->willDeleteRecord($record, $params);
+
+        $store = $this->storeByTypes([
+            ResourceObject::class => $this->willNotQuery(),
+            StandardObject::class => $adapter,
+        ]);
+
+        $this->assertNull($store->deleteRecord($record, $params));
+    }
+
+    public function testDeleteRecordFails()
+    {
+        $params = $this->factory->createQueryParameters();
+        $record = new StandardObject();
+
+        $adapter = $this->willDeleteRecord($record, $params, false);
+
+        $store = $this->storeByTypes([
+            ResourceObject::class => $this->willNotQuery(),
+            StandardObject::class => $adapter,
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $store->deleteRecord($record, $params);
     }
 
     /**
@@ -116,12 +186,12 @@ class StoreTest extends TestCase
         $record = new StandardObject();
         $expected = $this->factory->createPage([]);
 
-        $store = $this->store([
-            'users' => $this->willNotQuery(),
-            'posts' => $this->willQueryRelated($record, 'user', $parameters, $expected),
+        $store = $this->storeByTypes([
+            ResourceObject::class => $this->willNotQuery(),
+            StandardObject::class => $this->willQueryRelated($record, 'user', $parameters, $expected),
         ]);
 
-        $this->assertSame($expected, $store->queryRelated('posts', $record, 'user', $parameters));
+        $this->assertSame($expected, $store->queryRelated($record, 'user', $parameters));
     }
 
     /**
@@ -134,12 +204,12 @@ class StoreTest extends TestCase
         $record = new StandardObject();
         $expected = $this->factory->createPage([]);
 
-        $store = $this->store([
-            'users' => $this->willNotQuery(),
-            'posts' => $this->willQueryRelationship($record, 'user', $parameters, $expected),
+        $store = $this->storeByTypes([
+            ResourceObject::class => $this->willNotQuery(),
+            StandardObject::class => $this->willQueryRelationship($record, 'user', $parameters, $expected),
         ]);
 
-        $this->assertSame($expected, $store->queryRelationship('posts', $record, 'user', $parameters));
+        $this->assertSame($expected, $store->queryRelationship($record, 'user', $parameters));
     }
 
     public function testExists()
@@ -355,7 +425,7 @@ class StoreTest extends TestCase
 
     /**
      * @param array $adapters
-     * @return Store
+     * @return StoreInterface
      */
     private function store(array $adapters)
     {
@@ -365,7 +435,29 @@ class StoreTest extends TestCase
                 return isset($adapters[$resourceType]) ? $adapters[$resourceType] : null;
             });
 
-        return new Store($this->container);
+        return $this->factory->createStore($this->container);
+    }
+
+    /**
+     * @param array $types
+     * @return StoreInterface
+     */
+    private function storeByTypes(array $types)
+    {
+        $this->container
+            ->method('getAdapter')
+            ->willReturnCallback(function ($object) use ($types) {
+                $type = get_class($object);
+                return isset($types[$type]) ? $types[$type] : null;
+            });
+
+        $this->container
+            ->method('getAdapterByType')
+            ->willReturnCallback(function ($type) use ($types) {
+                return isset($types[$type]) ? $types[$type] : null;
+            });
+
+        return $this->factory->createStore($this->container);
     }
 
     /**
@@ -461,15 +553,28 @@ class StoreTest extends TestCase
     {
         $mock = $this->adapter();
 
-        $mock->expects($this->once())
-            ->method('withAdapters')
-            ->with($this->container)
-            ->willReturnSelf();
-
         $mock->expects($expectation ?: $this->any())
             ->method('query')
             ->with($params)
             ->willReturn($results);
+
+        return $mock;
+    }
+
+    /**
+     * @param $resourceObject
+     * @param $params
+     * @param $expected
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function willCreateRecord($resourceObject, $params, $expected)
+    {
+        $mock = $this->adapter();
+
+        $mock->expects($this->once())
+            ->method('create')
+            ->with($resourceObject, $params)
+            ->willReturn($expected);
 
         return $mock;
     }
@@ -480,19 +585,50 @@ class StoreTest extends TestCase
      * @param $record
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function willQueryRecord($resourceId, $params, $record)
+    private function willReadRecord($resourceId, $params, $record)
+    {
+        $mock = $this->adapter();
+
+        $mock->expects($this->atLeastOnce())
+            ->method('read')
+            ->with($resourceId, $params)
+            ->willReturn($record);
+
+        return $mock;
+    }
+
+    /**
+     * @param $resourceObject
+     * @param $params
+     * @param $expected
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function willUpdateRecord($record, $resourceObject, $params, $expected)
     {
         $mock = $this->adapter();
 
         $mock->expects($this->once())
-            ->method('withAdapters')
-            ->with($this->container)
-            ->willReturnSelf();
+            ->method('update')
+            ->with($record, $resourceObject, $params)
+            ->willReturn($expected);
 
-        $mock->expects($this->atLeastOnce())
-            ->method('queryRecord')
-            ->with($resourceId, $params)
-            ->willReturn($record);
+        return $mock;
+    }
+
+    /**
+     * @param $record
+     * @param $params
+     * @param bool $result
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    private function willDeleteRecord($record, $params, $result = true)
+    {
+        $mock = $this->adapter();
+
+        $mock->expects($this->once())
+            ->method('delete')
+            ->with($record, $params)
+            ->willReturn($result);
 
         return $mock;
     }
@@ -507,8 +643,9 @@ class StoreTest extends TestCase
     private function willQueryRelated($record, $relationshipName, $parameters, $expected)
     {
         $mock = $this->relationshipAdapter();
+
         $mock->expects($this->atLeastOnce())
-            ->method('queryRelated')
+            ->method('query')
             ->with($record, $parameters)
             ->willReturn($expected);
 
@@ -526,7 +663,7 @@ class StoreTest extends TestCase
     {
         $mock = $this->relationshipAdapter();
         $mock->expects($this->atLeastOnce())
-            ->method('queryRelationship')
+            ->method('relationship')
             ->with($record, $parameters)
             ->willReturn($expected);
 
@@ -540,7 +677,10 @@ class StoreTest extends TestCase
     {
         $mock = $this->adapter();
         $mock->expects($this->never())->method('query');
-        $mock->expects($this->never())->method('queryRecord');
+        $mock->expects($this->never())->method('create');
+        $mock->expects($this->never())->method('read');
+        $mock->expects($this->never())->method('update');
+        $mock->expects($this->never())->method('delete');
         $mock->expects($this->never())->method('related');
 
         return $mock;

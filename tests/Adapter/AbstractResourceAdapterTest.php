@@ -16,27 +16,24 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Hydrator;
+namespace CloudCreativity\JsonApi\Adapter;
 
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier;
-use CloudCreativity\JsonApi\Object\ResourceIdentifierCollection;
 use CloudCreativity\JsonApi\TestCase;
 use DateTime;
 use DateTimeZone;
-use stdClass;
+use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 
 /**
  * Class AbstractHydratorTest
  *
  * @package CloudCreativity\JsonApi
  */
-class AbstractHydratorTest extends TestCase
+class AbstractResourceAdapterTest extends TestCase
 {
 
     /**
-     * @var TestHydrator
+     * @var TestAdapter
      */
     private $hydrator;
 
@@ -52,7 +49,7 @@ class AbstractHydratorTest extends TestCase
     {
         /** @var StoreInterface $store */
         $store = $this->store = $this->createMock(StoreInterface::class);
-        $this->hydrator = new TestHydrator();
+        $this->hydrator = new TestAdapter();
         $this->hydrator->withStore($store);
     }
 
@@ -66,14 +63,6 @@ class AbstractHydratorTest extends TestCase
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content..."
-        },
-        "relationships": {
-            "user": {
-                "data": {
-                    "type": "users",
-                    "id": "123"
-                }
-            }
         }
     }
 }
@@ -86,10 +75,9 @@ JSON_API;
             'saved' => true,
             'title' => 'My First Post',
             'content' => 'Here is some content...',
-            'user_id' => '123',
         ];
 
-        $record = $this->hydrator->create($document->getResource());
+        $record = $this->hydrator->create($document->getResource(), new EncodingParameters());
         $this->assertEquals($expected, $record);
     }
 
@@ -103,32 +91,6 @@ JSON_API;
         "attributes": {
             "title": "My First Post",
             "content": "Here is some content..."
-        },
-        "relationships": {
-            "user": {
-                "data": {
-                    "type": "users",
-                    "id": "123"
-                }
-            },
-            "latest-tags": {
-                "data": [
-                    {
-                        "type": "tags",
-                        "id": "456"
-                    },
-                    {
-                        "type": "tags",
-                        "id": "789"
-                    }
-                ]
-            },
-            "ignored": {
-                "data": {
-                    "type": "ignored",
-                    "id": "999"
-                }
-            }
         }
     }
 }
@@ -141,12 +103,10 @@ JSON_API;
             'id' => '1',
             'title' => 'My First Post',
             'content' => 'Here is some content...',
-            'user_id' => '123',
-            'tag_ids' => ['456', '789'],
             'saved' => true,
         ];
 
-        $this->hydrator->update($document->getResource(), $record);
+        $this->hydrator->update($record, $document->getResource(), new EncodingParameters());
         $this->assertEquals($expected, $record);
     }
 
@@ -175,7 +135,7 @@ JSON_API;
             'saved' => true,
         ];
 
-        $this->hydrator->update($document->getResource(), $record);
+        $this->hydrator->update($record, $document->getResource(), new EncodingParameters());
         $this->assertEquals($expected, $record);
     }
 
@@ -212,7 +172,7 @@ JSON_API;
             'saved' => true,
         ];
 
-        $this->hydrator->update($document->getResource(), $record);
+        $this->hydrator->update($record, $document->getResource(), new EncodingParameters());
         $this->assertEquals($expected, $record);
     }
 
@@ -237,7 +197,7 @@ JSON_API;
         $document = $this->decode($content);
         $record = (object) ['id' => '1'];
 
-        $this->hydrator->update($document->getResource(), $record);
+        $this->hydrator->update($record, $document->getResource(), new EncodingParameters());
         $this->assertObjectNotHasAttribute('published', $record);
     }
 
@@ -280,122 +240,11 @@ JSON_API;
         $document = $this->decode($content);
         $record = (object) ['id' => '1'];
 
-        $this->hydrator->update($document->getResource(), $record);
+        $this->hydrator->update($record, $document->getResource(), new EncodingParameters());
         $this->assertEquals($published, $record->published_at);
         $this->assertEquals($exact, $record->exact);
         $this->assertObjectHasAttribute('empty', $record);
         $this->assertNull($record->empty);
-    }
-
-    public function testUpdateRelationship()
-    {
-        $content = <<<JSON_API
-{
-    "data": {
-        "type": "users",
-        "id": "999"
-    }
-}
-JSON_API;
-
-        $record = new stdClass();
-        $record->user_id = "123";
-
-        $document = $this->decode($content);
-        $this->hydrator->updateRelationship('user', $document->getRelationship(), $record);
-        $this->assertEquals("999", $record->user_id);
-    }
-
-    public function testAddToRelationship()
-    {
-        $tags = [
-            (object) ['id' => 2, 'name' => 'Foo'],
-            (object) ['id' => 3, 'name' => 'Bar'],
-        ];
-
-        $identifiers = new ResourceIdentifierCollection();
-        $identifiers->add(ResourceIdentifier::create('tags', '2'));
-        $identifiers->add(ResourceIdentifier::create('tags', '3'));
-
-        $this->store
-            ->expects($this->once())
-            ->method('findMany')
-            ->with($identifiers)
-            ->willReturn($tags);
-
-        $content = <<<JSON_API
-{
-    "data": [
-        {"type": "tags", "id": "2"},
-        {"type": "tags", "id": "3"}
-    ]
-}
-JSON_API;
-
-        $record = (object) ['tag_ids' => ['1']];
-
-        $document = $this->decode($content);
-        $this->hydrator->addToRelationship('latest-tags', $document->getRelationship(), $record);
-        $this->assertSame($tags, $record->tags);
-    }
-
-    public function testRemoveFromRelationship()
-    {
-        $tags = [
-            (object) ['id' => 1, 'name' => 'Foo'],
-            (object) ['id' => 2, 'name' => 'Bar'],
-            (object) ['id' => 3, 'name' => 'Baz'],
-            (object) ['id' => 4, 'name' => 'Bat'],
-        ];
-
-        $identifiers = new ResourceIdentifierCollection();
-        $identifiers->add(ResourceIdentifier::create('tags', '2'));
-        $identifiers->add(ResourceIdentifier::create('tags', '3'));
-
-        $this->store
-            ->expects($this->once())
-            ->method('findMany')
-            ->with($identifiers)
-            ->willReturn([$tags[1], $tags[2]]);
-
-        $content = <<<JSON_API
-{
-    "data": [
-        {"type": "tags", "id": "2"},
-        {"type": "tags", "id": "3"}
-    ]
-}
-JSON_API;
-
-        $record = (object) compact('tags');
-
-        $document = $this->decode($content);
-        $this->hydrator->removeFromRelationship('latest-tags', $document->getRelationship(), $record);
-        $this->assertEquals([$tags[0], $tags[3]], $record->tags);
-    }
-
-    /**
-     * If no store has been injected, an exception must be thrown if the hydrator needs to
-     * lookup resource identifiers.
-     */
-    public function testNoStoreThrowsException()
-    {
-        $this->expectException(RuntimeException::class);
-
-        $content = <<<JSON_API
-{
-    "data": [
-        {"type": "tags", "id": "2"},
-        {"type": "tags", "id": "3"}
-    ]
-}
-JSON_API;
-
-        $record = (object) [];
-        $document = $this->decode($content);
-
-        $this->expectException(RuntimeException::class);
-        (new TestHydrator())->addToRelationship('latest-tags', $document->getRelationship(), $record);
     }
 
 }

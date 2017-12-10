@@ -18,9 +18,13 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
+use CloudCreativity\JsonApi\Contracts\Adapter\ResourceAdapterInterface;
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -54,16 +58,53 @@ interface StoreInterface
      * @param EncodingParametersInterface $params
      * @return mixed
      */
-    public function query($resourceType, EncodingParametersInterface $params);
+    public function queryRecords($resourceType, EncodingParametersInterface $params);
+
+    /**
+     * Create a domain record using data from the supplied resource object.
+     *
+     * @param string $resourceType
+     * @param ResourceObjectInterface $resource
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the created domain record.
+     */
+    public function createRecord(
+        $resourceType,
+        ResourceObjectInterface $resource,
+        EncodingParametersInterface $params
+    );
 
     /**
      * Query the store for a single record using the supplied parameters.
      *
-     * @param ResourceIdentifierInterface $identifier
+     * @param string $resourceType
+     * @param string $resourceId
      * @param EncodingParametersInterface $params
      * @return object|null
      */
-    public function queryRecord(ResourceIdentifierInterface $identifier, EncodingParametersInterface $params);
+    public function readRecord($resourceType, $resourceId, EncodingParametersInterface $params);
+
+    /**
+     * Update a domain record with data from the supplied resource object.
+     *
+     * @param ResourceObjectInterface $resource
+     * @param object $record
+     *      the domain record to update.
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the updated domain record.
+     */
+    public function updateRecord($record, ResourceObjectInterface $resource, EncodingParametersInterface $params);
+
+    /**
+     * Delete a domain record.
+     *
+     * @param $record
+     * @param EncodingParametersInterface $params
+     * @return void
+     */
+    public function deleteRecord($record, EncodingParametersInterface $params);
 
     /**
      * Query the store for related records using the supplied parameters.
@@ -72,11 +113,9 @@ interface StoreInterface
      * the store would be queried as follows:
      *
      * ```
-     * $comments = $store->queryRelated('posts', $post, 'comments', $encodingParameters);
+     * $comments = $store->queryRelated($post, 'comments', $encodingParameters);
      * ```
      *
-     * @param string $resourceType
-     *      the JSON API resource type of the record on which the relationship exists
      * @param $record
      *      the domain record on which the relationship exists.
      * @param $relationshipName
@@ -86,12 +125,7 @@ interface StoreInterface
      * @return mixed
      *      the related records
      */
-    public function queryRelated(
-        $resourceType,
-        $record,
-        $relationshipName,
-        EncodingParametersInterface $params
-    );
+    public function queryRelated($record, $relationshipName, EncodingParametersInterface $params);
 
     /**
      * Query the store for relationship data using the supplied parameters.
@@ -100,11 +134,9 @@ interface StoreInterface
      * the store would be queried as follows:
      *
      * ```
-     * $comments = $store->queryRelationship('posts', $post, 'comments', $encodingParameters);
+     * $comments = $store->queryRelationship($post, 'comments', $encodingParameters);
      * ```
      *
-     * @param string $resourceType
-     *      the JSON API resource type of the record on which the relationship exists
      * @param $record
      *      the domain record on which the relationship exists.
      * @param $relationshipName
@@ -114,10 +146,77 @@ interface StoreInterface
      * @return mixed
      *      the related records
      */
-    public function queryRelationship(
-        $resourceType,
+    public function queryRelationship($record, $relationshipName, EncodingParametersInterface $params);
+
+    /**
+     * Update a domain record's relationship with data from the supplied relationship object.
+     *
+     * For a has-one relationship, this changes the relationship to match the supplied relationship
+     * object.
+     *
+     * For a has-many relationship, this completely replaces every member of the relationship, changing
+     * it to match the supplied relationship object.
+     *
+     * @param object $record
+     *      the object to hydrate.
+     * @param $relationshipKey
+     *      the key of the relationship to hydrate.
+     * @param RelationshipInterface $relationship
+     *      the relationship object to use for the hydration.
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the updated domain record.
+     */
+    public function updateRelationship(
         $record,
-        $relationshipName,
+        $relationshipKey,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $params
+    );
+
+    /**
+     * Add data to a domain record's relationship using data from the supplied relationship object.
+     *
+     * For a has-many relationship, this adds the resource identifiers in the relationship to the domain
+     * record's relationship. It is not valid for a has-one relationship.
+     *
+     * @param object $record
+     *      the domain record to update.
+     * @param $relationshipKey
+     * @param RelationshipInterface $relationship
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the updated domain record.
+     * @throws RuntimeException
+     *      if the relationship object is a has-one relationship.
+     */
+    public function addToRelationship(
+        $record,
+        $relationshipKey,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $params
+    );
+
+    /**
+     * Remove data from a domain record's relationship using data from the supplied relationship object.
+     *
+     * For a has-many relationship, this removes the resource identifiers in the relationship from the
+     * domain record's relationship. It is not valid for a has-one relationship.
+     *
+     * @param object $record
+     *      the domain record to update.
+     * @param $relationshipKey
+     * @param RelationshipInterface $relationship
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the updated domain record.
+     * @throws RuntimeException
+     *      if the relationship object is a has-one relationship.
+     */
+    public function removeFromRelationship(
+        $record,
+        $relationshipKey,
+        RelationshipInterface $relationship,
         EncodingParametersInterface $params
     );
 
@@ -173,5 +272,13 @@ interface StoreInterface
      *      an array of domain records that match the supplied identifiers.
      */
     public function findMany(ResourceIdentifierCollectionInterface $identifiers);
+
+    /**
+     * Get the adapter for the supplied JSON API resource type or domain record.
+     *
+     * @param string|object $resourceType
+     * @return ResourceAdapterInterface
+     */
+    public function adapterFor($resourceType);
 
 }

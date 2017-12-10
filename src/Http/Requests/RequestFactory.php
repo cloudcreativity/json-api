@@ -22,7 +22,6 @@ use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
-use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -123,8 +122,7 @@ class RequestFactory
             return null;
         }
 
-        $identifier = ResourceIdentifier::create($interpreter->getResourceType(), $id);
-        $record = $store->queryRecord($identifier, $parameters);
+        $record = $store->readRecord($interpreter->getResourceType(), $id, $parameters);
 
         if (!$record) {
             throw new JsonApiException([], 404);

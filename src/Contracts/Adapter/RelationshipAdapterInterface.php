@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2017 Cloud Creativity Limited
  *
@@ -16,60 +15,38 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Hydrator;
+namespace CloudCreativity\JsonApi\Contracts\Adapter;
 
 use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
-use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
-use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
-/**
- * Interface HydratorInterface
- *
- * Hydrators are responsible for transferring data from JSON API resource and relationship objects
- * into the domain records that they represent, and persisting the changes.
- *
- * @package CloudCreativity\JsonApi
- */
-interface HydratorInterface
+interface RelationshipAdapterInterface
 {
 
     /**
-     * Use the supplied store to lookup JSON API identifiers.
+     * Query related resources for the specified domain record.
      *
-     * @param StoreInterface $store
-     * @return $this
-     */
-    public function withStore(StoreInterface $store);
-
-    /**
-     * Create a domain record using data from the supplied resource object.
+     * For example, if a client was querying the `comments` relationship of a `posts` resource.
+     * This method would be invoked providing the post that is being queried as the `$record` argument.
      *
-     * @param ResourceObjectInterface $resource
-     * @return object
-     *      the created domain record.
-     */
-    public function create(ResourceObjectInterface $resource);
-
-    /**
-     * Update a domain record with data from the supplied resource object.
-     *
-     * @param ResourceObjectInterface $resource
      * @param object $record
-     *      the domain record to update.
-     * @return object
-     *      the updated domain record.
+     * @param EncodingParametersInterface $parameters
+     * @return mixed
      */
-    public function update(ResourceObjectInterface $resource, $record);
+    public function query($record, EncodingParametersInterface $parameters);
 
     /**
-     * Delete a domain record.
+     * Query relationship data for the specified domain record.
+     *
+     * For example, if a client was querying the `comments` relationship of a `posts` resource.
+     * This method would be invoked providing the post that is being queried as the `$record` argument.
      *
      * @param $record
-     * @return bool
-     *      whether the record was successfully destroyed.
+     * @param EncodingParametersInterface $parameters
+     * @return mixed
      */
-    public function delete($record);
+    public function relationship($record, EncodingParametersInterface $parameters);
 
     /**
      * Update a domain record's relationship with data from the supplied relationship object.
@@ -80,16 +57,15 @@ interface HydratorInterface
      * For a has-many relationship, this completely replaces every member of the relationship, changing
      * it to match the supplied relationship object.
      *
-     * @param $relationshipKey
-     *      the key of the relationship to hydrate.
-     * @param RelationshipInterface $relationship
-     *      the relationship object to use for the hydration.
      * @param object $record
      *      the object to hydrate.
+     * @param RelationshipInterface $relationship
+     *      the relationship object to use for the hydration.
+     * @param EncodingParametersInterface $parameters
      * @return object
      *      the updated domain record.
      */
-    public function updateRelationship($relationshipKey, RelationshipInterface $relationship, $record);
+    public function update($record, RelationshipInterface $relationship, EncodingParametersInterface $parameters);
 
     /**
      * Add data to a domain record's relationship using data from the supplied relationship object.
@@ -97,32 +73,33 @@ interface HydratorInterface
      * For a has-many relationship, this adds the resource identifiers in the relationship to the domain
      * record's relationship. It is not valid for a has-one relationship.
      *
-     * @param $relationshipKey
-     * @param RelationshipInterface $relationship
      * @param object $record
-     *      the domain record to update.
+     *      the object to hydrate.
+     * @param RelationshipInterface $relationship
+     * @param EncodingParametersInterface $parameters
      * @return object
      *      the updated domain record.
      * @throws RuntimeException
      *      if the relationship object is a has-one relationship.
      */
-    public function addToRelationship($relationshipKey, RelationshipInterface $relationship, $record);
+    public function add($record, RelationshipInterface $relationship, EncodingParametersInterface $parameters);
 
     /**
      * Remove data from a domain record's relationship using data from the supplied relationship object.
      *
      * For a has-many relationship, this removes the resource identifiers in the relationship from the
-     * domain record's relationship. It is not valid for a has-one relationship.
+     * domain record's relationship. It is not valid for a has-one relationship, as `update()` must
+     * be used instead.
      *
-     * @param $relationshipKey
-     * @param RelationshipInterface $relationship
      * @param object $record
-     *      the domain record to update.
+     *      the object to hydrate.
+     * @param RelationshipInterface $relationship
+     * @param EncodingParametersInterface $parameters
      * @return object
      *      the updated domain record.
      * @throws RuntimeException
      *      if the relationship object is a has-one relationship.
      */
-    public function removeFromRelationship($relationshipKey, RelationshipInterface $relationship, $record);
+    public function remove($record, RelationshipInterface $relationship, EncodingParametersInterface $parameters);
 
 }

@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Store;
+namespace CloudCreativity\JsonApi\Contracts\Adapter;
 
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -33,14 +34,6 @@ interface ResourceAdapterInterface
 {
 
     /**
-     * Use the supplied container to gain access to other adapters.
-     *
-     * @param ContainerInterface $adapters
-     * @return $this
-     */
-    public function withAdapters(ContainerInterface $adapters);
-
-    /**
      * Query many domain records.
      *
      * @param EncodingParametersInterface $parameters
@@ -49,13 +42,45 @@ interface ResourceAdapterInterface
     public function query(EncodingParametersInterface $parameters);
 
     /**
+     * Create a domain record using data from the supplied resource object.
+     *
+     * @param ResourceObjectInterface $resource
+     * @param EncodingParametersInterface $parameters
+     * @return object
+     *      the created domain record.
+     */
+    public function create(ResourceObjectInterface $resource, EncodingParametersInterface $parameters);
+
+    /**
      * Query a single domain record.
      *
      * @param string $resourceId
      * @param EncodingParametersInterface $parameters
      * @return object|null
      */
-    public function queryRecord($resourceId, EncodingParametersInterface $parameters);
+    public function read($resourceId, EncodingParametersInterface $parameters);
+
+    /**
+     * Update a domain record with data from the supplied resource object.
+     *
+     * @param object $record
+     *      the domain record to update.
+     * @param ResourceObjectInterface $resource
+     * @param EncodingParametersInterface $params
+     * @return object
+     *      the updated domain record.
+     */
+    public function update($record, ResourceObjectInterface $resource, EncodingParametersInterface $params);
+
+    /**
+     * Delete a domain record.
+     *
+     * @param $record
+     * @param EncodingParametersInterface $params
+     * @return bool
+     *      whether the record was successfully destroyed.
+     */
+    public function delete($record, EncodingParametersInterface $params);
 
     /**
      * Does a domain record of the specified JSON API resource id exist?

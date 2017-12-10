@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Factories;
 
+use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
@@ -26,7 +27,6 @@ use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
@@ -124,16 +124,12 @@ interface FactoryInterface extends BaseFactoryInterface
     public function createConfiguredCodecMatcher(SchemaContainerInterface $schemas, array $codecs, $urlPrefix = null);
 
     /**
-     * @param AdapterContainerInterface $adapters
+     * Create a store.
+     *
+     * @param ContainerInterface $container
      * @return StoreInterface
      */
-    public function createStore(AdapterContainerInterface $adapters);
-
-    /**
-     * @param array $adapters
-     * @return AdapterContainerInterface
-     */
-    public function createAdapterContainer(array $adapters);
+    public function createStore(ContainerInterface $container);
 
     /**
      * @param array $errors

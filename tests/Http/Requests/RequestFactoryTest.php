@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
+use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
@@ -88,10 +89,12 @@ class RequestFactoryTest extends TestCase
     {
         parent::setUp();
         $this->interpreter = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
-        $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
-        $this->store = $this->factory->createStore(
-            $this->factory->createAdapterContainer(['posts' => $this->adapter])
-        );
+        $this->adapter = $this->createMock(AdapterInterface::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('getAdapterByResourceType')->willReturn($this->adapter);
+
+        $this->store = $this->factory->createStore($container);
     }
 
     public function testIndex()
@@ -266,7 +269,7 @@ JSON_API;
     {
         $this->expectedRecord = new stdClass();
         $this->adapter->method('exists')->with($resourceId)->willReturn(true);
-        $this->adapter->method('queryRecord')->with($resourceId)->willReturn($this->expectedRecord);
+        $this->adapter->method('read')->with($resourceId)->willReturn($this->expectedRecord);
 
         return $this;
     }

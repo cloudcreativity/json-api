@@ -18,13 +18,16 @@
 
 namespace CloudCreativity\JsonApi\Store;
 
+use CloudCreativity\JsonApi\Contracts\ContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierCollectionInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
-use CloudCreativity\JsonApi\Contracts\Store\AdapterInterface;
-use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreAwareInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\RecordNotFoundException;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
@@ -67,7 +70,7 @@ class Store implements StoreInterface
     /**
      * @inheritDoc
      */
-    public function query($resourceType, EncodingParametersInterface $params)
+    public function queryRecords($resourceType, EncodingParametersInterface $params)
     {
         return $this
             ->adapterFor($resourceType)
@@ -77,41 +80,118 @@ class Store implements StoreInterface
     /**
      * @inheritDoc
      */
-    public function queryRecord(ResourceIdentifierInterface $identifier, EncodingParametersInterface $params)
+    public function createRecord($resourceType, ResourceObjectInterface $resource, EncodingParametersInterface $params)
+    {
+        $record = $this
+            ->adapterFor($resourceType)
+            ->create($resource, $params);
+
+        if ($schema = $this->container->getSchemaByResourceType($resourceType)) {
+            $identifier = ResourceIdentifier::create($resourceType, $schema->getId($record));
+            $this->identityMap->add($identifier, $record);
+        }
+
+        return $record;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readRecord($resourceType, $resourceId, EncodingParametersInterface $params)
+    {
+        $record = $this
+            ->adapterFor($resourceType)
+            ->read($resourceId, $params);
+
+        $this->identityMap->add(ResourceIdentifier::create($resourceType, $resourceId), $record ?: false);
+
+        return $record;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateRecord($record, ResourceObjectInterface $resource, EncodingParametersInterface $params)
     {
         return $this
-            ->adapterFor($identifier->getType())
-            ->queryRecord($identifier->getId(), $params);
+            ->adapterFor($record)
+            ->update($record, $resource, $params);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteRecord($record, EncodingParametersInterface $params)
+    {
+        $adapter = $this->adapterFor($record);
+
+        if (!$adapter->delete($record, $params)) {
+            throw new RuntimeException('Record could not be deleted.');
+        }
     }
 
     /**
      * @inheritDoc
      */
     public function queryRelated(
-        $resourceType,
         $record,
         $relationshipName,
         EncodingParametersInterface $params
     ) {
         return $this
-            ->adapterFor($resourceType)
+            ->adapterFor($record)
             ->related($relationshipName)
-            ->queryRelated($record, $params);
+            ->query($record, $params);
     }
 
     /**
      * @inheritDoc
      */
     public function queryRelationship(
-        $resourceType,
         $record,
         $relationshipName,
         EncodingParametersInterface $params
     ) {
         return $this
-            ->adapterFor($resourceType)
+            ->adapterFor($record)
             ->related($relationshipName)
-            ->queryRelationship($record, $params);
+            ->relationship($record, $params);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateRelationship(
+        $record,
+        $relationshipKey,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $params
+    ) {
+        // TODO: Implement updateRelationship() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addToRelationship(
+        $record,
+        $relationshipKey,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $params
+    ) {
+        // TODO: Implement addToRelationship() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeFromRelationship(
+        $record,
+        $relationshipKey,
+        RelationshipInterface $relationship,
+        EncodingParametersInterface $params
+    ) {
+        // TODO: Implement removeFromRelationship() method.
     }
 
     /**
@@ -192,16 +272,21 @@ class Store implements StoreInterface
     }
 
     /**
-     * @param $resourceType
-     * @return AdapterInterface
+     * @inheritdoc
      */
-    protected function adapterFor($resourceType)
+    public function adapterFor($resourceType)
     {
+        if (is_object($resourceType)) {
+            return $this->container->getAdapter($resourceType);
+        }
+
         if (!$adapter = $this->container->getAdapterByResourceType($resourceType)) {
             throw new RuntimeException("No adapter for resource type: $resourceType");
         }
 
-        $adapter->withAdapters($this->container);
+        if ($adapter instanceof StoreAwareInterface) {
+            $adapter->withStore($this);
+        }
 
         return $adapter;
     }
