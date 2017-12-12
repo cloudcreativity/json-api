@@ -19,7 +19,7 @@ namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Contracts\Adapter\ResourceAdapterInterface;
 use CloudCreativity\JsonApi\Contracts\ContainerInterface;
-use CloudCreativity\JsonApi\Contracts\ResolverInterface;
+use CloudCreativity\JsonApi\Contracts\Resolver\ResolverInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;

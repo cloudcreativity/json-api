@@ -1,12 +1,31 @@
 <?php
+/**
+ * Copyright 2017 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace CloudCreativity\JsonApi\Resolver;
 
-use CloudCreativity\JsonApi\Contracts\ResolverInterface;
+use CloudCreativity\JsonApi\Contracts\Resolver\ResolverInterface;
 use CloudCreativity\JsonApi\Utils\Str;
-use IteratorAggregate;
 
-class NamespaceResolver implements IteratorAggregate, ResolverInterface
+/**
+ * Class NamespaceResolver
+ *
+ * @package CloudCreativity\JsonApi
+ */
+class NamespaceResolver implements ResolverInterface
 {
 
     /**
@@ -25,7 +44,7 @@ class NamespaceResolver implements IteratorAggregate, ResolverInterface
     private $types;
 
     /**
-     * PodResolver constructor.
+     * NamespaceResolver constructor.
      *
      * @param string $rootNamespace
      * @param array $resources
@@ -60,6 +79,15 @@ class NamespaceResolver implements IteratorAggregate, ResolverInterface
     /**
      * @inheritDoc
      */
+    public function getAllTypes()
+    {
+        return array_keys($this->types);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function isResourceType($resourceType)
     {
         return isset($this->resources[$resourceType]);
@@ -75,6 +103,14 @@ class NamespaceResolver implements IteratorAggregate, ResolverInterface
         }
 
         return $this->types[$type];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllResourceTypes()
+    {
+        return array_keys($this->resources);
     }
 
     /**
@@ -150,40 +186,28 @@ class NamespaceResolver implements IteratorAggregate, ResolverInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getIterator()
-    {
-        foreach ($this->types as $type => $resourceType) {
-            yield $type => [
-                'type' => $resourceType,
-                'adapter' => $this->getAdapterByResourceType($resourceType),
-                'authorizer' => $this->getAuthorizerByResourceType($resourceType),
-                'schema' => $this->getSchemaByResourceType($resourceType),
-                'validators' => $this->getValidatorsByResourceType($resourceType),
-            ];
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return iterator_to_array($this);
-    }
-
-    /**
+     * Convert the provided unit name and resource type into a fully qualified namespace.
+     *
      * @param $unit
      * @param $resourceType
      * @return string
      */
     protected function resolve($unit, $resourceType)
     {
-        $rootNamespace = rtrim($this->rootNamespace, '\\');
         $resourceType = Str::classify($resourceType);
 
-        return sprintf('%s\%s\%s', $rootNamespace, $resourceType, $unit);
+        return $this->append($resourceType . '\\' . $unit);
+    }
+
+    /**
+     * Append the string to the root namespace.
+     *
+     * @param $string
+     * @return string
+     */
+    protected function append($string)
+    {
+        return sprintf('%s\%s', rtrim($this->rootNamespace, '\\'), $string);
     }
 
     /**

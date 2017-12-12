@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts;
+namespace CloudCreativity\JsonApi\Contracts\Resolver;
 
 /**
  * Interface ResolverInterface
@@ -42,6 +42,13 @@ interface ResolverInterface
     public function getType($resourceType);
 
     /**
+     * Get all domain record types.
+     *
+     * @return string[]
+     */
+    public function getAllTypes();
+
+    /**
      * Does the supplied JSON API resource type exist?
      *
      * @param $resourceType
@@ -56,6 +63,13 @@ interface ResolverInterface
      * @return string|null
      */
     public function getResourceType($type);
+
+    /**
+     * Get all JSON API resource types.
+     *
+     * @return string[]
+     */
+    public function getAllResourceTypes();
 
     /**
      * Get schema by domain record type.
