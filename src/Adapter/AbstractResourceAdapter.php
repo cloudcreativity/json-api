@@ -31,7 +31,7 @@ use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
  *
  * @package CloudCreativity\JsonApi
  */
-abstract class AbstractResourceAdaptor implements ResourceAdapterInterface, StoreAwareInterface
+abstract class AbstractResourceAdapter implements ResourceAdapterInterface, StoreAwareInterface
 {
 
     use StoreAwareTrait;

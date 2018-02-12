@@ -23,11 +23,11 @@ use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 /**
- * Class TestHydrator
+ * Class TestAdapter
  *
  * @package CloudCreativity\JsonApi
  */
-class TestAdapter extends AbstractResourceAdaptor
+class TestAdapter extends AbstractResourceAdapter
 {
 
     use HydratesAttributesTrait;
