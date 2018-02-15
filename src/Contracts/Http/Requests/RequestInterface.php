@@ -71,6 +71,7 @@ interface RequestInterface
      * and the id is valid.
      *
      * @return object|null
+     * @deprecated
      */
     public function getRecord();
 

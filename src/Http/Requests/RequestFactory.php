@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,13 +41,22 @@ class RequestFactory
     private $factory;
 
     /**
+     * Whether the record should be loaded from the store when creating the request.
+     *
+     * @var bool
+     */
+    private $locateRecord;
+
+    /**
      * RequestFactory constructor.
      *
      * @param FactoryInterface $factory
+     * @param bool $locateRecord
      */
-    public function __construct(FactoryInterface $factory)
+    public function __construct(FactoryInterface $factory, $locateRecord = true)
     {
         $this->factory = $factory;
+        $this->locateRecord = $locateRecord;
     }
 
     /**
@@ -75,7 +85,7 @@ class RequestFactory
             $interpreter->getResourceId(),
             $interpreter->getRelationshipName(),
             $this->parseDocument($request, $interpreter),
-            $this->locateRecord($interpreter, $store, $parameters)
+            $this->locateRecord ? $this->locateRecord($interpreter, $store) : null
         );
     }
 
@@ -110,19 +120,18 @@ class RequestFactory
     /**
      * @param RequestInterpreterInterface $interpreter
      * @param StoreInterface $store
-     * @param EncodingParametersInterface $parameters
      * @return object
+     * @deprecated
      */
     protected function locateRecord(
         RequestInterpreterInterface $interpreter,
-        StoreInterface $store,
-        EncodingParametersInterface $parameters
+        StoreInterface $store
     ) {
         if (!$id = $interpreter->getResourceId()) {
             return null;
         }
 
-        $record = $store->readRecord($interpreter->getResourceType(), $id, $parameters);
+        $record = $store->find(ResourceIdentifier::create($interpreter->getResourceType(), $id));
 
         if (!$record) {
             throw new JsonApiException([], 404);
