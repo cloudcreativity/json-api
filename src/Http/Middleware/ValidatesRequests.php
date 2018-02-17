@@ -18,8 +18,8 @@
 
 namespace CloudCreativity\JsonApi\Http\Middleware;
 
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\InboundRequestInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
@@ -35,83 +35,95 @@ trait ValidatesRequests
 {
 
     /**
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
+     * @param StoreInterface $store
      * @param ValidatorProviderInterface $validators
+     * @return void
+     * @throws JsonApiException
      */
     protected function validate(
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request,
+        InboundRequestInterface $request,
+        StoreInterface $store,
         ValidatorProviderInterface $validators
     ) {
         /** Check request parameters are acceptable */
-        $this->checkQueryParameters($interpreter, $request, $validators);
+        $this->checkQueryParameters($request, $validators);
+
+        $identifier = $request->getResourceIdentifier();
+        $record = $identifier ? $store->findOrFail($identifier) : null;
 
         /** Check the document content is acceptable */
-        $this->checkDocumentIsAcceptable($interpreter, $request, $validators);
+        $this->checkExpectingDocument($request);
+        $this->checkDocumentIsAcceptable($request, $validators, $record);
     }
 
     /**
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
      * @param ValidatorProviderInterface $validators
      * @throws JsonApiException
      */
     protected function checkQueryParameters(
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request,
+        InboundRequestInterface $request,
         ValidatorProviderInterface $validators
     ) {
-        $checker = $this->queryChecker($validators, $interpreter);
+        $checker = $this->queryChecker($validators, $request);
         $checker->checkQuery($request->getParameters());
     }
 
+    /**
+     * @param InboundRequestInterface $request
+     * @return void
+     * @throws JsonApiException
+     * @todo throw if a document is expected, but none has been provided.
+     */
+    protected function checkExpectingDocument(InboundRequestInterface $request)
+    {
+    }
 
     /**
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
      * @param ValidatorProviderInterface $validators
+     * @param object|null $record
      * @throws JsonApiException
      */
     protected function checkDocumentIsAcceptable(
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request,
-        ValidatorProviderInterface $validators
+        InboundRequestInterface $request,
+        ValidatorProviderInterface $validators,
+        $record = null
     ) {
         if (!$document = $request->getDocument()) {
             return;
         }
 
-        $validator = $this->documentAcceptanceValidator($validators, $interpreter, $request);
+        $validator = $this->documentAcceptanceValidator($validators, $request, $record);
 
-        if ($validator && !$validator->isValid($document, $request->getRecord())) {
+        if ($validator && !$validator->isValid($document, $record)) {
             throw new ValidationException($validator->getErrors());
         }
     }
 
     /**
      * @param ValidatorProviderInterface $validators
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
+     * @param object|null $record
      * @return DocumentValidatorInterface|null
      */
     protected function documentAcceptanceValidator(
         ValidatorProviderInterface $validators,
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request
+        InboundRequestInterface $request,
+        $record = null
     ) {
-        $resourceId = $interpreter->getResourceId();
-        $relationshipName = $interpreter->getRelationshipName();
-        $record = $request->getRecord();
+        $resourceId = $request->getResourceId();
+        $relationshipName = $request->getRelationshipName();
 
         /** Create Resource */
-        if ($interpreter->isCreateResource()) {
+        if ($request->isCreateResource()) {
             return $validators->createResource();
         } /** Update Resource */
-        elseif ($interpreter->isUpdateResource()) {
+        elseif ($request->isUpdateResource()) {
             return $validators->updateResource($resourceId, $record);
         } /** Replace Relationship */
-        elseif ($interpreter->isModifyRelationship()) {
+        elseif ($request->isModifyRelationship()) {
             return $validators->modifyRelationship($resourceId, $relationshipName, $record);
         }
 
@@ -120,16 +132,16 @@ trait ValidatesRequests
 
     /**
      * @param ValidatorProviderInterface $validators
-     * @param RequestInterpreterInterface $interpreter
+     * @param InboundRequestInterface $request
      * @return QueryCheckerInterface
      */
-    protected function queryChecker(ValidatorProviderInterface $validators, RequestInterpreterInterface $interpreter)
+    protected function queryChecker(ValidatorProviderInterface $validators, InboundRequestInterface $request)
     {
-        if ($interpreter->isIndex()) {
+        if ($request->isIndex()) {
             return $validators->searchQueryChecker();
-        } elseif ($interpreter->isReadRelatedResource()) {
+        } elseif ($request->isReadRelatedResource()) {
             return $validators->searchRelatedQueryChecker();
-        } elseif ($interpreter->isRelationshipData()) {
+        } elseif ($request->hasRelationships()) {
             return $validators->searchRelationshipQueryChecker();
         }
 

@@ -20,7 +20,6 @@ namespace CloudCreativity\JsonApi\Http\Client;
 
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Factories\Factory;
 use Exception;
