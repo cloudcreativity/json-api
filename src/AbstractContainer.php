@@ -147,7 +147,8 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         if (!$this->resolver->isResourceType($resourceType)) {
-            throw new RuntimeException("Cannot create an adapter because $resourceType is not a valid resource type.");
+            $this->setCreatedAdapter($resourceType, null);
+            return null;
         }
 
         $className = $this->resolver->getAdapterByResourceType($resourceType);
@@ -185,7 +186,8 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         if (!$this->resolver->isResourceType($resourceType)) {
-            throw new RuntimeException("Cannot create validators because $resourceType is not a valid resource type.");
+            $this->setCreatedValidators($resourceType, null);
+            return null;
         }
 
         $className = $this->resolver->getValidatorsByResourceType($resourceType);
@@ -223,7 +225,8 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         if (!$this->resolver->isResourceType($resourceType)) {
-            throw new RuntimeException("Cannot create authorizer because $resourceType is not a valid resource type.");
+            $this->setCreatedAuthorizer($resourceType, null);
+            return null;
         }
 
         $className = $this->resolver->getAuthorizerByResourceType($resourceType);
@@ -282,7 +285,7 @@ abstract class AbstractContainer implements ContainerInterface
      */
     protected function hasCreatedAdapter($resourceType)
     {
-        return isset($this->createdAdapters[$resourceType]);
+        return array_key_exists($resourceType, $this->createdAdapters);
     }
 
     /**
@@ -296,10 +299,10 @@ abstract class AbstractContainer implements ContainerInterface
 
     /**
      * @param string $resourceType
-     * @param ResourceAdapterInterface $adapter
+     * @param ResourceAdapterInterface|null $adapter
      * @return void
      */
-    protected function setCreatedAdapter($resourceType, ResourceAdapterInterface $adapter)
+    protected function setCreatedAdapter($resourceType, ResourceAdapterInterface $adapter = null)
     {
         $this->createdAdapters[$resourceType] = $adapter;
     }

@@ -121,11 +121,15 @@ class AbstractContainerTest extends TestCase
         $this->container->getAdapterByResourceType('posts');
     }
 
+    /**
+     * If a resource type is not valid, we expect `null` to be returned for the adapter.
+     * This is so that we can detect an unknown resource type as we expect all known
+     * resource types to have adapters.
+     */
     public function testAdapterForInvalidResourceType()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('comments');
-        $this->container->getAdapterByResourceType('comments');
+        $this->container->expects($this->never())->method('create');
+        $this->assertNull($this->container->getAdapterByResourceType('comments'));
     }
 
     public function testAdapterIsNotAnAdapter()
@@ -172,9 +176,8 @@ class AbstractContainerTest extends TestCase
 
     public function testValidatorsForInvalidResourceType()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('comments');
-        $this->container->getValidatorsByResourceType('comments');
+        $this->container->expects($this->never())->method('create');
+        $this->assertNull($this->container->getValidatorsByResourceType('comments'));
     }
 
     public function testValidatorsAreNotValidators()
@@ -220,9 +223,8 @@ class AbstractContainerTest extends TestCase
 
     public function testAuthorizerForInvalidResourceType()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('comments');
-        $this->container->getAuthorizerByResourceType('comments');
+        $this->container->expects($this->never())->method('create');
+        $this->assertNull($this->container->getAuthorizerByResourceType('comments'));
     }
 
     public function testAuthorizerIsNotAuthorizer()
