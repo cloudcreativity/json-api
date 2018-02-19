@@ -22,6 +22,7 @@ use CloudCreativity\JsonApi\Contracts\Http\Requests\InboundRequestInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\DocumentValidatorInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\JsonApi\Exceptions\ValidationException;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -37,24 +38,30 @@ trait ValidatesRequests
     /**
      * @param InboundRequestInterface $request
      * @param StoreInterface $store
-     * @param ValidatorProviderInterface $validators
+     * @param ValidatorProviderInterface $resource
+     *      validators for the primary resource.
+     * @param ValidatorProviderInterface|null $related
+     *      validators for the related resource, if the request is for a relationship.
      * @return void
      * @throws JsonApiException
      */
-    protected function validate(
+    public function validate(
         InboundRequestInterface $request,
         StoreInterface $store,
-        ValidatorProviderInterface $validators
+        ValidatorProviderInterface $resource,
+        ValidatorProviderInterface $related = null
     ) {
         /** Check request parameters are acceptable */
-        $this->checkQueryParameters($request, $validators);
+        $this->checkQueryParameters(
+            $request,
+            !$request->getRelationshipName() ? $resource : $related
+        );
 
         $identifier = $request->getResourceIdentifier();
         $record = $identifier ? $store->findOrFail($identifier) : null;
 
         /** Check the document content is acceptable */
-        $this->checkExpectingDocument($request);
-        $this->checkDocumentIsAcceptable($request, $validators, $record);
+        $this->checkDocumentIsAcceptable($request, $resource, $record);
     }
 
     /**
@@ -72,16 +79,6 @@ trait ValidatesRequests
 
     /**
      * @param InboundRequestInterface $request
-     * @return void
-     * @throws JsonApiException
-     * @todo throw if a document is expected, but none has been provided.
-     */
-    protected function checkExpectingDocument(InboundRequestInterface $request)
-    {
-    }
-
-    /**
-     * @param InboundRequestInterface $request
      * @param ValidatorProviderInterface $validators
      * @param object|null $record
      * @throws JsonApiException
@@ -91,11 +88,12 @@ trait ValidatesRequests
         ValidatorProviderInterface $validators,
         $record = null
     ) {
-        if (!$document = $request->getDocument()) {
-            return;
-        }
-
         $validator = $this->documentAcceptanceValidator($validators, $request, $record);
+        $document = $request->getDocument();
+
+        if ($validator && !$document) {
+            throw new RuntimeException('Expecting there to be a document on inbound request. Has the request been parsed?');
+        }
 
         if ($validator && !$validator->isValid($document, $record)) {
             throw new ValidationException($validator->getErrors());
@@ -140,9 +138,9 @@ trait ValidatesRequests
         if ($request->isIndex()) {
             return $validators->searchQueryChecker();
         } elseif ($request->isReadRelatedResource()) {
-            return $validators->searchRelatedQueryChecker();
+            return $validators->relatedQueryChecker();
         } elseif ($request->hasRelationships()) {
-            return $validators->searchRelationshipQueryChecker();
+            return $validators->relationshipQueryChecker();
         }
 
         return $validators->resourceQueryChecker();

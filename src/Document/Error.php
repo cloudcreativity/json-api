@@ -103,7 +103,7 @@ class Error implements MutableErrorInterface
      * @param array|object $input
      * @return Error
      */
-    public static function create($input)
+    public static function create($input = [])
     {
         $error = new self();
         $error->exchangeArray((array) $input);
