@@ -18,10 +18,11 @@
 namespace CloudCreativity\JsonApi;
 
 use CloudCreativity\JsonApi\Contracts\Adapter\ResourceAdapterInterface;
+use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
 use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Resolver\ResolverInterface;
+use CloudCreativity\JsonApi\Contracts\Validators\ValidatorProviderInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
-use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaProviderInterface;
 
 /**
@@ -38,11 +39,6 @@ abstract class AbstractContainer implements ContainerInterface
     private $resolver;
 
     /**
-     * @var SchemaFactoryInterface
-     */
-    private $factory;
-
-    /**
      * @var array
      */
     private $createdSchemas = [];
@@ -53,13 +49,24 @@ abstract class AbstractContainer implements ContainerInterface
     private $createdAdapters = [];
 
     /**
-     * Create an instance of the specified
+     * @var array
+     */
+    private $createdValidators = [];
+
+    /**
+     * @var array
+     */
+    private $createdAuthorizers = [];
+
+    /**
+     * Create an instance of the specified class.
      *
      * For example, a framework specific implementation may choose to delegate this method
-     * to its service container.
+     * to its service container. If the class name is not creatable or does not exist,
+     * this method MUST return `null`.
      *
      * @param string $className
-     * @return mixed
+     * @return object|null
      */
     abstract protected function create($className);
 
@@ -67,12 +74,10 @@ abstract class AbstractContainer implements ContainerInterface
      * AbstractContainer constructor.
      *
      * @param ResolverInterface $resolver
-     * @param SchemaFactoryInterface $factory
      */
-    public function __construct(ResolverInterface $resolver, SchemaFactoryInterface $factory)
+    public function __construct(ResolverInterface $resolver)
     {
         $this->resolver = $resolver;
-        $this->factory = $factory;
     }
 
     /**
@@ -103,7 +108,7 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         if (!$this->resolver->isResourceType($resourceType)) {
-            return $this->createdSchemas[$resourceType] = null;
+            throw new RuntimeException("Cannot create a schema because $resourceType is not a valid resource type.");
         }
 
         $className = $this->resolver->getSchemaByResourceType($resourceType);
@@ -112,7 +117,6 @@ abstract class AbstractContainer implements ContainerInterface
 
         return $schema;
     }
-
 
     /**
      * @param $record
@@ -143,7 +147,7 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         if (!$this->resolver->isResourceType($resourceType)) {
-            return $this->createdAdapters[$resourceType] = null;
+            throw new RuntimeException("Cannot create an adapter because $resourceType is not a valid resource type.");
         }
 
         $className = $this->resolver->getAdapterByResourceType($resourceType);
@@ -154,12 +158,88 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getValidators($record)
+    {
+        return $this->getValidatorsByType(get_class($record));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValidatorsByType($type)
+    {
+        $resourceType = $this->resolver->getResourceType($type);
+
+        return $this->getValidatorsByResourceType($resourceType);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getValidatorsByResourceType($resourceType)
+    {
+        if ($this->hasCreatedValidators($resourceType)) {
+            return $this->getCreatedValidators($resourceType);
+        }
+
+        if (!$this->resolver->isResourceType($resourceType)) {
+            throw new RuntimeException("Cannot create validators because $resourceType is not a valid resource type.");
+        }
+
+        $className = $this->resolver->getValidatorsByResourceType($resourceType);
+        $validators = $this->createValidatorsFromClassName($className);
+        $this->setCreatedValidators($resourceType, $validators);
+
+        return $validators;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAuthorizer($record)
+    {
+        return $this->getAuthorizerByType(get_class($record));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAuthorizerByType($type)
+    {
+        $resourceType = $this->resolver->getResourceType($type);
+
+        return $this->getAuthorizerByResourceType($resourceType);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAuthorizerByResourceType($resourceType)
+    {
+        if ($this->hasCreatedAuthorizer($resourceType)) {
+            return $this->getCreatedAuthorizer($resourceType);
+        }
+
+        if (!$this->resolver->isResourceType($resourceType)) {
+            throw new RuntimeException("Cannot create authorizer because $resourceType is not a valid resource type.");
+        }
+
+        $className = $this->resolver->getAuthorizerByResourceType($resourceType);
+        $authorizer = $this->createAuthorizerFromClassName($className);
+        $this->setCreatedAuthorizer($resourceType, $authorizer);
+
+        return $authorizer;
+    }
+
+    /**
      * @param string $resourceType
      * @return bool
      */
     protected function hasCreatedSchema($resourceType)
     {
-        return array_key_exists($resourceType, $this->createdSchemas);
+        return isset($this->createdSchemas[$resourceType]);
     }
 
     /**
@@ -182,12 +262,27 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
+     * @param string $className
+     * @return SchemaProviderInterface
+     */
+    protected function createSchemaFromClassName($className)
+    {
+        $schema = $this->create($className);
+
+        if (!$schema instanceof SchemaProviderInterface) {
+            throw new RuntimeException("Class [$className] is not a schema provider.");
+        }
+
+        return $schema;
+    }
+
+    /**
      * @param string $resourceType
      * @return bool
      */
     protected function hasCreatedAdapter($resourceType)
     {
-        return array_key_exists($resourceType, $this->createdAdapters);
+        return isset($this->createdAdapters[$resourceType]);
     }
 
     /**
@@ -210,21 +305,6 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
-     * @param string $className
-     * @return SchemaProviderInterface
-     */
-    protected function createSchemaFromClassName($className)
-    {
-        $schema = $this->create($className);
-
-        if (!$schema instanceof SchemaProviderInterface) {
-            throw new RuntimeException("Class [$className] is not a schema provider.");
-        }
-
-        return $schema;
-    }
-
-    /**
      * @param $className
      * @return ResourceAdapterInterface
      */
@@ -237,6 +317,92 @@ abstract class AbstractContainer implements ContainerInterface
         }
 
         return $adapter;
+    }
+
+    /**
+     * @param string $resourceType
+     * @return bool
+     */
+    protected function hasCreatedValidators($resourceType)
+    {
+        return array_key_exists($resourceType, $this->createdValidators);
+    }
+
+    /**
+     * @param string $resourceType
+     * @return ValidatorProviderInterface|null
+     */
+    protected function getCreatedValidators($resourceType)
+    {
+        return $this->createdValidators[$resourceType];
+    }
+
+    /**
+     * @param string $resourceType
+     * @param ValidatorProviderInterface|null $validators
+     * @return void
+     */
+    protected function setCreatedValidators($resourceType, ValidatorProviderInterface $validators = null)
+    {
+        $this->createdValidators[$resourceType] = $validators;
+    }
+
+    /**
+     * @param $className
+     * @return ValidatorProviderInterface|null
+     */
+    protected function createValidatorsFromClassName($className)
+    {
+        $validators = $this->create($className);
+
+        if (!is_null($validators) && !$validators instanceof ValidatorProviderInterface) {
+            throw new RuntimeException("Class [$className] is not a resource validator provider.");
+        }
+
+        return $validators;
+    }
+
+    /**
+     * @param string $resourceType
+     * @return bool
+     */
+    protected function hasCreatedAuthorizer($resourceType)
+    {
+        return array_key_exists($resourceType, $this->createdAuthorizers);
+    }
+
+    /**
+     * @param string $resourceType
+     * @return ValidatorProviderInterface|null
+     */
+    protected function getCreatedAuthorizer($resourceType)
+    {
+        return $this->createdAuthorizers[$resourceType];
+    }
+
+    /**
+     * @param string $resourceType
+     * @param AuthorizerInterface|null $authorizer
+     * @return void
+     */
+    protected function setCreatedAuthorizer($resourceType, AuthorizerInterface $authorizer = null)
+    {
+        $this->createdAuthorizers[$resourceType] = $authorizer;
+    }
+
+    /**
+     * @param $className
+     * @return AuthorizerInterface|null
+     */
+    protected function createAuthorizerFromClassName($className)
+    {
+        $authorizer = $this->create($className);
+
+        if (!is_null($authorizer) && !$authorizer instanceof AuthorizerInterface) {
+            throw new RuntimeException("Class [$className] is not a resource authorizer.");
+        }
+
+        return $authorizer;
     }
 
 }
