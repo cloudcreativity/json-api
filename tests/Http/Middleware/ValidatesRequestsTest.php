@@ -56,6 +56,9 @@ class ValidatesRequestsTest extends TestCase
      */
     private $trait;
 
+    /**
+     * @return void
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -63,7 +66,6 @@ class ValidatesRequestsTest extends TestCase
         $this->queryChecker = $this->createMock(QueryCheckerInterface::class);
         $this->providers = $this->createMock(ValidatorProviderInterface::class);
         $this->validator = $this->createMock(DocumentValidatorInterface::class);
-        $this->inverse = $this->createMock(ValidatorProviderInterface::class);
         $this->record = new \stdClass();
         $this->trait = $this->getMockForTrait(ValidatesRequests::class);
     }
@@ -189,6 +191,25 @@ class ValidatesRequestsTest extends TestCase
 
         $this->withRecord()
             ->withRelatedQueryChecker('relatedQueryChecker')
+            ->willNotCheckDocument()
+            ->doValidate();
+    }
+
+    /**
+     * If no related query checker is provided, then the query parameters
+     * are not checked.
+     */
+    public function testReadRelatedWithoutRelatedQueryChecker()
+    {
+        $this->request = $this->factory->createInboundRequest(
+            'GET',
+            'posts',
+            '1',
+            'comments',
+            false
+        );
+
+        $this->withRecord()
             ->willNotCheckDocument()
             ->doValidate();
     }
@@ -357,6 +378,7 @@ class ValidatesRequestsTest extends TestCase
      */
     private function withRelatedQueryChecker($method)
     {
+        $this->inverse = $this->createMock(ValidatorProviderInterface::class);
         $this->inverse->expects($this->once())->method($method)->willReturn($this->queryChecker);
         $this->willCheckQuery();
 

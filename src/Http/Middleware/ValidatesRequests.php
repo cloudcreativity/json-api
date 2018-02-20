@@ -36,7 +36,24 @@ trait ValidatesRequests
 {
 
     /**
-     * @param InboundRequestInterface $request
+     * Validate the inbound request query parameters and JSON API document.
+     *
+     * JSON API query parameters are checked using the primary resource's validators
+     * if it is not a related resource request, or against the related resource's
+     * validators if it is a relationship request. This is because the query parameters
+     * for a relationship request actually relate to the related resource that will
+     * be returned in the encoded response.
+     *
+     * So for a request to `GET /posts/1`, the `posts` validators are provided as
+     * `$resource` and the query parameters are checked using this set of validators.
+     * For a request to `GET /posts/1/comments` the query parameters are checked
+     * against the `comments` validators, which are provided as `$related`.
+     *
+     * The JSON API document is always checked against the primary resource validators
+     * (`$resource`) because the inbound document always relates to this primary
+     * resource, even if modifying a relationship.
+     *
+     * @param InboundRequestInterface $inboundRequest
      * @param StoreInterface $store
      * @param ValidatorProviderInterface $resource
      *      validators for the primary resource.
@@ -46,22 +63,23 @@ trait ValidatesRequests
      * @throws JsonApiException
      */
     public function validate(
-        InboundRequestInterface $request,
+        InboundRequestInterface $inboundRequest,
         StoreInterface $store,
         ValidatorProviderInterface $resource,
         ValidatorProviderInterface $related = null
     ) {
-        /** Check request parameters are acceptable */
-        $this->checkQueryParameters(
-            $request,
-            !$request->getRelationshipName() ? $resource : $related
-        );
+        /** Check the JSON API query parameters */
+        if (!$inboundRequest->getRelationshipName()) {
+            $this->checkQueryParameters($inboundRequest, $resource);
+        } elseif ($related) {
+            $this->checkQueryParameters($inboundRequest, $related);
+        }
 
-        $identifier = $request->getResourceIdentifier();
+        $identifier = $inboundRequest->getResourceIdentifier();
         $record = $identifier ? $store->findOrFail($identifier) : null;
 
-        /** Check the document content is acceptable */
-        $this->checkDocumentIsAcceptable($request, $resource, $record);
+        /** Check the JSON API document is acceptable */
+        $this->checkDocumentIsAcceptable($inboundRequest, $resource, $record);
     }
 
     /**
