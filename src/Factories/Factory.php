@@ -21,14 +21,14 @@ namespace CloudCreativity\JsonApi\Factories;
 use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
 use CloudCreativity\JsonApi\Encoder\Encoder;
 use CloudCreativity\JsonApi\Http\Client\GuzzleClient;
 use CloudCreativity\JsonApi\Http\Query\ValidationQueryChecker;
-use CloudCreativity\JsonApi\Http\Requests\RequestFactory;
+use CloudCreativity\JsonApi\Http\Requests\InboundRequest;
 use CloudCreativity\JsonApi\Http\Responses\ErrorResponse;
 use CloudCreativity\JsonApi\Http\Responses\Response;
 use CloudCreativity\JsonApi\Object\Document;
@@ -40,12 +40,12 @@ use CloudCreativity\JsonApi\Utils\Replacer;
 use CloudCreativity\JsonApi\Validators\ValidatorErrorFactory;
 use CloudCreativity\JsonApi\Validators\ValidatorFactory;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
 use Psr\Http\Message\RequestInterface as PsrRequest;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
-use Psr\Http\Message\ServerRequestInterface;
 use function CloudCreativity\JsonApi\http_contains_body;
 use function CloudCreativity\JsonApi\json_decode;
 
@@ -77,17 +77,28 @@ class Factory extends BaseFactory implements FactoryInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function createRequest(
-        ServerRequestInterface $httpRequest,
-        RequestInterpreterInterface $intepreter,
-        StoreInterface $store
+    public function createInboundRequest(
+        $method,
+        $resourceType,
+        $resourceId = null,
+        $relationshipName = null,
+        $relationships = false,
+        DocumentInterface $document = null,
+        EncodingParametersInterface $parameters = null
     ) {
-        $requestFactory = new RequestFactory($this);
-
-        return $requestFactory->build($httpRequest, $intepreter, $store);
+        return new InboundRequest(
+            $method,
+            $resourceType,
+            $resourceId,
+            $relationshipName,
+            $relationships,
+            $document,
+            $parameters
+        );
     }
+
 
     /**
      * @inheritDoc

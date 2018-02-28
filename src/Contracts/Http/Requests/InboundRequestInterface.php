@@ -18,36 +18,60 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Http\Requests;
 
+use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
+
 /**
- * Interface RequestInterpreterInterface
+ * Interface ClientRequestInterface
  *
  * @package CloudCreativity\JsonApi
  */
-interface RequestInterpreterInterface
+interface InboundRequestInterface
 {
 
     /**
-     * What resource type is in the URI?
+     * What resource type does the request relate to?
      *
-     * @return string
+     * @return string|null
+     *      the requested resource type, or null if none was requested.
      */
     public function getResourceType();
 
     /**
-     * What resource id was sent by the client?
+     * What resource id does the request relate to?
      *
      * @return string|null
-     *      the resource id or null if none for the current request
      */
     public function getResourceId();
 
     /**
-     * What relationship name was sent by the client?
+     * Get the resource identifier for the request.
+     *
+     * @return ResourceIdentifierInterface|null
+     */
+    public function getResourceIdentifier();
+
+    /**
+     * What resource relationship does the request relate to?
      *
      * @return string|null
-     *      the relationship name or null if none for the current request
      */
     public function getRelationshipName();
+
+    /**
+     * Get the encoding parameters from the request.
+     *
+     * @return EncodingParametersInterface
+     */
+    public function getParameters();
+
+    /**
+     * Get the JSON API document from the request, if there is one.
+     *
+     * @return DocumentInterface|null
+     */
+    public function getDocument();
 
     /**
      * Is this an index request?
@@ -104,6 +128,19 @@ interface RequestInterpreterInterface
     public function isReadRelatedResource();
 
     /**
+     * Does the request URI have the 'relationships' keyword?
+     *
+     * E.g. `/posts/1/relationships/author` or `/posts/1/relationships/comments`
+     *
+     * I.e. the URL request contains the pattern `/relationships/` after the
+     * resource id and before the relationship name.
+     *
+     * @return bool
+     * @see http://jsonapi.org/format/#fetching-relationships
+     */
+    public function hasRelationships();
+
+    /**
      * Is this a request to read the data of a relationship?
      *
      * E.g. `GET /posts/1/relationships/author` or `GET /posts/1/relationships/comments`
@@ -147,30 +184,4 @@ interface RequestInterpreterInterface
      */
     public function isRemoveFromRelationship();
 
-    /**
-     * Is this a request for relationship data?
-     *
-     * E.g. `/posts/1/relationships/author` or `/posts/1/relationships/comments`
-     *
-     * I.e. the URL request contains the pattern `/relationships/` after the
-     * resource id and before the relationship name.
-     *
-     * @return bool
-     * @see http://jsonapi.org/format/#fetching-relationships
-     */
-    public function isRelationshipData();
-
-    /**
-     * Is this a request where we expect a document to be sent by the client?
-     *
-     * We expect a document from the client if this is a:
-     * - create resource request
-     * - update resource request
-     * - replace relationship request
-     * - add to relationship request
-     * - remove from relationship request
-     *
-     * @return bool
-     */
-    public function isExpectingDocument();
 }

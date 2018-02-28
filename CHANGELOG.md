@@ -7,9 +7,14 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 - Adapter class now handles reading and modifying domain records.
 - Adapter class has been split into resource and relationship adapters.
+- Methods previously available on the request interpreter interface have been added to the request interface.
+- The request interface has been renamed to 'inbound request' to make it clearer that it represents a JSON API
+request inbound to a server from a client.
+- Middleware traits have been updated to reflect the changes to the inbound request interface.
 
 ### Removed
 - Hydrators have been removed as a result of the adapter changes described above.
+- The request interpreter interface and classes have been remeoved as a result of the above changes.
 
 ### Fixed
 

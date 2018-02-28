@@ -19,8 +19,8 @@
 namespace CloudCreativity\JsonApi\Http\Middleware;
 
 use CloudCreativity\JsonApi\Contracts\Authorizer\AuthorizerInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\InboundRequestInterface;
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Exceptions\AuthorizationException;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
 
@@ -35,17 +35,17 @@ trait AuthorizesRequests
     /**
      * Authorize the request or throw an exception
      *
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
+     * @param StoreInterface $store
      * @param AuthorizerInterface $authorizer
      * @throws AuthorizationException
      */
     protected function authorize(
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request,
+        InboundRequestInterface $request,
+        StoreInterface $store,
         AuthorizerInterface $authorizer
     ) {
-        $result = $this->checkAuthorization($interpreter, $request, $authorizer);
+        $result = $this->checkAuthorization($request, $store, $authorizer);
 
         if (true !== $result) {
             throw new AuthorizationException($result);
@@ -53,56 +53,56 @@ trait AuthorizesRequests
     }
 
     /**
-     * @param RequestInterpreterInterface $interpreter
-     * @param RequestInterface $request
+     * @param InboundRequestInterface $request
+     * @param StoreInterface $store
      * @param AuthorizerInterface $authorizer
      * @return ErrorCollection|bool
      *      errors if the request is not authorized, true if authorized.
      */
     protected function checkAuthorization(
-        RequestInterpreterInterface $interpreter,
-        RequestInterface $request,
+        InboundRequestInterface $request,
+        StoreInterface $store,
         AuthorizerInterface $authorizer
     ) {
         $parameters = $request->getParameters();
         $document = $request->getDocument();
-        $resourceType = $request->getResourceType();
-        $record = $request->getRecord();
+        $identifier = $request->getResourceIdentifier();
+        $record = $identifier ? $store->findOrFail($identifier) : null;
         $authorized = true;
 
         /** Index */
-        if ($interpreter->isIndex()) {
-            $authorized = $authorizer->canReadMany($resourceType, $parameters);
+        if ($request->isIndex()) {
+            $authorized = $authorizer->canReadMany($request->getResourceType(), $parameters);
         } /** Create Resource */
-        elseif ($interpreter->isCreateResource()) {
-            $authorized = $authorizer->canCreate($resourceType, $document->getResource(), $parameters);
+        elseif ($request->isCreateResource()) {
+            $authorized = $authorizer->canCreate($request->getResourceType(), $document->getResource(), $parameters);
         } /** Read Resource */
-        elseif ($interpreter->isReadResource()) {
+        elseif ($request->isReadResource()) {
             $authorized = $authorizer->canRead($record, $parameters);
         } /** Update Resource */
-        elseif ($interpreter->isUpdateResource()) {
+        elseif ($request->isUpdateResource()) {
             $authorized = $authorizer->canUpdate($record, $document->getResource(), $parameters);
         } /** Delete Resource */
-        elseif ($interpreter->isDeleteResource()) {
+        elseif ($request->isDeleteResource()) {
             $authorized = $authorizer->canDelete($record, $parameters);
         } /** Read Related Resource */
-        elseif ($interpreter->isReadRelatedResource()) {
+        elseif ($request->isReadRelatedResource()) {
             $authorized = $authorizer->canReadRelatedResource(
-                $interpreter->getRelationshipName(),
+                $request->getRelationshipName(),
                 $record,
                 $parameters
             );
         } /** Read Relationship Data */
-        elseif ($interpreter->isReadRelationship()) {
+        elseif ($request->isReadRelationship()) {
             $authorized = $authorizer->canReadRelationship(
-                $interpreter->getRelationshipName(),
+                $request->getRelationshipName(),
                 $record,
                 $parameters
             );
         } /** Modify Relationship Data */
-        elseif ($interpreter->isModifyRelationship()) {
+        elseif ($request->isModifyRelationship()) {
             $authorized = $authorizer->canModifyRelationship(
-                $interpreter->getRelationshipName(),
+                $request->getRelationshipName(),
                 $record,
                 $document->getRelationship(),
                 $parameters
