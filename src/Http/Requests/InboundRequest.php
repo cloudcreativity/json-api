@@ -159,7 +159,7 @@ class InboundRequest implements InboundRequestInterface
      */
     public function getDocument()
     {
-        return $this->document;
+        return $this->document ? clone $this->document : null;
     }
 
     /**

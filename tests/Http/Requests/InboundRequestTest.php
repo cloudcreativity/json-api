@@ -116,17 +116,27 @@ class InboundRequestTest extends TestCase
 
     public function testDocumentAndParameters()
     {
+        $document = new Document((object) [
+            'data' => (object) [
+                'type' => 'posts',
+                'attributes' => (object) [
+                    'title' => 'My First Post',
+                ],
+            ],
+        ]);
+
         $request = $this->factory->createInboundRequest(
             'POST',
             'posts',
             '1',
             null,
             false,
-            $document = new Document(),
+            $document,
             $params = new EncodingParameters()
         );
 
-        $this->assertSame($document, $request->getDocument());
+        $this->assertEquals($document, $request->getDocument());
+        $this->assertNotSame($document, $request->getDocument());
         $this->assertSame($params, $request->getParameters());
     }
 
