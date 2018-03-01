@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Contracts\Http\Requests\InboundRequestInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Object\ResourceIdentifier;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -29,7 +29,7 @@ use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
  *
  * @package CloudCreativity\JsonApi
  */
-class InboundRequest implements InboundRequestInterface
+class InboundRequest implements RequestInterface
 {
 
     /**

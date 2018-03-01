@@ -14,7 +14,10 @@ request inbound to a server from a client.
 
 ### Removed
 - Hydrators have been removed as a result of the adapter changes described above.
-- The request interpreter interface and classes have been remeoved as a result of the above changes.
+- The request interpreter interface and classes have been removed as a result of the above changes.
+
+### Deprecated
+- The request interface has been deprecated in favour of the inbound request interface.
 
 ### Fixed
 
