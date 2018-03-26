@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Object;
 
+use CloudCreativity\JsonApi\Contracts\Object\RelationshipInterface;
 use CloudCreativity\JsonApi\Contracts\Object\ResourceObjectInterface;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\Utils\Object\StandardObject;
@@ -84,6 +85,16 @@ class ResourceObject extends StandardObject implements ResourceObjectInterface
     public function hasRelationships()
     {
         return $this->has(self::RELATIONSHIPS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRelationship($key)
+    {
+        $relationships = $this->getRelationships();
+
+        return $relationships->has($key) ? $relationships->getRelationship($key) : null;
     }
 
 }

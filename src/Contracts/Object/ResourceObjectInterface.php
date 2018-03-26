@@ -90,4 +90,14 @@ interface ResourceObjectInterface extends StandardObjectInterface, MetaMemberInt
      */
     public function hasRelationships();
 
+    /**
+     * Get a relationship object by its key.
+     *
+     * @param string $key
+     * @return RelationshipInterface|null
+     *      the relationship object or null if it is not present.
+     * @throws RuntimeException
+     */
+    public function getRelationship($key);
+
 }
