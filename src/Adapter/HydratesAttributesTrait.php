@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Hydrator;
+namespace CloudCreativity\JsonApi\Adapter;
 
+use CloudCreativity\JsonApi\Utils\Str;
 use CloudCreativity\Utils\Object\StandardObjectInterface;
 use DateTime;
 
@@ -41,10 +42,10 @@ trait HydratesAttributesTrait
     abstract protected function hydrateAttribute($record, $attrKey, $value);
 
     /**
-     * @param StandardObjectInterface $attributes
      * @param object $record
+     * @param StandardObjectInterface $attributes
      */
-    protected function hydrateAttributes(StandardObjectInterface $attributes, $record)
+    protected function hydrateAttributes($record, StandardObjectInterface $attributes)
     {
         foreach ($this->attributeKeys($attributes, $record) as $resourceKey => $attrKey) {
             if (is_numeric($resourceKey)) {
@@ -57,7 +58,10 @@ trait HydratesAttributesTrait
             }
 
             $deserialized = $this->deserializeAttribute($attributes->get($resourceKey), $resourceKey);
-            $this->hydrateAttribute($record, $attrKey, $deserialized);
+
+            if (!$this->callMethodForField($resourceKey, $record, $deserialized)) {
+                $this->hydrateAttribute($record, $attrKey, $deserialized);
+            }
         }
     }
 
@@ -128,4 +132,38 @@ trait HydratesAttributesTrait
 
         return in_array($resourceKey, $dates, true);
     }
+
+
+    /**
+     * Get the method name for hydrating a field.
+     *
+     * @param $fieldName
+     * @return string
+     */
+    protected function methodForField($fieldName)
+    {
+        return 'hydrate' . Str::classify($fieldName) . 'Field';
+    }
+
+    /**
+     * Call a method for a resource's field, if it exists.
+     *
+     * @param $fieldName
+     * @param array ...$arguments
+     * @return bool
+     *      whether a method was invoked.
+     */
+    protected function callMethodForField($fieldName, ...$arguments)
+    {
+        $method = $this->methodForField($fieldName);
+
+        if (!method_exists($this, $method)) {
+            return false;
+        }
+
+        call_user_func_array([$this, $method], $arguments);
+
+        return true;
+    }
+
 }

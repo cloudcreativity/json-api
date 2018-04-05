@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2017 Cloud Creativity Limited
  *
@@ -16,21 +15,42 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Contracts\Store;
+namespace CloudCreativity\JsonApi\Store;
+
+use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
+use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 
 /**
- * Interface AdapterContainerInterface
+ * Trait StoreAwareTrait
  *
  * @package CloudCreativity\JsonApi
  */
-interface ContainerInterface
+trait StoreAwareTrait
 {
 
     /**
-     * @param string $resourceType
-     * @return AdapterInterface|null
-     *      the resource type's adapter, or null if no adapter exists.
+     * @var StoreInterface|null
      */
-    public function getAdapterByResourceType($resourceType);
+    private $store;
 
+    /**
+     * @param StoreInterface $store
+     * @return void
+     */
+    public function withStore(StoreInterface $store)
+    {
+        $this->store = $store;
+    }
+
+    /**
+     * @return StoreInterface
+     */
+    protected function store()
+    {
+        if (!$this->store) {
+            throw new RuntimeException('No store injected.');
+        }
+
+        return $this->store;
+    }
 }

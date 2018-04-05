@@ -61,10 +61,43 @@ interface ValidatorProviderInterface
     public function modifyRelationship($resourceId, $relationshipName, $record);
 
     /**
-     * Get a query checker for the specified resource type.
+     * Get a query checker for the resource when it appears as the primary resource.
+     *
+     * E.g. a request to `/posts/1`, this method will be invoked on the validators
+     * for the `posts` resource.
      *
      * @return QueryCheckerInterface
      */
-    public function queryChecker();
+    public function resourceQueryChecker();
+
+    /**
+     * Get a query checker for searching resources as primary data.
+     *
+     * I.e. a `GET /posts` request, this method will be invoked on the validators
+     * for the `posts` resource.
+     *
+     * @return QueryCheckerInterface
+     */
+    public function searchQueryChecker();
+
+    /**
+     * Get a query checker for the resource when it appears as a related resource.
+     *
+     * E.g. a `GET /posts/1/comments` request, this method will be invoked on the
+     * validators for the `comments` resource.
+     *
+     * @return QueryCheckerInterface
+     */
+    public function relatedQueryChecker();
+
+    /**
+     * Get a query check for the resource when it appears as relationship data.
+     *
+     * E.g. a `GET /posts/1/relationships/comments`, this method will be invoked
+     * on the validators for the `comments` resource.
+     *
+     * @return QueryCheckerInterface
+     */
+    public function relationshipQueryChecker();
 
 }

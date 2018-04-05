@@ -18,15 +18,14 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Factories;
 
+use CloudCreativity\JsonApi\Contracts\ContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Encoder\SerializerInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Client\ClientInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterface;
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Http\Requests\InboundRequestInterface;
 use CloudCreativity\JsonApi\Contracts\Http\Responses\ResponseInterface;
 use CloudCreativity\JsonApi\Contracts\Object\DocumentInterface;
 use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
 use CloudCreativity\JsonApi\Contracts\Repositories\ErrorRepositoryInterface;
-use CloudCreativity\JsonApi\Contracts\Store\ContainerInterface as AdapterContainerInterface;
 use CloudCreativity\JsonApi\Contracts\Store\StoreInterface;
 use CloudCreativity\JsonApi\Contracts\Utils\ReplacerInterface;
 use CloudCreativity\JsonApi\Contracts\Validators\QueryValidatorInterface;
@@ -34,14 +33,14 @@ use CloudCreativity\JsonApi\Contracts\Validators\ValidatorFactoryInterface;
 use Neomerx\JsonApi\Contracts\Codec\CodecMatcherInterface;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryCheckerInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface as SchemaContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface as PsrRequest;
 use Psr\Http\Message\ResponseInterface as PsrResponse;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Interface FactoryInterface
@@ -62,29 +61,35 @@ interface FactoryInterface extends BaseFactoryInterface
     public function createSerializer(SchemaContainerInterface $container, EncoderOptions $encoderOptions = null);
 
     /**
-     * Create a JSON API request object from a PSR server request.
+     * Create an inbound request object from the supplied parameters.
      *
-     * @param ServerRequestInterface $httpRequest
-     *      the inbound HTTP request
-     * @param RequestInterpreterInterface $interpreter
-     *      the interpreter to analyze the request
-     * @param StoreInterface $store
-     *      the store that the request relates to.
-     * @return RequestInterface
+     * @param $method
+     * @param $resourceType
+     * @param null $resourceId
+     * @param null $relationshipName
+     * @param bool $relationships
+     * @param DocumentInterface|null $document
+     * @param EncodingParametersInterface|null $parameters
+     * @return InboundRequestInterface
      */
-    public function createRequest(
-        ServerRequestInterface $httpRequest,
-        RequestInterpreterInterface $interpreter,
-        StoreInterface $store
+    public function createInboundRequest(
+        $method,
+        $resourceType,
+        $resourceId = null,
+        $relationshipName = null,
+        $relationships = false,
+        DocumentInterface $document = null,
+        EncodingParametersInterface $parameters = null
     );
 
     /**
      * Create a JSON API response object from a PSR response.
      *
+     * @param PsrRequest $request
      * @param PsrResponse $response
      * @return ResponseInterface
      */
-    public function createResponse(PsrResponse $response);
+    public function createResponse(PsrRequest $request, PsrResponse $response);
 
     /**
      * Create an error response object.
@@ -98,11 +103,12 @@ interface FactoryInterface extends BaseFactoryInterface
     /**
      * Create a JSON API document from a HTTP message.
      *
-     * @param MessageInterface $message
+     * @param PsrRequest $request
+     * @param PsrResponse $response
      * @return DocumentInterface|null
      *      the document, or null if the message does not contain body content.
      */
-    public function createDocumentObject(MessageInterface $message);
+    public function createDocumentObject(PsrRequest $request, PsrResponse $response = null);
 
     /**
      * @param mixed $httpClient
@@ -124,16 +130,12 @@ interface FactoryInterface extends BaseFactoryInterface
     public function createConfiguredCodecMatcher(SchemaContainerInterface $schemas, array $codecs, $urlPrefix = null);
 
     /**
-     * @param AdapterContainerInterface $adapters
+     * Create a store.
+     *
+     * @param ContainerInterface $container
      * @return StoreInterface
      */
-    public function createStore(AdapterContainerInterface $adapters);
-
-    /**
-     * @param array $adapters
-     * @return AdapterContainerInterface
-     */
-    public function createAdapterContainer(array $adapters);
+    public function createStore(ContainerInterface $container);
 
     /**
      * @param array $errors

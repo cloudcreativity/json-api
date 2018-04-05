@@ -2,6 +2,31 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.12.0] - 2018-04-05
+
+### Changed
+- Adapter class now handles reading and modifying domain records.
+- Adapter class has been split into resource and relationship adapters.
+- Methods previously available on the request interpreter interface have been added to the request interface.
+- The request interface has been renamed to 'inbound request' to make it clearer that it represents a JSON API
+request inbound to a server from a client.
+- Middleware traits have been updated to reflect the changes to the inbound request interface.
+
+### Removed
+- Hydrators have been removed as a result of the adapter changes described above.
+- The request interpreter interface and classes have been removed as a result of the above changes.
+
+### Deprecated
+- The request interface has been deprecated in favour of the inbound request interface.
+
+### Fixed
+
+- [37](https://github.com/cloudcreativity/json-api/issues/37) Correctly detect message body in a HTTP response.
+
+### Deprecated
+
+- The JSON API request interface's `getRecord()` method has been deprecated.
+
 ## [0.11.0] - 2017-09-02
 
 ### Removed

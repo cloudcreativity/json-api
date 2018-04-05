@@ -18,90 +18,126 @@
 
 namespace CloudCreativity\JsonApi\Http\Requests;
 
-use CloudCreativity\JsonApi\Contracts\Http\Requests\RequestInterpreterInterface;
+use CloudCreativity\JsonApi\Contracts\Object\ResourceIdentifierInterface;
+use CloudCreativity\JsonApi\Object\Document;
 use CloudCreativity\JsonApi\TestCase;
+use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 
 /**
  * Class RequestTest
  *
  * @package CloudCreativity\JsonApi
  */
-class RequestInterpreterTest extends TestCase
+class InboundRequestTest extends TestCase
 {
 
     /**
-     * @var RequestInterpreterInterface
+     * @var InboundRequest
      */
     private $request;
 
     public function testIsIndex()
     {
         $this->willSee('GET')
-            ->assertRequestType('index')
-            ->assertDocumentNotExpected();
+            ->assertRequestType('index');
+
+        $this->assertSame('posts', $this->request->getResourceType());
+        $this->assertNull($this->request->getResourceId());
+        $this->assertNull($this->request->getResourceIdentifier());
+        $this->assertNull($this->request->getRelationshipName());
+        $this->assertFalse($this->request->hasRelationships());
+        $this->assertNull($this->request->getDocument());
+        $this->assertEquals($this->factory->createQueryParameters(), $this->request->getParameters());
     }
 
     public function testIsCreateResource()
     {
         $this->willSee('POST')
-            ->assertRequestType('createResource')
-            ->assertDocumentExpected();
+            ->assertRequestType('createResource');
     }
 
     public function testIsReadResource()
     {
         $this->willSee('GET', '1')
-            ->assertRequestType('readResource')
-            ->assertDocumentNotExpected();
+            ->assertRequestType('readResource');
+
+        $this->assertSame('1', $this->request->getResourceId());
+        $this->assertInstanceOf(
+            ResourceIdentifierInterface::class,
+            $identifier = $this->request->getResourceIdentifier()
+        );
+        $this->assertSame('posts', $identifier->getType());
+        $this->assertSame('1', $identifier->getId());
     }
 
     public function testIsUpdateResource()
     {
         $this->willSee('PATCH', '1')
-            ->assertRequestType('updateResource')
-            ->assertDocumentExpected();
+            ->assertRequestType('updateResource');
     }
 
     public function testIsDeleteResource()
     {
         $this->willSee('DELETE', '1')
-            ->assertRequestType('deleteResource')
-            ->assertDocumentNotExpected();
+            ->assertRequestType('deleteResource');
     }
 
     public function testIsReadRelatedResource()
     {
         $this->willSee('GET', '1', 'comments')
-            ->assertRequestType('readRelatedResource')
-            ->assertDocumentNotExpected();
+            ->assertRequestType('readRelatedResource');
     }
 
     public function testIsReadRelationship()
     {
         $this->willSee('GET', '1', 'comments', true)
-            ->assertRequestType('readRelationship')
-            ->assertDocumentNotExpected();
+            ->assertRequestType('readRelationship');
+
+        $this->assertTrue($this->request->hasRelationships());
     }
 
     public function testIsReplaceRelationship()
     {
         $this->willSee('PATCH', '1', 'comments', true)
-            ->assertRequestType('replaceRelationship')
-            ->assertDocumentExpected();
+            ->assertRequestType('replaceRelationship');
     }
 
     public function testIsAddToRelationship()
     {
         $this->willSee('POST', '1', 'comments', true)
-            ->assertRequestType('addToRelationship')
-            ->assertDocumentExpected();
+            ->assertRequestType('addToRelationship');
     }
 
     public function testIsRemoveFromRelationship()
     {
         $this->willSee('DELETE', '1', 'comments', true)
-            ->assertRequestType('removeFromRelationship')
-            ->assertDocumentExpected();
+            ->assertRequestType('removeFromRelationship');
+    }
+
+    public function testDocumentAndParameters()
+    {
+        $document = new Document((object) [
+            'data' => (object) [
+                'type' => 'posts',
+                'attributes' => (object) [
+                    'title' => 'My First Post',
+                ],
+            ],
+        ]);
+
+        $request = $this->factory->createInboundRequest(
+            'POST',
+            'posts',
+            '1',
+            null,
+            false,
+            $document,
+            $params = new EncodingParameters()
+        );
+
+        $this->assertEquals($document, $request->getDocument());
+        $this->assertNotSame($document, $request->getDocument());
+        $this->assertSame($params, $request->getParameters());
     }
 
     /**
@@ -136,45 +172,21 @@ class RequestInterpreterTest extends TestCase
     }
 
     /**
-     * @return $this
-     */
-    private function assertDocumentExpected()
-    {
-        $this->assertTrue($this->request->isExpectingDocument(), 'Document should be expected');
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    private function assertDocumentNotExpected()
-    {
-        $this->assertFalse($this->request->isExpectingDocument(), 'Document should not be expected');
-
-        return $this;
-    }
-
-    /**
      * @param string $method
      * @param string|null $resourceId
      * @param string|null $relationshipName
-     * @param bool $relationshipData
+     * @param bool $relationships
      * @return $this
      */
-    private function willSee($method, $resourceId = null, $relationshipName = null, $relationshipData = false)
+    private function willSee($method, $resourceId = null, $relationshipName = null, $relationships = false)
     {
-        $mock = $this->getMockForAbstractClass(AbstractRequestInterpreter::class);
-
-        $mock->method('isMethod')->willReturnCallback(function ($m) use ($method) {
-            return strtolower($method) === strtolower($m);
-        });
-
-        $mock->method('getResourceId')->willReturn($resourceId);
-        $mock->method('getRelationshipName')->willReturn($relationshipName);
-        $mock->method('isRelationshipData')->willReturn($relationshipData);
-
-        $this->request = $mock;
+        $this->request = $this->factory->createInboundRequest(
+           $method,
+           'posts',
+           $resourceId,
+           $relationshipName,
+           $relationships
+        );
 
         return $this;
     }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2017 Cloud Creativity Limited
  *
@@ -18,14 +17,19 @@
 
 namespace CloudCreativity\JsonApi\Contracts\Store;
 
-use CloudCreativity\JsonApi\Contracts\Adapter\ResourceAdapterInterface;
-
 /**
- * Interface AdapterInterface
+ * Interface StoreAwareInterface
  *
  * @package CloudCreativity\JsonApi
- * @deprecated extend `ResourceAdapterInterface` directly.
  */
-interface AdapterInterface extends ResourceAdapterInterface
+interface StoreAwareInterface
 {
+
+    /**
+     * Inject the JSON API store.
+     *
+     * @param StoreInterface $store
+     * @return void
+     */
+    public function withStore(StoreInterface $store);
 }
